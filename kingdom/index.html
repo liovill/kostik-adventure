@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -370,7 +370,7 @@ canvas {
     </div>
 
     <!-- Hint text (tablet only, hidden on small phones) -->
-    <div class="touch-hint">SPACE=Dash<br>Z/X=Attack<br>(keyboard too)</div>
+    <div class="touch-hint">🧭 Иди<br>⚔️ Сражайся</div>
 
     <!-- Action buttons -->
     <div id="actionBtns">
@@ -1152,22 +1152,18 @@ function drawStart(t){
   for(let i=0;i<3;i++){const ag=ctx.createLinearGradient(0,60+i*20,W,80+i*20);ag.addColorStop(0,'rgba(0,0,0,0)');ag.addColorStop(0.4+Math.sin(t*0.4+i)*0.15,`rgba(80,200,${100+i*40},${0.07+0.03*Math.sin(t+i)})`);ag.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=ag;ctx.fillRect(0,40+i*25,W,40);}
   ctx.fillStyle='#1a3a20';ctx.beginPath();ctx.moveTo(0,H);ctx.bezierCurveTo(80,H-70,180,H-40,W/2,H-55);ctx.bezierCurveTo(W*0.65,H-70,W*0.8,H-90,W,H-50);ctx.lineTo(W,H);ctx.closePath();ctx.fill();
   for(let tx2=20;tx2<W;tx2+=60){ctx.fillStyle='#0f2010';ctx.fillRect(tx2+8,H-35-5,6,12);ctx.fillStyle='#1a3818';ctx.fillRect(tx2+2,H-35-8,18,8);ctx.fillStyle='#225020';ctx.fillRect(tx2+4,H-35-14,14,8);ctx.fillStyle='#2a6028';ctx.fillRect(tx2+6,H-35-19,10,7);}
-  ctx.font='bold 28px Courier New';ctx.fillStyle='rgba(255,160,0,0.15)';ctx.fillText('SOLSTICE VALLEY',W/2-100,83);
-  const tg=ctx.createLinearGradient(W/2-100,0,W/2+100,0);tg.addColorStop(0,'#ff9940');tg.addColorStop(0.4,'#ffdd80');tg.addColorStop(0.7,'#ffffff');tg.addColorStop(1,'#aaddff');ctx.fillStyle=tg;ctx.fillText('SOLSTICE VALLEY',W/2-100,82);
-  ctx.font='8px Courier New';ctx.fillStyle='#bb88ff';ctx.fillText('✦ An Adventure of Light & Shadow ✦',W/2-92,98);
-  ctx.fillStyle='rgba(10,5,25,0.78)';ctx.strokeStyle='rgba(180,120,255,0.35)';ctx.lineWidth=1;ctx.beginPath();ctx.roundRect(W/2-118,110,236,88,5);ctx.fill();ctx.stroke();
-  const touch=isMobileUI()||isTabletUI();
-  const ctrl=touch?[['D-PAD','Move'],['УДАР btn','Strike (combo!)'],['РЫВОК btn','Dodge (invincible)'],['Walk near NPC','Auto-talk']]:
-                   [['WASD / Arrows','Move'],['Z or X','Attack (combo!)'],['SPACE','Dash (invincible)'],['Walk near NPC','Auto-talk']];
-  ctx.font='8px Courier New';
-  ctrl.forEach(([k,v],i)=>{ctx.fillStyle='#ffee80';ctx.fillText(k,W/2-110,128+i*13);ctx.fillStyle='#ccbbff';ctx.fillText(v,W/2+10,128+i*13);});
-  ctx.font='8px Courier New';ctx.fillStyle='#88ddff';ctx.fillText('Goal: Sun ☀ + Moon ☽ fragments → defeat Shadow Boss',W/2-138,213);
-  if(Math.floor(t*2)%2===0){
-    const prompt=touch?'— TAP SCREEN or УДАР to Begin —':'— SPACE or ENTER to Begin —';
-    ctx.font='bold 10px Courier New';const pw=ctx.measureText(prompt).width;
-    const pgg=ctx.createLinearGradient(W/2-pw/2,0,W/2+pw/2,0);pgg.addColorStop(0,'#ff88aa');pgg.addColorStop(0.5,'#ffffff');pgg.addColorStop(1,'#88aaff');ctx.fillStyle=pgg;ctx.fillText(prompt,W/2-pw/2,238);
-  }
-  ctx.font='7px Courier New';ctx.fillStyle='rgba(100,80,140,0.55)';ctx.fillText('June Solstice Game Jam 2026',W/2-67,310);
+  ctx.textAlign='center';
+  ctx.font='bold 23px Arial';ctx.fillStyle='#ffe38d';ctx.fillText('КОСТИК И КИРИЛЛ',W/2,75);
+  ctx.font='bold 18px Arial';ctx.fillStyle='#ffffff';ctx.fillText('ДРАКОНЬЕ КОРОЛЕВСТВО',W/2,99);
+  ctx.fillStyle='rgba(10,5,25,0.85)';ctx.strokeStyle='#b67bff';ctx.lineWidth=1.5;ctx.beginPath();ctx.roundRect(95,115,290,102,8);ctx.fill();ctx.stroke();
+  ctx.font='13px Arial';ctx.fillStyle='#f9e8ff';
+  ctx.fillText('🕹️ Стрелки: движение',W/2,137);
+  ctx.fillText('⚔️ Удар: побеждай врагов',W/2,157);
+  ctx.fillText('💨 Рывок: уклоняйся',W/2,177);
+  ctx.fillText('✨ Собирай магические осколки',W/2,197);
+  if(Math.floor(t*2)%2===0){ctx.font='bold 16px Arial';ctx.fillStyle='#ffde85';ctx.fillText('НАЖМИ НА ЭКРАН, ЧТОБЫ ИГРАТЬ',W/2,245);}
+  ctx.font='10px Arial';ctx.fillStyle='#a99ac1';ctx.fillText('По мотивам Solstice Valley · Debb1ie',W/2,309);
+  ctx.textAlign='left';
 }
 
 function drawOver(t){

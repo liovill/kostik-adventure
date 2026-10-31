@@ -320,10 +320,10 @@ canvas {
 #topBar   { display: none; }
 #hud      { display: none; }
 #questBox { display: none; }
-</style>
+@media(max-width:520px){#shell{justify-content:flex-start;padding-top:58px;padding-bottom:env(safe-area-inset-bottom,0px)}#touchUI{margin-top:10px;padding:12px 12px 18px;min-height:168px}#topBar{min-height:35px}.dpad-btn{font-size:23px}.act-btn span.lbl{font-size:10px}#dialogue{font-size:12px;max-width:94%}#notify{font-size:12px}#kostikHome{top:calc(env(safe-area-inset-top,0px) + 4px)!important}} </style>
 </head>
 <body>
-<!-- Adapted from Костик и Кирилл by Debb1ie, https://github.com/Debb1ie/Soltice-Valley-Drop ; source README states MIT license. Retain original attribution. -->
+<!-- Adapted from Solstice Valley by Debb1ie, https://github.com/Debb1ie/Soltice-Valley-Drop ; source README states MIT license. Retain original attribution. -->
 <div id="kostikHome" style="position:fixed;z-index:99999;top:env(safe-area-inset-top, 4px);left:6px"><a href="../" style="display:inline-block;padding:7px 10px;background:#17354e;color:white;border:2px solid #f7dc82;border-radius:10px;text-decoration:none;font:700 13px system-ui">🏠 Игры</a></div>
 <div id="shell">
 
@@ -347,7 +347,7 @@ canvas {
         <div class="h-ctrl"   id="hudCtrl"></div>
       </div>
       <div id="questBox">
-        <div class="qt">📜 Quest</div>
+        <div class="qt">📜 Задание</div>
         <div id="questText"></div>
       </div>
       <div id="dialogue">
@@ -375,8 +375,8 @@ canvas {
     <!-- Action buttons -->
     <div id="actionBtns">
       <div class="act-row">
-        <div class="act-btn" id="btn-dash"   data-action="dash">💨<span class="lbl">Dash</span></div>
-        <div class="act-btn" id="btn-attack" data-action="attack">⚔️<span class="lbl">Attack</span></div>
+        <div class="act-btn" id="btn-dash"   data-action="dash">💨<span class="lbl">Рывок</span></div>
+        <div class="act-btn" id="btn-attack" data-action="attack">⚔️<span class="lbl">Удар</span></div>
       </div>
     </div>
   </div>
@@ -429,16 +429,16 @@ function applyResponsiveLayout(){
     topBar.style.display   = 'flex';
     hud.style.display      = 'none';
     questBox.style.display = 'none';
-    document.documentElement.style.setProperty('--touch-btn-size','48px');
-    document.documentElement.style.setProperty('--dpad-btn-size','34px');
+    document.documentElement.style.setProperty('--touch-btn-size','68px');
+    document.documentElement.style.setProperty('--dpad-btn-size','52px');
     if(window.innerWidth <= 360){
-      document.documentElement.style.setProperty('--touch-btn-size','42px');
-      document.documentElement.style.setProperty('--dpad-btn-size','30px');
+      document.documentElement.style.setProperty('--touch-btn-size','60px');
+      document.documentElement.style.setProperty('--dpad-btn-size','46px');
       if(hint) hint.style.display = 'none';
     }
     if(window.innerHeight <= 420){
-      document.documentElement.style.setProperty('--touch-btn-size','38px');
-      document.documentElement.style.setProperty('--dpad-btn-size','28px');
+      document.documentElement.style.setProperty('--touch-btn-size','52px');
+      document.documentElement.style.setProperty('--dpad-btn-size','40px');
       if(hint) hint.style.display = 'none';
     }
   }
@@ -450,8 +450,8 @@ function calcScale(){
   const topH  = document.getElementById('topBar').offsetHeight  || 0;
   const touchH= document.getElementById('touchUI').offsetHeight || 0;
   const avW = window.innerWidth;
-  const avH = window.innerHeight - topH - touchH;
-  return Math.max(1, Math.min(
+  const avH = window.innerHeight - topH - touchH - 110;
+  return Math.max(0.5, Math.min(
     Math.floor(avW / W * 20) / 20,
     Math.floor(avH / H * 20) / 20
   ));

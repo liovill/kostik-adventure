@@ -588,39 +588,39 @@ const player={
 
 // ── NPC DEFS ────────────────────────────────────────
 const NPC_DEFS=[
-  {id:'mira', x:15*TILE+8, y:5*TILE+8, name:'Elder Mira', color:'#e07080',
+  {id:'mira', x:15*TILE+8, y:5*TILE+8, name:'Волшебница Мира', color:'#e07080',
    questLines:{
-     0:["Traveller! Our valley faces darkness! Bring me 5 ☀ Sun Fragments!"],
-     1:["You need 5 Sun Fragments. Keep searching the grass!"],
-     1.5:["Wonderful! Now seek 5 ☽ Moon Fragments — find Brom at the shrine."],
-     2:["Brom needs the Moon Fragments. Find him near the dark shrines."],
-     3:["The Shadow Boss lurks in the south! Attack + Dash!"],
-     4:["You've saved Костик и Кирилл! The balance is restored!"],
+     0:["Костик, помоги нам! Найди 5 солнечных осколков ☀!"],
+     1:["Ищи золотые осколки ☀ на траве!"],
+     1.5:["Отлично! Теперь найди Брома и собери 5 лунных осколков ☾!"],
+     2:["Бром ждёт лунные осколки у тёмного храма."],
+     3:["На юге злой дракон! Используй удар и рывок!"],
+     4:["Костик и Кирилл спасли королевство!"],
    }},
-  {id:'brom', x:5*TILE+8, y:5*TILE+8, name:'Brom', color:'#70a0e0',
+  {id:'brom', x:5*TILE+8, y:5*TILE+8, name:'Маг Бром', color:'#70a0e0',
    questLines:{
-     0:["The shadows grow long... something dark stirs."],
-     1:["Bring moon fragments to me after Mira sends you."],
-     2:["Yes! 5 Moon Fragments! Now the Shadow Boss can be banished!"],
-     2.5:["Head south! The boss lurks near the dark shrines!"],
-     3:["The boss is still out there — fight it with quick combos!"],
-     4:["Incredible! The valley is safe again!"],
+     0:["Ночью здесь появляются тени. Будь осторожен!"],
+     1:["Приноси мне лунные осколки, когда Мира попросит."],
+     2:["Ура! Пять осколков! Теперь можно победить дракона!"],
+     2.5:["Иди на юг! Дракон ждёт у тёмных храмов!"],
+     3:["Бей дракона несколько раз подряд!"],
+     4:["Ура! Королевство спасено!"],
    }},
-  {id:'lyra', x:25*TILE+8, y:5*TILE+8, name:'Lyra', color:'#a070e0',
+  {id:'lyra', x:25*TILE+8, y:5*TILE+8, name:'Лира', color:'#a070e0',
    questLines:{
-     0:["Tap УДАР to fight! Tap РЫВОК to dodge! Hit enemies fast for COMBO!"],
-     1:["Sun fragments are golden diamonds in the grass."],
-     2:["Moon fragments are silvery crescents. Great at night!"],
-     3:["COMBO attacks deal extra damage! Hit 3x fast for bonus!"],
-     4:["You're a legend! The spirits sing your name!"],
+     0:["Нажимай УДАР для атаки, а РЫВОК чтобы уклоняться!"],
+     1:["Солнечные осколки сияют золотом в траве."],
+     2:["Лунные осколки серебристые. Ищи их ночью!"],
+     3:["Три быстрых удара наносят больше урона!"],
+     4:["Костик, ты настоящий герой!"],
    }},
-  {id:'pip', x:14*TILE+8, y:11*TILE+8, name:'Pip', color:'#70d090',
+  {id:'pip', x:14*TILE+8, y:11*TILE+8, name:'Кирилл', color:'#70d090',
    questLines:{
-     0:["I heard a roar from the south last night…"],
-     1:["Keep collecting! Don't let shadow wisps touch you."],
-     2:["Wisps deal 1 damage. Dash for invincibility!"],
-     3:["Smack that boss! Crystal drops are worth big points!"],
-     4:["Hooray! I knew you could do it!"],
+     0:["Братик, я слышал дракона на юге!"],
+     1:["Собирай звёздочки! Берегись тёмных призраков!"],
+     2:["Призраки кусаются! Рывок поможет убежать!"],
+     3:["Победи дракона! За кристаллы дают много очков!"],
+     4:["Костик, я знал, что ты победишь!"],
    }},
 ];
 let npcs=[];
@@ -741,7 +741,7 @@ function killEnemy(e){
 
 function checkQuestProgress(){
   if(questStage===1&&sunCollected>=5){ questStage=1.5; notify('☀ 5 Sun Fragments!\nReturn to Elder Mira!','#ffd040',3.5); updateQuestUI(); }
-  if(questStage===2&&moonCollected>=5){ questStage=2.5; notify('☽ 5 Moon Fragments!\nReturn to Brom!','#aaddff',3.5); updateQuestUI(); }
+  if(questStage===2&&moonCollected>=5){ questStage=2.5; notify('☽ 5 Moon Fragments!\n🧙 Найди Брома!','#aaddff',3.5); updateQuestUI(); }
   if(questStage===3&&bossDefeated){
     questStage=4; score+=500;
     notify('🌟 SOLSTICE SAVED!\n+500 bonus! You are a Guardian!','#ffeeaa',6);
@@ -755,17 +755,17 @@ function checkQuestProgress(){
 
 function updateQuestUI(){
   const lines={
-    0:'Talk to Elder Mira\n(at the well ⬆)',
-    1:`Sun ☀: ${sunCollected}/5`,
-    1.5:'Return to\nElder Mira!',
-    2:`Moon ☽: ${moonCollected}/5`,
-    2.5:'Return to Brom!',
-    3:'Defeat Shadow Boss!\n(south of map)',
-    4:'🎉 Valley is saved!',
+    0:'🧙 Найди Миру ⬆',
+    1:`☀ Собери: ${sunCollected}/5`,
+    1.5:'🧙 Вернись к Мире!',
+    2:`🌙 Собери: ${moonCollected}/5`,
+    2.5:'🧙 Найди Брома!',
+    3:'🐉 Победи дракона на юге!',
+    4:'🎉 Королевство спасено!',
   };
   const txt=lines[questStage]||'';
   document.getElementById('questText').textContent=txt;
-  document.getElementById('questBox').style.display='block';
+  document.getElementById('questBox').style.display=(getLayout()==='mobile'?'none':'block');
   document.getElementById('tbQuest').textContent=txt.replace('\n',' ');
 }
 
@@ -918,7 +918,7 @@ function triggerNPCDialogue(npc){
   document.getElementById('dialogue').style.display='block';
   if(npc.id==='mira'&&questStage===0){questStage=1;sunCollected=0;updateQuestUI();notify('New Quest: Collect 5 ☀ Sun Fragments!','#ffd040',3);}
   if(npc.id==='mira'&&questStage===1.5){questStage=2;moonCollected=0;updateQuestUI();notify('New Quest: Collect 5 ☽ Moon Fragments!','#aaddff',3);}
-  if(npc.id==='brom'&&questStage===2.5){questStage=3;updateQuestUI();notify('New Quest: Defeat the Shadow Boss!','#ff88ff',3);}
+  if(npc.id==='brom'&&questStage===2.5){questStage=3;updateQuestUI();notify('🐉 Новое задание: победи дракона!','#ff88ff',3);}
   npc._dlgIdx=(npc._dlgIdx||0)+1;
 }
 
@@ -1178,7 +1178,7 @@ function drawOver(t){
   ctx.fillStyle='rgba(255,255,255,0.25)';ctx.fillRect(W/2-90,137,180,1);
   ctx.font='8px Courier New';ctx.fillStyle='#aaa';
   ctx.fillText(`Quest: Stage ${Math.floor(questStage)} of 4`,W/2-58,152);
-  ctx.fillText(`Sun ☀: ${sunCollected}/5   Moon ☽: ${moonCollected}/5`,W/2-76,166);
+  ctx.fillText(`☀ Собери: ${sunCollected}/5   🌙 Собери: ${moonCollected}/5`,W/2-76,166);
   ctx.fillText('Keep going — the valley needs you!',W/2-86,180);
   if(Math.floor(t*2)%2===0){
     ctx.font='bold 10px Courier New';ctx.fillStyle='#ff88aa';
@@ -1236,7 +1236,7 @@ function startGame(){
   document.getElementById('dialogue').style.display='none';
   document.getElementById('notify').style.display='none';
   updateQuestUI();
-  notify('❗ Найди волшебницу at the well!\n(Walk near any NPC to talk)','#ffd040',4.5);
+  notify('🧙 Найди волшебницу Миру!\nПодойди к ней, чтобы поговорить.','#ffd040',4.5);
   state='PLAY';
 }
 

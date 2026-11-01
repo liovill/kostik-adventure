@@ -53,9 +53,9 @@ function hallDrawLesson(){
 function hallCheckAnswer(value,btn){
  if(hallMode!=="lesson"||hallAnswered||!hallTask)return;
  if(String(value)!==hallTask.answer){
-  btn.disabled=true;btn.classList.add("wrong");$("hallFeedback").textContent="💛 Попробуй ещё! Ты обязательно справишься.";if(state.settings.voice)speak("Попробуй ещё.");return
+  btn.disabled=true;if(window.AcademySound)window.AcademySound.cue("try");btn.classList.add("wrong");$("hallFeedback").textContent="💛 Попробуй ещё! Ты обязательно справишься.";if(state.settings.voice)speak("Попробуй ещё.");return
  }
- hallAnswered=true;btn.classList.add("correct");$("hallAnswers").querySelectorAll("button").forEach(b=>b.disabled=true);
+ hallAnswered=true;if(window.AcademySound)window.AcademySound.cue("good");btn.classList.add("correct");$("hallAnswers").querySelectorAll("button").forEach(b=>b.disabled=true);
  hallProfile().subjects[hallLesson.subject]+=1;hallLesson.earned++;save();
  $("hallFeedback").textContent="🌟 Молодец! Ещё одна звезда знаний!";
  $("hallTotalXP").textContent="⭐ "+hallStars()+" звёзд знаний";
@@ -73,7 +73,7 @@ function hallCompleteLesson(){
  $("hallEarnedStars").textContent=hallLesson.earned;
  $("hallNewTotal").textContent=hallStars();
  $("hallFinishMessage").textContent=NAMES[state.active]+", сегодня ты решил ещё пять заданий по теме «"+sub.name+"». Академия становится сильнее!";
- hallSection("complete");
+ hallSection("complete");if(window.AcademySound)window.AcademySound.cue("medal");
  if(!state.settings.reduceMotion&&typeof confetti==="function")confetti();
  if(state.settings.voice)speak("Ура! Урок пройден!")
 }

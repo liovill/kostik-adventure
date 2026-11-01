@@ -24,7 +24,7 @@
   ["🔵","синий"],["🟢","зелёный"],["🟡","жёлтый"],["🟣","фиолетовый"]
  ];
  let readSettings=()=>({voice:true}),writeSettings=()=>{},onSettingsChange=()=>{},studio=null,speechSerial=0,currentUtterance=null;
- let voices=[];
+ let voices=[],currentClip=null;
  const voiceSupported=()=>!!(root.speechSynthesis&&typeof root.SpeechSynthesisUtterance==="function");
  function config(settings){
   if(settings&&typeof settings.getSettings==="function")readSettings=settings.getSettings;
@@ -65,9 +65,16 @@
   const el=studio.querySelector("[data-voice-status]");
   if(el)el.textContent=message
  }
+ function stopClip(){
+  if(!currentClip)return;
+  const c=currentClip;currentClip=null;
+  try{c.onended=null;c.onerror=null;c.onplay=null;c.pause();c.currentTime=0}catch(e){}
+ }
  function stop(){
   speechSerial++;
   currentUtterance=null;
+  stopClip();
+  if(root.AcademySound)root.AcademySound.duck(false);
   if(voiceSupported())try{root.speechSynthesis.cancel()}catch(e){}
   updateStatus("Воспроизведение остановлено.")
  }
@@ -78,6 +85,21 @@
   const spoken=cleanText(text);
   if(!spoken)return false;
   const role=ROLES[opts.role]?opts.role:"wizard";
+  stopClip();
+  if(root.AcademySound)root.AcademySound.duck(false);
+  // Recorded clips take priority only if a real, explicitly listed local audio asset exists.
+  if(opts.clip&&typeof root.Audio==="function"&&/^\.\/audio\/[\w\-\/]+\.(mp3|m4a|ogg|wav)$/i.test(opts.clip)){
+   const token=++speechSerial;
+   try{
+    if(voiceSupported())root.speechSynthesis.cancel();
+    const clip=new root.Audio(opts.clip);clip.preload="auto";clip.volume=1;currentClip=clip;
+    clip.onplay=()=>{if(token===speechSerial){if(root.AcademySound)root.AcademySound.duck(true);updateStatus("🎙️ Звучит записанная реплика: "+ROLES[role].name)}};
+    clip.onended=()=>{if(token===speechSerial){currentClip=null;if(root.AcademySound)root.AcademySound.duck(false);updateStatus("Реплика завершена.")}};
+    clip.onerror=()=>{if(token===speechSerial){currentClip=null;if(root.AcademySound)root.AcademySound.duck(false);speak(text,{...opts,clip:null})}};
+    const promise=clip.play();if(promise&&typeof promise.catch==="function")promise.catch(()=>{if(token===speechSerial){currentClip=null;if(root.AcademySound)root.AcademySound.duck(false);speak(text,{...opts,clip:null})}});
+    return true
+   }catch(e){currentClip=null}
+  }
   const utterance=new root.SpeechSynthesisUtterance(spoken);
   const preset=pickPreset(),character=ROLES[role];
   utterance.lang="ru-RU";
@@ -88,11 +110,12 @@
   const selected=voiceForRole(role);
   if(selected)utterance.voice=selected;
   const token=++speechSerial;
-  utterance.onstart=()=>{if(token===speechSerial)updateStatus("🔊 Звучит: "+character.name)};
-  utterance.onend=()=>{if(token===speechSerial){currentUtterance=null;updateStatus("Готово. Можно послушать другой вариант.")}};
+  utterance.onstart=()=>{if(token===speechSerial){if(root.AcademySound)root.AcademySound.duck(true);updateStatus("🔊 Звучит: "+character.name)}};
+  utterance.onend=()=>{if(token===speechSerial){currentUtterance=null;if(root.AcademySound)root.AcademySound.duck(false);updateStatus("Готово. Можно послушать другой вариант.")}};
   utterance.onerror=event=>{
    if(token!==speechSerial||event.error==="interrupted"||event.error==="canceled")return;
    currentUtterance=null;
+   if(root.AcademySound)root.AcademySound.duck(false);
    updateStatus("Звук не запустился. Проверь громкость и русский голос в настройках устройства.")
   };
   // iOS Safari generally requires this to run in the originating tap handler.
@@ -104,10 +127,12 @@
    return true
   }catch(e){
    currentUtterance=null;
+   if(root.AcademySound)root.AcademySound.duck(false);
    updateStatus("Не удалось запустить звук. Попробуй другой голос.");
    return false
   }
  }
+ function line(id,opts={}){const item=root.AcademyVoiceLines&&root.AcademyVoiceLines[id];if(!item||typeof item.text!=="string")return false;return speak(item.text,{...opts,role:opts.role||item.role||"wizard",clip:item.file||null})}
  function setEnabled(enabled){
   options().voice=Boolean(enabled);
   try{writeSettings()}catch(e){}
@@ -212,6 +237,22 @@
   speakers.appendChild(field("🧙‍♂️ Голос Звездочёта",wizard));
   speakers.appendChild(field("🦉 Голос совы Луны",owl));
   panel.appendChild(speakers);
+  if(root.AcademySound){
+   const ambience=controlSelect([{label:"🌲 Атмосфера включена",value:"on"},{label:"Тихо: без фоновых звуков",value:"off"}],options().ambientOn?"on":"off",v=>{
+    const enabled=root.AcademySound.setAmbient(v==="on");
+    updateStatus(enabled?"🌿 Играет тихая музыка леса.":"Фоновые звуки выключены.")
+   });
+   panel.appendChild(field("🌿 Атмосфера волшебного мира",ambience));
+   const effects=controlSelect([{label:"✨ Эффекты включены",value:"on"},{label:"Без звуков действий",value:"off"}],options().fxOn===false?"off":"on",v=>root.AcademySound.setEffects(v==="on"));
+   panel.appendChild(field("✨ Звуки находок и волшебства",effects));
+   const vol=node("input","voice-speed");
+   vol.type="range";vol.min="0.10";vol.max="0.70";vol.step="0.05";vol.value=String(options().audioVolume||.38);
+   const volLabel=node("span","voice-speed-label",Math.round(Number(vol.value)*100)+"%");
+   const volumeField=field("Громкость атмосферы и эффектов",vol);
+   volumeField.appendChild(volLabel);
+   vol.addEventListener("input",()=>{root.AcademySound.setVolume(Number(vol.value));volLabel.textContent=Math.round(Number(vol.value)*100)+"%"});
+   panel.appendChild(volumeField);
+  }
   const note=node("p","voice-device-note","");
   note.setAttribute("data-voice-count","");
   panel.appendChild(note);
@@ -228,7 +269,7 @@
   footer.appendChild(createButton("⏹ Остановить",stop,"voice-action secondary"));
   footer.appendChild(createButton("✓ Готово",closeStudio,"voice-action primary"));
   panel.appendChild(footer);
-  panel.appendChild(node("p","voice-studio-disclaimer","Сейчас используются системные голоса браузера. Профессиональные актёрские голоса потребуют записанных реплик или отдельного сервиса синтеза."));
+  panel.appendChild(node("p","voice-studio-disclaimer","Сейчас голоса произносит устройство, а звуки и музыка созданы для Академии. Для настоящих актёрских голосов предусмотрена поддержка записанных реплик."));
   overlay.addEventListener("click",e=>{if(e.target===overlay)closeStudio()});
   overlay.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();closeStudio()}});
   document.body.appendChild(overlay);
@@ -241,5 +282,5 @@
  if(root.speechSynthesis){
   try{root.speechSynthesis.addEventListener("voiceschanged",refreshVoices)}catch(e){}
  }
- root.AcademyVoice={configure:config,speak,stop,setEnabled,openStudio,closeStudio,refreshVoices,cleanText,getVoices:()=>voices.slice(),voiceSupported};
+ root.AcademyVoice={configure:config,speak,line,stop,setEnabled,openStudio,closeStudio,refreshVoices,cleanText,getVoices:()=>voices.slice(),voiceSupported};
 })(window);

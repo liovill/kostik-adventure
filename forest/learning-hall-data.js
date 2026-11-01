@@ -10,7 +10,7 @@ const HALL_SUBJECTS=[
 ];
 const HALL_ITEMS={
  animals:[{name:"кот",icon:"🐱",letter:"К",home:"дом"},{name:"собака",icon:"🐶",letter:"С",home:"дом"},{name:"лиса",icon:"🦊",letter:"Л",home:"лес"},{name:"заяц",icon:"🐰",letter:"З",home:"лес"},{name:"рыба",icon:"🐟",letter:"Р",home:"вода"},{name:"медведь",icon:"🐻",letter:"М",home:"лес"},{name:"утка",icon:"🦆",letter:"У",home:"вода"},{name:"ёж",icon:"🦔",letter:"Ё",home:"лес"},{name:"корова",icon:"🐮",letter:"К",home:"ферма"},{name:"волк",icon:"🐺",letter:"В",home:"лес"},{name:"слон",icon:"🐘",letter:"С",home:"саванна"},{name:"лягушка",icon:"🐸",letter:"Л",home:"вода"}],
- words:[{word:"КОТ",icon:"🐱"},{word:"ДОМ",icon:"🏠"},{word:"ЛЕС",icon:"🌲"},{word:"МАК",icon:"🌺"},{word:"СЫР",icon:"🧀"},{word:"СОН",icon:"💤"},{word:"СОК",icon:"🧃"},{word:"ЛУК",icon:"🧅"},{word:"КИТ",icon:"🐳"}],
+ words:[{word:"КОТ",icon:"🐱"},{word:"ДОМ",icon:"🏠"},{word:"ЛЕС",icon:"🌲"},{word:"МЯЧ",icon:"⚽"},{word:"СЫР",icon:"🧀"},{word:"НОС",icon:"👃"},{word:"СОК",icon:"🧃"},{word:"ЛУК",icon:"🧅"},{word:"КИТ",icon:"🐳"},{word:"УХО",icon:"👂"},{word:"СУП",icon:"🥣"},{word:"ЗУБ",icon:"🦷"},{word:"РУКА",icon:"✋"},{word:"РОТ",icon:"👄"},{word:"КЛЮЧ",icon:"🔑"},{word:"КНИГА",icon:"📖"}],
  colors:[{color:"красный",icon:"🔴"},{color:"синий",icon:"🔵"},{color:"жёлтый",icon:"🟡"},{color:"зелёный",icon:"🟢"},{color:"фиолетовый",icon:"🟣"},{color:"оранжевый",icon:"🟠"}],
  shapes:[{name:"круг",icon:"🔵"},{name:"треугольник",icon:"🔺"},{name:"квадрат",icon:"🟦"},{name:"звезда",icon:"⭐"},{name:"сердце",icon:"❤️"}],
  nature:[{q:"Кто летает в небе?",answer:"🐦",options:["🐟","🐦","🐱"]},{q:"Какое животное живёт в воде?",answer:"🐟",options:["🐻","🐟","🐰"]},{q:"Что растёт на дереве?",answer:"🍎",options:["🍎","🧸","🚗"]},{q:"Что нужно растению для роста?",answer:"💧",options:["📺","💧","🧱"]},{q:"Что можно увидеть ночью?",answer:"🌙",options:["🌙","☀️","🌻"]},{q:"Что помогает согреться зимой?",answer:"🧣",options:["🧣","🩴","🕶️"]},{q:"Кто делает мёд?",answer:"🐝",options:["🐟","🐝","🐱"]},{q:"На чём можно плавать по воде?",answer:"⛵",options:["🚂","⛵","🚲"]},{q:"Кто живёт на ферме?",answer:"🐮",options:["🐯","🐮","🦈"]},{q:"Что появляется после дождя и солнца?",answer:"🌈",options:["🌈","🌙","🌋"]}]
@@ -21,14 +21,17 @@ function hallPick(random,list){return list[Math.floor(random()*list.length)]}
 function hallShuffle(random,arr){const out=arr.slice();for(let i=out.length-1;i>0;i--){let j=Math.floor(random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out}
 function hallAnswer(q,visual,answer,distractors,say,kind){const choices=[String(answer),...distractors.map(String)].filter((v,i,a)=>a.indexOf(v)===i);if(choices.length<3)throw new Error("Hall: not enough unique choices");return{kind:kind||"choice",q,visual,answer:String(answer),options:choices.slice(0,3),say:say||q}}
 function generateHallTask(hero,subject,index){
- const rand=hallRandom(hallSeed(hero,subject,index)),pick=x=>hallPick(rand,x),shuffle=x=>hallShuffle(rand,x),easy=hero==="kirill",variant=index%5;let q;
+ const rand=hallRandom(hallSeed(hero,subject,index)),pick=x=>hallPick(rand,x),shuffle=x=>hallShuffle(rand,x),easy=hero==="kirill";
+ // Shuffle task types per lesson instead of repeating the same five in the same order.
+ const round=Math.floor(index/5),sequence=hallShuffle(hallRandom(hallSeed(hero,subject,round)^0x5A17F00D),[0,1,2,3,4]);
+ const variant=sequence[index%5];let q;
  if(subject==="math"){
   if(easy){
-   if(variant===0){const n=1+Math.floor(rand()*3);const choices=shuffle([1,2,3]);q=hallAnswer("Сколько звёздочек?","⭐ ".repeat(n).trim(),n,choices.filter(x=>x!==n),"Посчитай звёздочки. Сколько их?")}
-   else if(variant===1){const n=1+Math.floor(rand()*3);q=hallAnswer("Где "+(n===1?"один мячик?":n===2?"два мячика?":"три мячика?"),"", "⚽".repeat(n),[1,2,3].filter(x=>x!==n).map(x=>"⚽".repeat(x)),"Найди нужное количество мячиков.")}
-   else if(variant===2){const n=1+Math.floor(rand()*3);q=hallAnswer("Найди такую же группу","🍎 ".repeat(n).trim(),"🍎".repeat(n),[1,2,3].filter(x=>x!==n).map(x=>"🍎".repeat(x)),"Найди столько же яблок.")}
-   else if(variant===3){const group=pick(["🍓","🍐","🧸"]);const n=1+Math.floor(rand()*3);q=hallAnswer("Найди столько же предметов",group.repeat(n),String(n),[1,2,3].filter(x=>x!==n),"Посчитай предметы и выбери число.")}
-   else {const n=2+Math.floor(rand()*2);const groups=["🐱","🐶","🐰"];q=hallAnswer("Где "+(n===2?"два":"три")+" зверька?","",groups[0].repeat(n),[1,3,4].filter(x=>x!==n).slice(0,2).map(x=>groups[0].repeat(x)),"Найди группу с правильным количеством зверят.")}
+   if(variant===0){const icon=pick(["⭐","🌸","🐞","🍓","🧸","🐟","🍎","🦋"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди столько же предметов",icon.repeat(n),icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Посмотри на предметы сверху. Найди внизу такую же группу.")}
+   else if(variant===1){const icon=pick(["⚽","🐻","🧸","🍪","🚗","🐶"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди нужное количество предметов","",icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Найди "+n+" одинаковых предмета.")}
+   else if(variant===2){const icon=pick(["🍎","🍌","🥕","🍄","🐬","🌻"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди такую же группу",icon.repeat(n),icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Найди точно такую же группу предметов.")}
+   else if(variant===3){const group=pick(["🍓","🍐","🧸","🐣","🚀","🌼","🐢","🍒"]);const n=1+Math.floor(rand()*3);q=hallAnswer("Найди столько же предметов",group.repeat(n),group.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>group.repeat(x)),"Найди столько же предметов, сколько показано сверху.")}
+   else {const animal=pick(["🐱","🐶","🐰","🐥","🐼","🐭"]),n=2+Math.floor(rand()*2);q=hallAnswer("Найди зверят","",animal.repeat(n),[1,3,4].filter(x=>x!==n).slice(0,2).map(x=>animal.repeat(x)),"Найди "+(n===2?"двух":"трёх")+" одинаковых зверят.")}
   }else{
    const level=Math.min(3,Math.floor(index/16)),lim=[5,10,15,20][level];
    if(variant===0){const n=2+Math.floor(rand()*Math.min(lim-1,9)),emoji=pick(["🍄","⭐","🍓","🐞","🍎"]);q=hallAnswer("Сколько предметов ты видишь?",Array(n).fill(emoji).join(" "),n,shuffle([n+1,n-1,n+2,n-2]).filter(x=>x>=1).slice(0,2),"Посчитай предметы и выбери число.")}
@@ -49,7 +52,7 @@ function generateHallTask(hero,subject,index){
    if(variant===0){const x=pick(HALL_ITEMS.animals);const letters=shuffle([...new Set(HALL_ITEMS.animals.map(a=>a.letter).filter(c=>c!==x.letter))]).slice(0,2);q=hallAnswer("С какого звука начинается название животного?",x.icon,x.letter,letters,"Посмотри на картинку. Это "+x.name+". С какого звука начинается название?")}
    else if(variant===1){const x=pick(HALL_ITEMS.words),others=shuffle(HALL_ITEMS.words.filter(a=>a.word!==x.word)).slice(0,2);q=hallAnswer("Выбери слово по картинке",x.icon,x.word,others.map(a=>a.word),"Посмотри на картинку и найди слово "+x.word.toLowerCase()+".")}
    else if(variant===2){let letter=pick(["М","Л","С","Р","Н","К","Т","П"]);const syll=letter+"А";q=hallAnswer("Какой слог получится?",letter+" + А = ❓",syll,[letter+"О","А"+letter],"Соедини звуки "+letter+" и А.")}
-   else if(variant===3){const x=pick(HALL_ITEMS.words),others=shuffle(HALL_ITEMS.words.filter(a=>a.word!==x.word)).slice(0,2);q=hallAnswer("Какое слово начинается с буквы «"+x.word[0]+"»?", "",x.word,others.map(a=>a.word).filter(w=>w[0]!==x.word[0]).concat(["УХО","ЭХО"]).slice(0,2),"Найди слово, которое начинается с буквы "+x.word[0]+".")}
+   else if(variant===3){const x=pick(HALL_ITEMS.words),others=shuffle(HALL_ITEMS.words.filter(a=>a.word[0]!==x.word[0])).slice(0,2);q=hallAnswer("Какое слово начинается с буквы «"+x.word[0]+"»?","",x.word,others.map(a=>a.word),"Найди слово, которое начинается с буквы "+x.word[0]+".")}
    else {const x=pick(["А","М","О","Т","К","И","Л","С","Н"]);const lower=x.toLowerCase();q=hallAnswer("Найди маленькую букву для большой «"+x+"»","",lower,shuffle(["а","м","о","т","к","и","л","с","н"].filter(t=>t!==lower)).slice(0,2),"Найди маленькую букву "+x+".")}
   }
  }
@@ -77,7 +80,7 @@ function generateHallTask(hero,subject,index){
    else if(variant===3){let x=pick(["🍎","🥕","🍌","🍓"]);q=hallAnswer("Найди такой же продукт",x,x,shuffle(["🍎","🥕","🍌","🍓"].filter(t=>t!==x)).slice(0,2),"Найди такую же еду.")}
    else {let x=pick(["🐦","🐟","🦋","🐝"]);q=hallAnswer("Найди такое же живое существо",x,x,shuffle(["🐦","🐟","🦋","🐝"].filter(t=>t!==x)).slice(0,2),"Найди такое же существо.")}
   }else{
-   if(variant===0){const x=pick(HALL_ITEMS.animals.filter(a=>["лес","дом","вода","ферма"].includes(a.home)));const opts=shuffle(["лес","дом","вода","ферма"].filter(v=>v!==x.home)).slice(0,2);q=hallAnswer("Где обычно живёт это животное?",x.icon,x.home,opts,"Где обычно живёт "+x.name+"?")}
+   if(variant===0){const x=pick(HALL_ITEMS.animals.filter(a=>["лиса","заяц","рыба","медведь","корова","волк"].includes(a.name)));const opts=shuffle(["лес","дом","вода","ферма"].filter(v=>v!==x.home)).slice(0,2);q=hallAnswer("Где обычно живёт это животное?",x.icon,x.home,opts,"Где обычно живёт "+x.name+"?")}
    else if(variant===1){const x=pick(HALL_ITEMS.nature);q=hallAnswer(x.q,"",x.answer,x.options.filter(x2=>x2!==x.answer),x.q)}
    else if(variant===2){const arr=[{q:"Какое время года после зимы?",a:"весна",o:["лето","осень"]},{q:"Какое время года после лета?",a:"осень",o:["зима","весна"]},{q:"Когда листья часто желтеют?",a:"осень",o:["весна","лето"]},{q:"Когда чаще всего идёт снег?",a:"зима",o:["лето","весна"]}];let x=pick(arr);q=hallAnswer(x.q,"",x.a,x.o,x.q)}
    else if(variant===3){const x=pick([{q:"Что относится к транспорту?",a:"🚲",o:["🐱","🌼"]},{q:"Что относится к растениям?",a:"🌻",o:["🐻","🚕"]},{q:"Что относится к посуде?",a:"🥄",o:["🚲","🦊"]},{q:"Что относится к одежде?",a:"🧥",o:["🍎","⚽"]}]);q=hallAnswer(x.q,"",x.a,x.o,x.q)}

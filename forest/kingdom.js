@@ -20,7 +20,7 @@ function canOpen(i){return i===0||cleared(REGIONS[i-1])}
 function nextRegion(){let i=REGIONS.findIndex(r=>!cleared(r));return i===-1?5:i}
 function avatar(h){const kid=h==="kirill",cape=kid?"#26936f":"#3f65bd",body=kid?"#5bd1a0":"#61a2ed";const hair=kid?
 '<circle cx="34" cy="36" r="13" fill="#e8c16a"/><circle cx="47" cy="26" r="13" fill="#f9dc88"/><circle cx="61" cy="25" r="13" fill="#eec96e"/><circle cx="75" cy="31" r="13" fill="#f6d784"/><circle cx="82" cy="42" r="12" fill="#e9c36d"/>':
-'<path d="M27 54Q19 20 42 20L71 20Q91 26 82 53L75 43L67 48L58 39L49 47L38 42L34 55Z" fill="#382a35"/>';
+'<path d="M27 53Q22 33 32 25Q45 17 67 21Q83 23 86 38L83 52L78 48L77 42Q57 44 38 39L35 52Z" fill="#302933"/><path d="M36 38Q54 41 77 36" fill="none" stroke="#56434d" stroke-width="3" stroke-linecap="round"/>';
 return '<svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+NAMES[h]+'">'+
 '<ellipse cx="60" cy="141" rx="37" ry="6" fill="#132943" opacity=".3"/>'+
 '<path d="M31 84Q14 109 13 135L105 135Q102 101 79 84Z" fill="'+cape+'"/>'+

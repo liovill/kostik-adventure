@@ -1,0 +1,71 @@
+/* Living Forest v41: touch-first, accessible scene objects and reactive scenery. */
+.world-activities{position:absolute;inset:0;z-index:8;pointer-events:none}
+.world-activity{
+ position:absolute;transform:translate(-50%,-50%);z-index:1;pointer-events:auto;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ width:clamp(60px,10vw,83px);min-height:69px;padding:6px 4px 5px;
+ border:1px solid #fff3b8a8;border-radius:19px;
+ color:#fff8e9;background:linear-gradient(155deg,#22585bdc,#123e4ce6);
+ box-shadow:inset 0 2px 8px #def8d33d,0 4px 12px #102b426e;
+ text-shadow:0 1px 3px #163a42;font-weight:850;
+ -webkit-tap-highlight-color:transparent;touch-action:manipulation
+}
+.world-activity svg{display:block;width:clamp(39px,6.2vw,49px);height:clamp(39px,6.2vw,49px);overflow:visible;filter:drop-shadow(0 2px 5px #19344187)}
+.world-activity small{display:block;max-width:100%;font-size:9px;line-height:1.12;text-align:center;overflow-wrap:normal}
+.world-activity.visited{border-color:#bbf5c1c9;background:linear-gradient(150deg,#2e7365e6,#174953e8)}
+.world-activity.visited::after{content:"✓";position:absolute;top:0;right:3px;font-size:12px;color:#f1ffbb}
+.world-activity:focus-visible{outline:4px solid #fff1aa;outline-offset:3px}
+.world-activity:active{filter:brightness(1.25)}
+.world-activity.reacting{animation:world-object-pop .8s ease-out}
+.world-activity-footer{display:flex;align-items:center;gap:9px;background:linear-gradient(110deg,#275259,#245048);
+ color:#f8f9df;border-top:1px solid #bbe8c66b;padding:9px 15px;min-height:52px}
+.world-activity-footer>span:first-child{font-size:24px}
+.world-activity-footer>span:last-child{display:block;min-width:0;font-size:12px;font-weight:750}
+.world-activity-footer strong{color:#ffecad;margin-left:5px;font-variant-numeric:tabular-nums}
+.world-activity-footer small{display:block;font-size:11px;font-weight:500;color:#d8edda;margin-top:2px}
+.world-activity-sparks{position:absolute;z-index:2;pointer-events:none}
+.world-activity-sparks span{position:absolute;left:0;top:0;color:#fff4b0;font-size:20px;filter:drop-shadow(0 0 6px #fff8bc);animation:world-sparkle .9s ease-out both}
+.world-scene.world-wind .tree .crown{transform-origin:50% 90%;animation:world-tree-wind .85s ease-in-out}
+.world-scene.world-bells .sun{box-shadow:0 0 105px 48px #fff5bfa8}
+.world-scene.world-rain .flower-bed{animation:world-flowers-wake 1s ease-in-out}
+.world-scene.world-rain .forest-fog{background:radial-gradient(ellipse at 52% 61%,#d4f7fba9,transparent 61%)}
+.world-scene.world-bug .forest-shrub{animation:world-bug-dance .95s ease-in-out}
+.world-scene.world-ripples .river{filter:brightness(1.4) saturate(1.4);animation:world-river-shimmer 1s ease-in-out}
+.world-scene.world-fish .river{filter:brightness(1.35)}
+.world-scene.world-crystal .world-portal{filter:drop-shadow(0 0 26px #b7faff) brightness(1.35)}
+.world-scene.world-crystal .forest-godrays{opacity:.88;filter:hue-rotate(85deg)}
+.world-scene.world-starlight .world-nest{filter:drop-shadow(0 0 25px #fff0b2) brightness(1.45)}
+.world-scene.world-starlight .sun{filter:brightness(1.3)}
+@keyframes world-object-pop{
+ 0%,100%{transform:translate(-50%,-50%) scale(1)}
+ 30%{transform:translate(-50%,-50%) scale(1.16) rotate(-5deg)}
+ 60%{transform:translate(-50%,-50%) scale(1.06) rotate(4deg)}
+}
+@keyframes world-sparkle{
+ 0%{opacity:0;transform:translate(0,0) scale(.4)}
+ 20%{opacity:1}
+ 100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.25)}
+}
+@keyframes world-tree-wind{0%,100%{transform:rotate(0)}25%{transform:rotate(6deg)}68%{transform:rotate(-4deg)}}
+@keyframes world-flowers-wake{0%,100%{transform:scale(1)}45%{transform:scale(1.3) rotate(-5deg)}}
+@keyframes world-bug-dance{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@keyframes world-river-shimmer{0%,100%{opacity:1}45%{opacity:.68}}
+@media(max-width:610px){
+ .world-activity{width:60px;min-height:61px;border-radius:15px;padding:3px 2px}
+ .world-activity svg{width:37px;height:37px}
+ .world-activity small{font-size:8.5px;letter-spacing:-.02em}
+ .world-activity-footer{padding:8px 10px}
+}
+@media(max-width:370px){
+ .world-activity{width:52px;min-height:55px}
+ .world-activity svg{width:33px;height:33px}
+ .world-activity small{font-size:8px;line-height:1.05}
+}
+@media(prefers-reduced-motion:reduce){
+ .world-activity.reacting,.world-activity-sparks span,
+ .world-scene.world-wind .tree .crown,.world-scene.world-rain .flower-bed,
+ .world-scene.world-bug .forest-shrub,.world-scene.world-ripples .river{animation:none!important}
+}
+.app.reduce-motion .world-activity.reacting,.app.reduce-motion .world-activity-sparks span,
+.app.reduce-motion .world-scene.world-wind .tree .crown,.app.reduce-motion .world-scene.world-rain .flower-bed,
+.app.reduce-motion .world-scene.world-bug .forest-shrub,.app.reduce-motion .world-scene.world-ripples .river{animation:none!important}

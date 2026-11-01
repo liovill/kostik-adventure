@@ -107,9 +107,9 @@ function f3Avatar(who){
  '<path d="M35 115L29 143L47 143L54 115M72 115L71 143L87 143L81 115" fill="'+tunic+'" stroke="'+cape+'" stroke-width="4"/>'+
  '<ellipse cx="39" cy="140" rx="15" ry="7" fill="#574a4e"/><ellipse cx="83" cy="140" rx="15" ry="7" fill="#574a4e"/>'+
  '<rect x="34" y="85" width="50" height="44" rx="17" fill="'+tunic+'"/><path d="M39 103L59 113L79 102" stroke="#f9d68d" stroke-width="4" fill="none"/>'+
- '<path d="M35 96Q21 102 20 117M84 96Q98 103 97 114" fill="none" stroke="#f6c39f" stroke-width="12" stroke-linecap="round"/>'+
+ '<path d="M35 96Q21 102 20 117" fill="none" stroke="#f6c39f" stroke-width="12" stroke-linecap="round"/><path class="hero-wave" d="M84 96Q98 103 97 114" fill="none" stroke="#f6c39f" stroke-width="12" stroke-linecap="round"/>'+
  '<ellipse cx="56" cy="52" rx="34" ry="37" fill="#f6c8a1"/><circle cx="25" cy="54" r="8" fill="#f6c8a1"/><circle cx="89" cy="54" r="8" fill="#f6c8a1"/>'+hair+
- '<ellipse cx="43" cy="59" rx="4.1" ry="5.5" fill="#233847"/><ellipse cx="69" cy="59" rx="4.1" ry="5.5" fill="#233847"/><circle cx="44" cy="57" r="1.6" fill="#fff"/><circle cx="70" cy="57" r="1.6" fill="#fff"/>'+
+ '<ellipse cx="43" cy="59" rx="4.1" ry="5.5" fill="#233847"/><ellipse cx="69" cy="59" rx="4.1" ry="5.5" fill="#233847"/><circle cx="44" cy="57" r="1.6" fill="#fff"/><circle cx="70" cy="57" r="1.6" fill="#fff"/><g class="hero-eye-blink"><path d="M36 58Q43 64 50 58M62 58Q69 64 76 58" stroke="#f6c8a1" stroke-width="10" fill="none" stroke-linecap="round"/></g>'+
  '<circle cx="37" cy="70" r="5" fill="#e6a18a" opacity=".7"/><circle cx="76" cy="70" r="5" fill="#e6a18a" opacity=".7"/><path d="M47 77Q57 84 68 77" fill="none" stroke="#a36b62" stroke-width="3" stroke-linecap="round"/>'+
  (kid?'<circle cx="99" cy="108" r="13" fill="#80d6ab"/><circle cx="103" cy="104" r="2" fill="#234951"/>':
  '<path d="M99 128L104 43" fill="none" stroke="#8b6645" stroke-width="6" stroke-linecap="round"/><path d="M104 22L108 33L120 39L108 44L103 57L99 44L87 39L99 34Z" fill="#ffe383" stroke="#fff8bb" stroke-width="2"/>')+'</svg>'

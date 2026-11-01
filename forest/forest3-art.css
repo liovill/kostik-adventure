@@ -80,7 +80,7 @@
 .owl-face .forest-owl-svg{width:100%;height:100%;filter:drop-shadow(0 2px 5px #152d3880)}
 .talk-owl{width:122px;height:132px;max-width:100%;margin:0 auto 4px;filter:drop-shadow(0 6px 10px #1532386c)}
 .world-nest .forest-dragon-svg{width:clamp(88px,11vw,123px);height:clamp(88px,11vw,123px);filter:drop-shadow(0 9px 8px #23414784);animation:forest-dragon-float 3s ease-in-out infinite}
-.owl-eye-blink,.dragon-eye-blink{transform:scaleY(.04);transform-origin:50% 55%;opacity:0;animation:forest-eye-blink 6.9s ease-in-out infinite}
+.owl-eye-blink,.dragon-eye-blink,.hero-eye-blink{transform:scaleY(.04);transform-origin:50% 55%;opacity:0;animation:forest-eye-blink 6.9s ease-in-out infinite}
 .dragon-eye-blink{animation-delay:-2.3s}
 .hero-figure svg{transform-origin:50% 80%;animation:forest-hero-idle 4.5s ease-in-out infinite alternate}
 .hero-figure.walking svg{animation:hero-walk .3s ease-in-out infinite alternate}
@@ -121,8 +121,8 @@
 @media(prefers-reduced-motion:reduce){
  .forest-godrays,.world-scene .crown,.world-scene.garden .flower-bed,
  .forest-mote,.forest-discovery .forest-secret-icon,.scene-hotspot.owl .forest-owl-svg,
- .owl-eye-blink,.dragon-eye-blink,.world-nest .forest-dragon-svg,
+ .owl-eye-blink,.dragon-eye-blink,.hero-eye-blink,.world-nest .forest-dragon-svg,
  .hero-figure svg,.hero-figure .hero-wave,.forest-burst-star{animation:none!important}
- .owl-eye-blink,.dragon-eye-blink{opacity:0!important}
+ .owl-eye-blink,.dragon-eye-blink,.hero-eye-blink{opacity:0!important}
  .forest-mote{opacity:.3}
 }

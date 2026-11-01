@@ -126,3 +126,16 @@
  .owl-eye-blink,.dragon-eye-blink,.hero-eye-blink{opacity:0!important}
  .forest-mote{opacity:.3}
 }
+
+/* Персонаж тоже участник приключения: к нему можно обратиться касанием. */
+.hero-figure{border:0;background:transparent;padding:0;cursor:pointer;pointer-events:auto;touch-action:manipulation}
+.hero-figure:focus-visible{outline:3px solid #fff3b1;outline-offset:4px;border-radius:17px}
+.hero-figure.cheer svg{animation:forest-hero-cheer .42s ease-in-out 2}
+@keyframes forest-hero-cheer{25%{transform:translateY(-13px) rotate(-3deg)}60%{transform:translateY(-2px) rotate(4deg)}100%{transform:translateY(0) rotate(0)}}
+/* Внутриигровая настройка уменьшаемой анимации дополняет настройки iOS. */
+#forestApp.reduce-motion *,#forestApp.reduce-motion *::before,#forestApp.reduce-motion *::after{
+ animation-duration:.01ms!important;
+ animation-iteration-count:1!important;
+ transition-duration:.01ms!important;
+ scroll-behavior:auto!important
+}

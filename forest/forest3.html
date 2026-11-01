@@ -88,6 +88,33 @@
     </div>
   </section>
 
+  <section class="atelier-panel hidden" id="potionAtelier" aria-label="Волшебная кухня в саду">
+    <div class="atelier-head">
+      <div><span class="atelier-kicker">🌸 ДОПОЛНИТЕЛЬНОЕ ПРИКЛЮЧЕНИЕ</span>
+        <h2 id="atelierTitle">Волшебная кухня</h2>
+        <p id="atelierLead">Выбирай ингредиенты и открывай чудеса.</p>
+      </div>
+      <span class="atelier-avatar" aria-hidden="true">🐲</span>
+    </div>
+    <p class="atelier-recipe" id="atelierRecipe">✨ Секретный рецепт</p>
+    <div class="atelier-workbench">
+      <div class="atelier-pot-area">
+        <div class="atelier-cauldron" id="atelierPot" aria-label="Волшебный котёл">
+          <span class="atelier-pot-emoji" aria-hidden="true">🫕</span>
+          <span class="atelier-pot-contents" id="atelierPotContents">✨</span>
+          <span class="atelier-result" id="atelierResult">🫧</span>
+        </div>
+        <span class="atelier-count" id="atelierCount">0 / 3</span>
+      </div>
+      <div class="atelier-ingredients" id="atelierIngredients" aria-label="Ингредиенты для котла"></div>
+    </div>
+    <p class="atelier-feedback" id="atelierFeedback" role="status" aria-live="polite"></p>
+    <div class="atelier-actions">
+      <button class="atelier-next hidden" id="atelierNext">✨ Следующий рецепт</button>
+      <button class="atelier-clear" id="atelierReset">↶ Начать заново</button>
+    </div>
+  </section>
+
   <div class="ending-panel hidden" id="endingPanel">
     <div class="ending-stars">✨ 🏆 ✨</div>
     <h2>Лес снова живой!</h2>
@@ -118,5 +145,6 @@
 <script defer src="./voice-engine.js?v=6"></script>
 <script defer src="./forest3-data.js?v=1"></script>
 <script defer src="./forest3.js?v=14"></script>
+<script defer src="./potion-atelier.js?v=1"></script>
 </body>
 </html>

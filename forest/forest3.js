@@ -380,7 +380,7 @@ function renderEgg(root){
 function renderFinish(root){
  put(root,"div","scene-complete-banner","🏆 Медаль Хранителя леса получена!");
  put(root,"p","puzzle-hint","Ты прошёл всю историю. Лес теперь живёт и светится благодаря тебе.");
- primary(root,"🏰 В семейную Академию",()=>{window.location.href="./?v=40"})
+ primary(root,"🏰 В семейную Академию",()=>{window.location.href="./?v=41"})
 }
 function resetChapter(){
  if(window.AcademyVoice)window.AcademyVoice.stop();if(!window.confirm("Начать главу сначала? Медаль за первое прохождение сохранится."))return;

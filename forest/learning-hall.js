@@ -20,7 +20,7 @@ function hallRender(){
   content.appendChild(title);content.appendChild(sub);content.appendChild(progress);btn.appendChild(icon);btn.appendChild(content);btn.onclick=()=>hallStartLesson(subject.id);root.appendChild(btn)
  }
  hallSection(hallMode);
- if(hallMode==="lesson"&&hallLesson)hallDrawLesson();
+ if(hallMode==="lesson"&&hallLesson){if(hallAnswered){if(hallLesson.step===4)hallCompleteLesson();else{hallLesson.step++;hallDrawLesson()}}else hallDrawLesson()}
  if(hallMode==="trace"&&typeof hallShowTrace==="function")hallShowTrace();
  if(hallMode==="pairs"&&typeof hallShowPairs==="function")hallShowPairs();
 }

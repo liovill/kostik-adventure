@@ -7,7 +7,7 @@
 <meta name="description" content="Князь и Кудрявый: семейная Академия волшебства для Кости и Кирилла. Приключения, задания, карта и общий замок.">
 <title>Князь и Кудрявый | Академия волшебства</title>
 <link rel="stylesheet" href="./kingdom.css?v=1">
-<link rel="stylesheet" href="./dragon-garden.css?v=1">
+<link rel="stylesheet" href="./dragon-garden.css?v=2">
 </head>
 <body>
 <div id="app">
@@ -60,7 +60,7 @@
     <div><span class="chip" id="nextChapter">Глава 1</span><h3 id="nextTitle" style="margin:11px 0 6px">Лес искр</h3><p id="nextDesc">Найди потерянные волшебные кристаллы.</p><button class="button small" id="nextMission">Отправиться ✨</button></div>
     <div class="art" id="nextEmoji">🌲</div>
   </div>
-  <button class="pet-promo" data-go="garden" aria-label="Отправиться в Драконий сад"><span><strong>🐉 Познакомься с Искриком!</strong><small>Покорми дракончика, сыграй в волшебные игры и помоги братьям вырастить общего друга.</small></span><span class="pet-promo-art" aria-hidden="true">🐲</span></button>
+  <button class="pet-promo" data-go="garden" aria-label="Отправиться в Драконий сад"><span><strong>🐉 Познакомься с Искриком!</strong><small>Покорми дракончика, сыграй в волшебные игры и помоги братьям вырастить общего друга.</small><span class="chip" id="homePetHearts">❤️ 0 из 24 сердечек</span></span><span class="pet-promo-art" aria-hidden="true">🐲</span></button>
 <div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
   <div class="quick-grid">
     <button class="quick" data-go="castle"><span class="emoji">🏰</span><strong>Семейный замок</strong><span>Расти вместе и украшай комнаты</span></button>
@@ -88,6 +88,7 @@
       <div id="worldDecor" aria-hidden="true"></div>
       <button class="gate" id="worldGate" aria-label="Волшебные ворота">🏰</button>
       <div id="worldTokens"></div>
+      <div class="world-pet hidden" id="worldPet" aria-hidden="true">🐲</div>
       <div class="hero-actor" id="worldActor"><div id="actorArt"></div><span class="name-tag" id="actorName">Костя</span></div>
       <div class="field-speech" id="fieldBubble">Ищи волшебные предметы!</div>
     </div>
@@ -210,7 +211,7 @@
 </div>
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <script defer src="./kingdom-data.js?v=1"></script>
-<script defer src="./kingdom.js?v=3"></script>
+<script defer src="./kingdom.js?v=4"></script>
 <script defer src="./dragon-garden.js?v=1"></script>
 </body>
 </html>

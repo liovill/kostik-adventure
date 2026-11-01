@@ -215,8 +215,8 @@ function renderGardenInline(){
 }
 function plantSeed(i){
  if(state().stage!==2||state().seeds[i])return;
- if(selectedSeed===null){feedback("Сначала выбери семечко сверху.");return}
- if(selectedSeed!==i){feedback("💛 Цвета пока не совпадают. Попробуй другую клумбу.");return}
+ if(selectedSeed===null){feedback("Сначала выбери семечко сверху.");say("Сначала выбери семечко.",false,"owl");return}
+ if(selectedSeed!==i){feedback("💛 Цвета пока не совпадают. Попробуй другую клумбу.");say("Найди клумбу такого же цвета.",false,"owl");return}
  state().seeds[i]=true;selectedSeed=null;const count=state().seeds.filter(Boolean).length;
  if(count===3){save();advance();return}save();render();feedback("🌸 Цветок вырос! Осталось "+(3-count)+".");say("Смотри! Цветочек вырос!")
 }
@@ -230,7 +230,7 @@ function renderPatterns(root){
   const b=put(choices,"button","task-choice"+(String(value).length>2?" textual":""),value);
   b.onclick=()=>{
    if(state().stage!==3)return;
-   if(value!==t.correct){b.classList.add("wrong");feedback("💛 Посмотри на узор ещё раз. Попробуй другой вариант.");return}
+   if(value!==t.correct){b.classList.add("wrong");feedback("💛 Посмотри на узор ещё раз. Попробуй другой вариант.");say("Посмотри на узор ещё раз. У тебя получится!",false,"owl");return}
    state().patterns++;if(state().patterns===3){save();advance();return}
    save();render();feedback("✨ Верно! Мозаика становится ярче.");say("Молодец! Узор оживает. "+missionSpeech())
   }
@@ -261,8 +261,8 @@ function renderBridgeInline(){
 }
 function installPlank(i){
  if(state().stage!==4||state().planks[i])return;
- if(selectedPlank===null){feedback("Сначала выбери дощечку выше.");return}
- if(selectedPlank!==i){feedback("💛 Эта дощечка подходит другому месту. Попробуй ещё.");return}
+ if(selectedPlank===null){feedback("Сначала выбери дощечку выше.");say("Сначала выбери дощечку.",false,"owl");return}
+ if(selectedPlank!==i){feedback("💛 Эта дощечка подходит другому месту. Попробуй ещё.");say("Давай попробуем другое место.",false,"owl");return}
  state().planks[i]=true;selectedPlank=null;const done=state().planks.filter(Boolean).length;
  if(done===3){save();advance();return}save();render();feedback("🌉 Одна часть моста готова! Осталось "+(3-done)+".");say("Ура! Мост становится крепче!")
 }
@@ -294,7 +294,7 @@ function renderMemory(root){
   const prev=put(root,"div","memory-preview");
   put(prev,"div","memory-symbols",info.sequence.join(" "));
   put(prev,"div","puzzle-hint","Посмотри, запомни порядок и нажми кнопку.");
-  primary(root,"✨ Я запомнил!",()=>{memoryShowing=false;memoryInput=[];render();feedback("Теперь нажимай на камни в том же порядке.")})
+  primary(root,"✨ Я запомнил!",()=>{memoryShowing=false;memoryInput=[];render();feedback("Теперь нажимай на камни в том же порядке.");say("Теперь повтори цвета в том же порядке.",false,"owl")})
  }else{
   put(root,"p","puzzle-hint","Повтори цвета в том же порядке. Если забудешь, можно посмотреть ещё раз.");
   put(root,"div","memory-entry",memoryInput.join(" ")+"  "+"○ ".repeat(info.sequence.length-memoryInput.length));
@@ -313,7 +313,7 @@ function renderMemory(root){
 function memoryPress(value){
  if(state().stage!==5||memoryShowing)return;
  const info=F3_MEMORY[hero][state().memory],n=memoryInput.length;
- if(value!==info.sequence[n]){memoryInput=[];feedback("💛 Попробуем снова. Можно посмотреть последовательность ещё раз.");render();feedback("💛 Давай попробуем снова. У тебя получится!");return}
+ if(value!==info.sequence[n]){memoryInput=[];feedback("💛 Попробуем снова. Можно посмотреть последовательность ещё раз.");render();feedback("💛 Давай попробуем снова. У тебя получится!");say("Попробуем снова. Ты можешь посмотреть последовательность ещё раз.",false,"owl");return}
  memoryInput.push(value);
  if(memoryInput.length===info.sequence.length){
   state().memory++;memoryShowing=true;memoryInput=[];
@@ -331,7 +331,7 @@ function renderEgg(root){
   const b=put(choices,"button","task-choice"+(String(value).length>2?" textual":""),value);
   b.onclick=()=>{
    if(state().stage!==6)return;
-   if(value!==t.correct){b.classList.add("wrong");feedback("💛 Почти! Дракончик верит в тебя. Попробуй ещё.");return}
+   if(value!==t.correct){b.classList.add("wrong");feedback("💛 Почти! Дракончик верит в тебя. Попробуй ещё.");say("Почти! Давай попробуем ещё.",false,"owl");return}
    state().eggs++;
    if(state().eggs===3){save();advance();return}
    save();render();feedback("✨ Яйцо засветилось ещё ярче!");say("Ура! Дракончик скоро проснётся! "+missionSpeech())

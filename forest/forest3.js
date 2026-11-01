@@ -39,11 +39,22 @@ let hero=(localStorage.getItem(F3_HERO_STORAGE)||family.active)==="kirill"?"kiri
 let scene=F3_STAGES[family.forest3.heroes[hero].stage].scene;
 let selectedSeed=null,selectedPlank=null,memoryShowing=true,memoryInput=[],feedbackTimer=null;
 function state(){return family.forest3.heroes[hero]}
-function save(){
+function f3MergeCurrent(a,b){
+ const x=f3Clean(a),y=f3Clean(b);
+ x.stage=Math.max(x.stage,y.stage);
+ for(const key of ["lights","seeds","planks"])x[key]=x[key].map((v,i)=>v||y[key][i]);
+ for(const key of ["patterns","memory","eggs","replays"])x[key]=Math.max(x[key],y[key]);
+ x.medal=x.medal||y.medal;
+ return x
+}
+function save(resetChapterNow=false){
  try{
-  // Preserve any other Academy data, including its older towers and rewards.
+  // Preserve the other brother's chapter on concurrent tabs.
   const latest=f3ReadFamily();
-  latest.forest3=family.forest3;
+  const latestHeroes=latest.forest3&&latest.forest3.heroes||{};
+  const current=f3Clean(family.forest3.heroes[hero]);
+  const merged=resetChapterNow?current:f3MergeCurrent(current,latestHeroes[hero]);
+  latest.forest3={heroes:{...latestHeroes,[hero]:merged}};
   latest.settings=family.settings;
   latest.active=hero;
   family=latest;f3EnsureFamily();
@@ -360,7 +371,7 @@ function resetChapter(){
  if(window.AcademyVoice)window.AcademyVoice.stop();if(!window.confirm("Начать главу сначала? Медаль за первое прохождение сохранится."))return;
  const previous=state(),replay=f3Empty();replay.medal=previous.medal;replay.replays=previous.replays+1;
  family.forest3.heroes[hero]=replay;scene="grove";if(window.AcademySound)window.AcademySound.setScene(scene);selectedSeed=null;selectedPlank=null;
- save();render();story("Лес готов к новому приключению! Поговори с совой Луной.","🦉 Сова Луна",true)
+ save(true);render();story("Лес готов к новому приключению! Поговори с совой Луной.","🦉 Сова Луна",true)
 }
 function switchHero(){
  if(window.AcademyVoice)window.AcademyVoice.stop();hero=hero==="kostya"?"kirill":"kostya";save();scene=activeSceneForStage();if(window.AcademySound)window.AcademySound.setScene(scene);selectedSeed=null;selectedPlank=null;memoryShowing=true;memoryInput=[];

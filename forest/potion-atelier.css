@@ -1,0 +1,36 @@
+
+/* Волшебная кухня: дополнительное интерактивное занятие для обоих братьев. */
+.atelier-panel{position:relative;overflow:hidden;margin:20px 0;padding:clamp(14px,3vw,24px);background:radial-gradient(ellipse at 85% 0,#78945d8a 0,transparent 42%),linear-gradient(140deg,#2e5b50,#274359 72%,#283b65);border:2px solid #d2e6ae8f;border-radius:24px;box-shadow:0 16px 34px #071b286b;color:#f5f6e6}
+.atelier-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.atelier-head h2{font-size:clamp(23px,4.5vw,32px);color:#ffdf9a;margin:5px 0 7px}
+.atelier-head p{font-size:clamp(13px,2.8vw,16px);color:#deefe0;margin:0;line-height:1.55}
+.atelier-kicker{font-size:10px;letter-spacing:.13em;font-weight:900;color:#d6eab0}
+.atelier-avatar{font-size:clamp(46px,10vw,80px);filter:drop-shadow(0 6px 10px #102c3a70)}
+.atelier-recipe{display:block;margin:13px 0;padding:12px 15px;background:#182c396b;border:1px solid #e0e6b681;border-radius:15px;color:#fff2c8;font-size:clamp(19px,4vw,26px);font-weight:850;text-align:center;line-height:1.4;letter-spacing:.035em}
+.atelier-workbench{display:grid;grid-template-columns:minmax(145px,36%) minmax(0,1fr);gap:16px;align-items:center}
+.atelier-pot-area{display:grid;justify-items:center;align-content:center;gap:7px;padding:13px 5px;min-height:240px;border-radius:23px;background:radial-gradient(circle at 50% 56%,#ffe49a33,transparent 70%),#17343e5e}
+.atelier-cauldron{position:relative;display:grid;place-items:center;width:170px;height:170px;max-width:100%;border-radius:50%;background:radial-gradient(circle at 50% 48%,var(--brew-hue,#99cafe) 0,#7e86c395 30%,#192d4e 64%,transparent 68%);box-shadow:0 0 34px #d8e9b34b;isolation:isolate}
+.atelier-pot-emoji{position:absolute;z-index:1;font-size:109px;line-height:1;filter:drop-shadow(0 8px 6px #0007)}
+.atelier-pot-contents{position:absolute;z-index:2;top:31%;left:6%;right:6%;text-align:center;font-size:25px;filter:drop-shadow(0 2px 3px #000a);overflow-wrap:anywhere}
+.atelier-result{position:absolute;z-index:3;top:-7px;right:9px;font-size:38px;text-shadow:0 0 16px #ffe999}
+.atelier-count{font-size:14px;font-weight:900;color:#d7f1cb}
+.atelier-ingredients{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.atelier-ingredient{min-height:93px;padding:8px 4px;border:2px solid #f6ebbfa8;border-radius:17px;background:linear-gradient(150deg,#fff4d6,#e9f1d0);color:#34423c;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;box-shadow:0 4px 0 #7d9f85;cursor:pointer;touch-action:manipulation}
+.atelier-ingredient .ingredient-icon{font-size:clamp(30px,5vw,48px);line-height:1.1}
+.atelier-ingredient small{font-weight:800;font-size:clamp(11px,2vw,13px)}
+.atelier-ingredient:active{transform:translateY(3px);box-shadow:0 1px 0 #7d9f85}
+.atelier-ingredient:focus-visible,.atelier-next:focus-visible,.atelier-clear:focus-visible{outline:4px solid #fffcab;outline-offset:3px}
+.atelier-ingredients.toddler{grid-template-columns:repeat(2,minmax(0,1fr))}
+.atelier-ingredients.toddler .atelier-ingredient{min-height:111px}
+.atelier-ingredients.toddler .ingredient-icon{font-size:clamp(39px,8vw,60px)}
+.atelier-feedback{min-height:31px;margin:13px 0;font-size:15px;font-weight:800;color:#fbe7af;line-height:1.5}
+.atelier-actions{display:flex;flex-wrap:wrap;gap:9px}
+.atelier-next,.atelier-clear{border-radius:14px;min-height:49px;padding:11px 16px;font-size:14px;font-weight:850;cursor:pointer}
+.atelier-next{background:#f5dda2;color:#2c3e3e;border:1px solid #ffe5a0}
+.atelier-clear{background:#ffffff1c;color:#eaf5ed;border:1px solid #cee7bd8c}
+.atelier-cauldron.pop{animation:atelier-pop .45s ease-out}
+.world-scene.potion-sparkle{animation:atelier-scene 1.5s ease-out}
+@keyframes atelier-pop{50%{transform:scale(1.11);filter:brightness(1.2)}}
+@keyframes atelier-scene{40%{filter:saturate(1.5) brightness(1.13)}}
+@media(max-width:580px){.atelier-workbench{grid-template-columns:1fr;gap:9px}.atelier-pot-area{min-height:190px;padding:7px}.atelier-cauldron{width:145px;height:145px}.atelier-pot-emoji{font-size:90px}.atelier-pot-contents{font-size:23px}.atelier-result{font-size:30px}.atelier-ingredients{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.atelier-ingredient{min-height:90px}.atelier-ingredients.toddler{grid-template-columns:repeat(3,minmax(0,1fr))}.atelier-ingredients.toddler .atelier-ingredient{min-height:99px}.atelier-ingredients.toddler .ingredient-icon{font-size:clamp(34px,10vw,48px)}}
+@media(prefers-reduced-motion:reduce){.atelier-cauldron.pop,.world-scene.potion-sparkle{animation:none}}

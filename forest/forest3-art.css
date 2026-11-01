@@ -1,0 +1,128 @@
+/* Зачарованный лес: атмосферные глубины, собственные персонажи и игровые секреты.
+ * Векторные детали работают без сетевых ассетов и без JS-анимации по кадрам.
+ */
+.world-frame{border:2px solid #b2ddaeb0;box-shadow:0 13px 34px #0b243a70,0 0 0 3px #ffffff14}
+.world-scene{
+ --glimmer:#f6e5a5;
+ background:
+ radial-gradient(circle at 81% 12%,#fff6c670,transparent 23%),
+ linear-gradient(180deg,#476e88 0%,#7fb5ae 31%,#c1d9ad 55%,#6a9872 56%,#2e675b 100%);
+ transition:background .75s ease;
+}
+.world-scene.grove{--glimmer:#ffe8ac;background:radial-gradient(circle at 81% 12%,#fff2bd77,transparent 24%),linear-gradient(180deg,#3a657d 0%,#76b5a8 36%,#c5d9ae 55%,#5f9976 55.5%,#255b52 100%)}
+.world-scene.garden{--glimmer:#ffeabf;background:radial-gradient(circle at 78% 16%,#fff2a6a0,transparent 29%),linear-gradient(180deg,#75b2ba 0%,#a4d5bd 40%,#f2dca5 55%,#94bd7f 56%,#467e68 100%)}
+.world-scene.river{--glimmer:#d9ffff;background:radial-gradient(circle at 79% 14%,#f1f6dc81,transparent 22%),linear-gradient(180deg,#5c8bad 0%,#acd2d9 42%,#d5eadc 54%,#669ca6 55%,#285f79 100%)}
+.world-scene.clearing{--glimmer:#ffe6cf;background:radial-gradient(circle at 80% 14%,#ffdda77d,transparent 24%),linear-gradient(180deg,#615b95 0%,#a991b9 39%,#f4cda7 55%,#7daa88 56%,#466b70 100%)}
+.world-scene.restored{filter:saturate(1.12)}
+.world-scene::before{background:radial-gradient(circle at 81% 18%,#fff8d289 0 3%,transparent 19%);opacity:.75}
+.world-scene::after{background:linear-gradient(180deg,#16333a19 0%,transparent 31%,transparent 73%,#142e357a 100%);z-index:8}
+.world-scene .sun{right:16%;top:12%;width:clamp(48px,9vw,72px);height:clamp(48px,9vw,72px);background:radial-gradient(circle at 35% 30%,#fffce8,#ffecc1 57%,#eacb86);box-shadow:0 0 40px 16px #fff0ae52,0 0 85px 30px #fff1ab3d}
+.forest-godrays{position:absolute;inset:-70% -15% -15%;z-index:0;pointer-events:none;background:conic-gradient(from 205deg at 80% 54%,transparent 0 8deg,#fff9cc1d 11deg,transparent 18deg 24deg,#fff9ce2d 27deg,transparent 36deg 43deg,#fff8cf24 47deg,transparent 58deg 66deg,#f6ffd51a 71deg,transparent 83deg 360deg);mix-blend-mode:screen;opacity:.75;transform-origin:79% 53%;animation:forest-rays 18s ease-in-out infinite alternate}
+.forest-fog{position:absolute;inset:42% -10% 0;z-index:1;pointer-events:none;background:radial-gradient(ellipse at 24% 65%,#e7ffe147,transparent 48%),radial-gradient(ellipse at 86% 47%,#d8e8ea55,transparent 42%);filter:blur(12px);opacity:.7}
+.forest-ridge{position:absolute;left:-12%;right:-12%;pointer-events:none;z-index:0;filter:drop-shadow(0 12px 6px #153f4a2b)}
+.forest-ridge-far{top:34%;height:32%;background:linear-gradient(#86a9a4,#57877d);clip-path:polygon(0 100%,0 42%,8% 30%,19% 61%,28% 18%,42% 56%,53% 28%,65% 58%,79% 11%,89% 55%,100% 25%,100% 100%)}
+.forest-ridge-near{z-index:1;top:46%;height:46%;background:linear-gradient(175deg,#3f8c75,#275d56 93%);clip-path:polygon(0 100%,0 15%,12% 43%,24% 16%,36% 55%,48% 22%,60% 47%,77% 14%,88% 54%,100% 13%,100% 100%);opacity:.76}
+.world-scene.garden .forest-ridge-far{background:linear-gradient(#a9bf98,#649c80)}
+.world-scene.river .forest-ridge-far{background:linear-gradient(#89b4b3,#5d9099)}
+.world-scene.clearing .forest-ridge-far{background:linear-gradient(#aaa1b8,#707a99)}
+.world-scene.clearing .forest-ridge-near{opacity:.52}
+.world-scene .world-path{background:linear-gradient(90deg,#c69f6e8c 0,#f4dfadcb 40%,#d2b17d9e 100%);box-shadow:inset 2px 0 18px #af8f6d63}
+.world-scene .mountain{opacity:.49}
+.world-scene .tree{filter:drop-shadow(0 12px 12px #122d3d77)}
+.world-scene .trunk{background:repeating-linear-gradient(90deg,#5a3e34 0 6px,#876044 7px 13px,#a2754e 14px 18px)}
+.world-scene .crown{background:radial-gradient(circle at 30% 21%,#aed28a,#69a37c 34%,#3e7c67 67%,#235c57 90%);box-shadow:inset -20px -13px 33px #194c4d7a,inset 14px 10px 18px #d5f0a129,0 3px 15px #123f395b;animation:forest-sway 8s ease-in-out infinite alternate;transform-origin:50% 90%}
+.world-scene .crown::before,.world-scene .crown::after{content:"";position:absolute;border-radius:50%;pointer-events:none}
+.world-scene .crown::before{width:61%;height:58%;left:4%;top:12%;background:radial-gradient(circle at 24% 24%,#e1f3a15c,transparent 65%)}
+.world-scene .crown::after{width:49%;height:42%;right:5%;bottom:12%;background:radial-gradient(circle at 45% 40%,#84b98183,transparent 72%)}
+.world-scene.garden .crown{filter:hue-rotate(-13deg) brightness(1.12)}
+.world-scene.river .crown{filter:hue-rotate(12deg) saturate(.8)}
+.world-scene.clearing .crown{filter:hue-rotate(36deg) brightness(.94)}
+.forest-floor-details{position:absolute;inset:0;z-index:3;pointer-events:none}
+.forest-shrub{position:absolute;bottom:-3%;width:24%;height:31%;border-radius:65% 60% 40% 40%;background:radial-gradient(ellipse at 30% 24%,#b8e0a0,#57976e 43%,#205a51 85%);box-shadow:0 -7px 12px #346a627b;opacity:.95}
+.shrub-one{left:-7%;transform:rotate(-7deg)}.shrub-two{right:-6%;transform:rotate(7deg)}.shrub-three{right:17%;bottom:-11%;width:16%;height:19%;opacity:.65}
+.forest-shrub::before,.forest-shrub::after{content:"";position:absolute;width:63%;height:64%;bottom:18%;background:inherit;border-radius:50%}
+.forest-shrub::before{left:-13%;transform:rotate(-24deg)}.forest-shrub::after{right:-14%;transform:rotate(27deg)}
+.forest-mushroom-shape{position:absolute;bottom:7%;width:23px;height:30px;border-radius:10px;background:linear-gradient(90deg,#fff2c7,#d5c5a0);transform:rotate(-7deg);filter:drop-shadow(0 3px 3px #133e3955)}
+.forest-mushroom-shape::before{content:"";position:absolute;left:-16px;top:-11px;width:53px;height:25px;border-radius:65% 65% 27% 27%;background:radial-gradient(circle at 27% 39%,#ffdfbe 0 4px,transparent 5px),radial-gradient(circle at 72% 35%,#ffdfbe 0 5px,transparent 6px),linear-gradient(#e98d74,#a95a60);box-shadow:inset 0 -5px 0 #9c575d9c}
+.mushroom-one{left:6%}.mushroom-two{right:8%;bottom:11%;transform:scale(.65) rotate(15deg)}
+.world-scene.river .forest-mushroom-shape,.world-scene.clearing .forest-mushroom-shape{opacity:.35}
+.forest-pebbles{position:absolute;bottom:8%;left:31%;width:40%;height:18px;background:radial-gradient(ellipse at 15% 50%,#e6c79f 0 10px,transparent 11px),radial-gradient(ellipse at 41% 64%,#d6b18a 0 8px,transparent 9px),radial-gradient(ellipse at 68% 26%,#eddaaa 0 6px,transparent 7px),radial-gradient(ellipse at 85% 63%,#bfa181 0 11px,transparent 12px);opacity:.8}
+.world-scene .river{background:repeating-linear-gradient(-11deg,#55c9d29e 0 14px,#a4eff3c7 14px 18px,#438bb19e 18px 30px),linear-gradient(180deg,#bdf9f2,#3e91a6);box-shadow:0 -9px 26px #bff7ee74,0 5px 14px #124c697a}
+.world-scene.river .bridge{filter:drop-shadow(0 7px 10px #183c4950)}
+.world-scene.garden .flower-bed{filter:drop-shadow(0 4px 11px #aaf6aa);animation:forest-flower-breathe 4.9s ease-in-out infinite alternate}
+.world-scene.restored .world-nest{animation:forest-dragon-float 4s ease-in-out infinite}
+.forest-motes,.scene-celebration{position:absolute;inset:0;pointer-events:none}
+.forest-motes{z-index:4;overflow:hidden}
+.forest-mote{position:absolute;width:4px;height:4px;border-radius:50%;background:#fff6b4;box-shadow:0 0 9px 3px #fff4a16b;opacity:0;animation:forest-mote-drift var(--duration,6s) ease-in-out var(--delay,0s) infinite alternate}
+.world-scene.river .forest-mote{background:#dcffff;box-shadow:0 0 9px 4px #c3f7ff90}
+.world-scene.clearing .forest-mote{background:#ffddfc;box-shadow:0 0 10px 4px #ffc4f18c}
+.scene-discoveries{position:absolute;inset:0;z-index:9;pointer-events:none}
+.forest-discovery{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-width:61px;min-height:64px;max-width:105px;padding:3px 4px;border-radius:19px;border:1px solid #fdf0be8a;background:radial-gradient(circle at 45% 37%,#fff5c85e,#2a54556c 70%);box-shadow:0 0 15px #fff2a177,0 4px 9px #173e4766;color:#fff9d9;transform:translate(-50%,-50%);pointer-events:auto;cursor:pointer;touch-action:manipulation;transition:filter .25s,background .25s}
+.forest-discovery.hidden{display:none!important}
+.forest-discovery .forest-secret-icon{font-size:clamp(27px,5vw,38px);line-height:1.14;animation:forest-find-pulse 4.2s ease-in-out infinite}
+.forest-discovery small{font-size:10px;font-weight:850;white-space:nowrap;text-shadow:0 1px 3px #13353d,0 1px 6px #13353d;line-height:1.35}
+.forest-discovery.found{background:#2755538a;border-color:#b7e4b28c;box-shadow:0 3px 8px #163d466a}
+.forest-discovery.found .forest-secret-icon{filter:saturate(.75);animation:none;opacity:.82}
+.forest-discovery.found small::after{content:" ✓";color:#cbf5b7}
+.forest-discovery:focus-visible{outline:4px solid #fff9b5;outline-offset:3px}
+.forest-discovery:active{filter:brightness(1.5)}
+.scene-celebration{z-index:15;overflow:hidden}
+.forest-burst{position:absolute;display:block;width:0;height:0}
+.forest-burst-star{position:absolute;left:0;top:0;font-size:22px;color:#fff8ac;text-shadow:0 0 14px #ffef9a;animation:forest-star-explode 1s ease-out both;transform:rotate(var(--angle)) translateY(-40px)}
+.forest-secret-bar{display:flex;align-items:center;gap:11px;min-height:63px;padding:10px 15px;background:linear-gradient(110deg,#253f49,#315b57);border-top:1px solid #a9d6c05d;color:#eff9df}
+.forest-secret-emblem{font-size:30px;color:#f3d89c;line-height:1}
+.forest-secret-copy{flex:1;min-width:0;display:grid;gap:2px}.forest-secret-copy strong{font-size:14px;color:#ffedc1}.forest-secret-copy strong span{color:#bcedba;margin-left:3px}.forest-secret-copy small{font-size:11px;color:#cee4d4;line-height:1.3}.forest-secret-orb{font-size:24px;filter:drop-shadow(0 0 8px #f9ecb5)}
+.scene-hotspot.owl{top:45%}
+.scene-hotspot.owl .hotspot-emoji{width:clamp(69px,9.5vw,110px);height:clamp(78px,11vw,113px);display:block}
+.forest-owl-svg,.forest-dragon-svg{width:100%;height:100%;display:block;overflow:visible}
+.scene-hotspot.owl .forest-owl-svg{filter:drop-shadow(0 7px 5px #183a3e80);animation:forest-owl-idle 4.7s ease-in-out infinite alternate}
+.owl-face{width:61px;height:64px;line-height:1;flex:none}
+.owl-face .forest-owl-svg{width:100%;height:100%;filter:drop-shadow(0 2px 5px #152d3880)}
+.talk-owl{width:122px;height:132px;max-width:100%;margin:0 auto 4px;filter:drop-shadow(0 6px 10px #1532386c)}
+.world-nest .forest-dragon-svg{width:clamp(88px,11vw,123px);height:clamp(88px,11vw,123px);filter:drop-shadow(0 9px 8px #23414784);animation:forest-dragon-float 3s ease-in-out infinite}
+.owl-eye-blink,.dragon-eye-blink{transform:scaleY(.04);transform-origin:50% 55%;opacity:0;animation:forest-eye-blink 6.9s ease-in-out infinite}
+.dragon-eye-blink{animation-delay:-2.3s}
+.hero-figure svg{transform-origin:50% 80%;animation:forest-hero-idle 4.5s ease-in-out infinite alternate}
+.hero-figure.walking svg{animation:hero-walk .3s ease-in-out infinite alternate}
+.hero-figure .hero-wave{transform-origin:83px 96px;animation:forest-hero-wave 4.5s ease-in-out infinite}
+@keyframes forest-rays{to{transform:rotate(4deg);opacity:.5}}
+@keyframes forest-sway{to{transform:rotate(2.5deg) translateX(3px)}}
+@keyframes forest-mote-drift{0%{opacity:0;transform:translateY(18px) scale(.6)}30%{opacity:.8}100%{opacity:.22;transform:translate(17px,-42px) scale(1.3)}}
+@keyframes forest-find-pulse{50%{filter:drop-shadow(0 0 9px #fff19c);transform:translateY(-4px)}}
+@keyframes forest-star-explode{0%{opacity:0;transform:rotate(var(--angle)) translateY(0) scale(.4)}25%{opacity:1}100%{opacity:0;transform:rotate(var(--angle)) translateY(-66px) scale(1.5)}}
+@keyframes forest-owl-idle{to{transform:translateY(-5px) rotate(-1.5deg)}}
+@keyframes forest-dragon-float{50%{transform:translateY(-9px) rotate(2deg)}}
+@keyframes forest-eye-blink{0%,92%,97%,100%{opacity:0;transform:scaleY(.04)}94%,95%{opacity:1;transform:scaleY(1)}}
+@keyframes forest-hero-idle{50%{transform:translateY(-2.5px) rotate(.6deg)}}
+@keyframes forest-hero-wave{0%,78%,100%{transform:rotate(0deg)}83%,91%{transform:rotate(-14deg)}}
+@keyframes forest-flower-breathe{to{transform:scale(1.12) rotate(3deg)}}
+@media(max-width:610px){
+ .world-scene .sun{width:53px;height:53px}
+ .world-scene .tree-a{left:-15%;top:24%}.world-scene .tree-b{right:-15%;top:23%}
+ .forest-discovery{min-width:53px;min-height:57px;border-radius:15px;padding:3px}
+ .forest-discovery small{font-size:9px}
+ .forest-discovery .forest-secret-icon{font-size:30px}
+ .scene-hotspot.owl .hotspot-emoji{width:78px;height:84px}
+ .scene-hotspot.owl{left:12%;top:44%}
+ .forest-secret-bar{padding:9px 11px;gap:8px}
+ .forest-secret-copy strong{font-size:13px}
+ .forest-secret-copy small{font-size:10px}
+ .owl-face{width:49px;height:54px}
+ .world-nest .forest-dragon-svg{width:91px;height:96px}
+}
+@media(max-width:370px){
+ .forest-discovery{min-width:50px;min-height:54px}
+ .forest-discovery small{font-size:9px;max-width:70px;white-space:normal}
+ .forest-secret-orb{display:none}
+ .scene-hotspot.owl .hotspot-emoji{width:70px;height:77px}
+ .forest-mushroom-shape{transform:scale(.7)}
+ .forest-secret-bar{min-height:58px}
+}
+@media(prefers-reduced-motion:reduce){
+ .forest-godrays,.world-scene .crown,.world-scene.garden .flower-bed,
+ .forest-mote,.forest-discovery .forest-secret-icon,.scene-hotspot.owl .forest-owl-svg,
+ .owl-eye-blink,.dragon-eye-blink,.world-nest .forest-dragon-svg,
+ .hero-figure svg,.hero-figure .hero-wave,.forest-burst-star{animation:none!important}
+ .owl-eye-blink,.dragon-eye-blink{opacity:0!important}
+ .forest-mote{opacity:.3}
+}

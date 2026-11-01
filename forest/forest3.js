@@ -167,7 +167,7 @@ function render(){
   if(p.lights[i])return;
   const btn=document.createElement("button");btn.className="light-button";
   btn.style.left=f.x+"%";btn.style.top=f.y+"%";btn.textContent=f.icon;
-  btn.setAttribute("aria-label",f.label);btn.onclick=()=>takeLight(i);lights.appendChild(btn)
+  btn.setAttribute("aria-label",f.label);btn.onclick=()=>{if(window.ForestExplorer)window.ForestExplorer.walkToObject(f,()=>takeLight(i));else takeLight(i)};lights.appendChild(btn)
  })}
  const current=sceneIsCurrent();
  $("missionTitle").textContent=current?stage.title:"Здесь уже знакомая тропинка";
@@ -188,7 +188,7 @@ function render(){
  $("endingPanel").classList.toggle("hidden",p.stage!==7);
  if(p.stage===7)$("endingMessage").textContent=F3_NAMES[hero]+", ты вернул свет в лес, помог сове Луне и разбудил дракончика. Медаль Хранителя леса навсегда осталась в твоей книге приключений.";
  $("missionHint").disabled=p.stage===7;
- story(F3_TEXT[p.stage]);if(window.PotionAtelier)window.PotionAtelier.render();if(window.ForestArt)window.ForestArt.render();if(window.ForestWorld)window.ForestWorld.render()
+ story(F3_TEXT[p.stage]);if(window.PotionAtelier)window.PotionAtelier.render();if(window.ForestArt)window.ForestArt.render();if(window.ForestWorld)window.ForestWorld.render();if(window.ForestExplorer)window.ForestExplorer.render()
 }
 function element(tag,cls,text){
  const el=document.createElement(tag);if(cls)el.className=cls;
@@ -420,7 +420,7 @@ function init(){
   story(hero==="kirill"?"Кирилл радостно помахал тебе и зовёт исследовать лес!":"Костик улыбается и готов к следующему волшебному открытию!","✨ Наш герой",true)
  };
  document.querySelectorAll("[data-scene]").forEach(b=>b.onclick=()=>chooseScene(b.dataset.scene,true));
- $("owlHotspot").onclick=openTalk;
+ $("owlHotspot").onclick=()=>{if(window.ForestExplorer)window.ForestExplorer.walkToElement($("owlHotspot"),openTalk);else openTalk()};
  $("saplingHotspot").onclick=()=>{if(state().stage===2){chooseScene("garden");feedback("Выбери цвет семечка и подходящую клумбу.")}else story("Сад оживает от твоей заботы!","🦉 Сова Луна",true)};
  $("riverHotspot").onclick=()=>{if(state().stage===5)story("Посмотри на камни и запомни их мелодию.","🦉 Сова Луна",true);else story("Вода несёт в лес новые песни.","🦉 Сова Луна",true)};
  $("nestHotspot").onclick=()=>{if(state().stage===6)story("Скорее помоги дракончику выбраться из яйца!","🦉 Сова Луна",true);else story("Теперь здесь живёт наш новый друг, Искрик!","🦉 Сова Луна",true)};

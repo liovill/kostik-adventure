@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="./forest3.css?v=5">
 <link rel="stylesheet" href="./voice-studio.css?v=2">
 <link rel="stylesheet" href="./potion-atelier.css?v=1">
+<link rel="stylesheet" href="./forest3-art.css?v=1">
 </head>
 <body>
 <div class="app" id="forestApp">
@@ -34,6 +35,10 @@
   <section class="world-frame" id="worldFrame" aria-label="Интерактивная карта Зачарованного леса">
     <div class="world-scene grove" id="worldScene">
       <div class="sun"></div>
+      <div class="forest-godrays" aria-hidden="true"></div>
+      <div class="forest-fog" aria-hidden="true"></div>
+      <div class="forest-ridge forest-ridge-far" aria-hidden="true"></div>
+      <div class="forest-ridge forest-ridge-near" aria-hidden="true"></div>
       <div class="sky-cloud cloud-a"></div><div class="sky-cloud cloud-b"></div>
       <div class="mountain mountain-a"></div><div class="mountain mountain-b"></div>
       <div class="tree tree-a"><div class="crown"></div><div class="trunk"></div></div>
@@ -41,6 +46,8 @@
       <div class="tree tree-c"><div class="crown"></div><div class="trunk"></div></div>
       <div class="tree tree-d"><div class="crown"></div><div class="trunk"></div></div>
       <div class="world-path"></div><div class="river"></div>
+      <div class="forest-floor-details" aria-hidden="true"><span class="forest-shrub shrub-one"></span><span class="forest-shrub shrub-two"></span><span class="forest-shrub shrub-three"></span><span class="forest-mushroom-shape mushroom-one"></span><span class="forest-mushroom-shape mushroom-two"></span><span class="forest-pebbles"></span></div>
+      <div class="forest-motes" id="forestMotes" aria-hidden="true"></div>
       <div class="bridge" id="worldBridge"><span class="rope"></span><span class="planks" id="bridgePlanks"></span></div>
       <div class="flower-bed bed-a" id="bedArt0">🌱</div>
       <div class="flower-bed bed-b" id="bedArt1">🌱</div>
@@ -48,6 +55,8 @@
       <div class="world-portal" id="worldPortal">🏡</div>
       <div class="world-nest" id="worldNest">🥚</div>
       <div class="forest-lights" id="forestLights"></div>
+      <div class="scene-discoveries" id="sceneDiscoveries" aria-label="Волшебные предметы для поиска"></div>
+      <div class="scene-celebration" id="sceneCelebration" aria-hidden="true"></div>
       <div class="hero-figure" id="heroActor" aria-hidden="true"></div>
       <div class="scene-badge" id="sceneBadge">🌲 Лесная опушка</div>
       <button class="scene-hotspot owl" id="owlHotspot" aria-label="Поговорить с мудрой совой"><span class="hotspot-emoji">🦉</span><span class="hotspot-label">Сова Луна</span></button>
@@ -60,6 +69,11 @@
       <button data-scene="garden">🌼 Сад</button>
       <button data-scene="river">🌊 Река</button>
       <button data-scene="clearing">🐲 Поляна</button>
+    </div>
+    <div class="forest-secret-bar" aria-live="polite">
+      <span class="forest-secret-emblem" aria-hidden="true">✦</span>
+      <div class="forest-secret-copy"><strong>Сокровища леса <span id="forestSecretCount">0 / 8</span></strong><small id="forestSecretHint">Потрогай волшебные предметы на карте</small></div>
+      <span class="forest-secret-orb" aria-hidden="true">✨</span>
     </div>
   </section>
 
@@ -145,7 +159,8 @@
 <script defer src="./voice-lines.js?v=1"></script>
 <script defer src="./voice-engine.js?v=6"></script>
 <script defer src="./forest3-data.js?v=1"></script>
-<script defer src="./forest3.js?v=15"></script>
+<script defer src="./forest3.js?v=16"></script>
+<script defer src="./forest3-art.js?v=1"></script>
 <script defer src="./potion-atelier.js?v=1"></script>
 </body>
 </html>

@@ -63,8 +63,8 @@ function hallTraceCheck(){
  if(hallMode!=="trace")return;
  const shape=hallTraceShape(),r=hallTraceScore(shape.path,hallTracePoints);
  $("hallTraceFeedback").textContent=r.ok?"🌟 Замечательно! Получилось!":"💛 "+r.reason;
- if(!r.ok)return;
- hallTraceSuccess=true;
+ if(!r.ok){if(window.AcademySound)window.AcademySound.cue("try");return}
+ if(window.AcademySound)window.AcademySound.cue("good");hallTraceSuccess=true;
  if(!hallProfile().traceAwards[shape.id]){hallProfile().traceAwards[shape.id]=true;save();$("hallTraceFeedback").textContent="🎉 Новая звезда за "+shape.title+"!"}
  else $("hallTraceFeedback").textContent="🌟 Отличное повторение "+shape.title+"!";
  $("hallTraceCheck").classList.add("hidden");$("hallTraceNext").classList.remove("hidden");
@@ -110,8 +110,8 @@ function hallPairPickRight(i,button){
  if(hallPairSelected===null){$("hallPairsFeedback").textContent="Сначала выбери предмет слева.";return}
  if(hallPairMatched.has(i))return;
  const chosen=hallPairSelected;
- if(i!==chosen){$("hallPairsFeedback").textContent="💛 Попробуй другой предмет справа.";button.classList.add("wrong");setTimeout(()=>button.classList.remove("wrong"),500);return}
- hallPairMatched.add(i);hallPairButtons.left[i].classList.remove("active");hallPairButtons.left[i].classList.add("matched");hallPairButtons.left[i].disabled=true;
+ if(i!==chosen){if(window.AcademySound)window.AcademySound.cue("try");$("hallPairsFeedback").textContent="💛 Попробуй другой предмет справа.";button.classList.add("wrong");setTimeout(()=>button.classList.remove("wrong"),500);return}
+ hallPairMatched.add(i);if(window.AcademySound)window.AcademySound.cue("good");hallPairButtons.left[i].classList.remove("active");hallPairButtons.left[i].classList.add("matched");hallPairButtons.left[i].disabled=true;
  button.classList.add("matched");button.disabled=true;hallPairSelected=null;hallPairProgress();
  if(hallPairMatched.size===4){
   const repeated=hallProfile().pairAwards.includes(hallPairIndex);

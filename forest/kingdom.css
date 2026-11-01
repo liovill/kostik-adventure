@@ -12,3 +12,14 @@
 /* Safe-area compact sound controls on iPhone SE/mini. */
 @media(max-width:450px){.topbar{gap:5px}.wordmark{flex:0 0 auto;min-width:0}.wordmark span:not(.emblem){display:none}.wordmark .emblem{flex:none;width:38px;height:38px;font-size:22px}.top-actions{gap:5px;min-width:0}.top-btn.tiny{flex:none;width:38px;min-height:38px;border-radius:50%;padding:6px;font-size:19px;display:grid;place-items:center}.top-btn:not(.tiny){font-size:12px;min-height:39px;padding:7px 9px;white-space:nowrap}.topbar{justify-content:space-between}}
 @media(max-width:350px){.topbar{gap:3px}.top-actions{gap:3px}.top-btn.tiny{width:35px;min-height:35px}.top-btn:not(.tiny){padding:6px 7px}.wordmark .emblem{width:34px;height:35px}}
+
+/* Visible original soundtrack in the Academy lobby. */
+.academy-soundbar{display:flex;gap:12px;align-items:center;margin:14px 0 6px;padding:12px 14px;border-radius:20px;border:1px solid #ebd8a6a0;background:linear-gradient(110deg,#29385a,#35506a 65%,#3b6263);box-shadow:0 7px 22px #060d2244;color:#f8f7e8}
+.academy-soundbar-art{font-size:34px;display:grid;place-items:center;width:47px;height:47px;flex:none;background:#ffffff1d;border:1px solid #ffffff46;border-radius:16px}
+.academy-soundbar-label{flex:1;min-width:0;display:grid;gap:3px}.academy-soundbar-label strong{font-size:15px;color:#ffe7ad;font-weight:850;line-height:1.25}.academy-soundbar-label small{font-size:12px;color:#dcebec;line-height:1.3}
+.academy-soundbar-toggle{flex:none;min-height:45px;min-width:130px;padding:9px 12px;background:linear-gradient(130deg,#ffe7b0,#efc277);color:#2d3944;font-size:13px;font-weight:900;border:1px solid #ffebc0;border-radius:14px;cursor:pointer}.academy-soundbar-toggle[aria-pressed="true"]{background:#c8f0d3;color:#214f44;border-color:#edffe6}
+.academy-soundbar.playing{border-color:#d8eba4}.academy-soundbar.playing .academy-soundbar-art{animation:academy-sound-breathe 2.7s ease-in-out infinite}
+@keyframes academy-sound-breathe{50%{transform:scale(1.09);filter:drop-shadow(0 0 9px #ffe49b)}}
+@media(max-width:520px){.academy-soundbar{padding:10px;gap:8px;margin-top:11px}.academy-soundbar-art{font-size:24px;width:38px;height:38px}.academy-soundbar-label strong{font-size:12px}.academy-soundbar-label small{font-size:11px}.academy-soundbar-toggle{min-width:97px;min-height:44px;font-size:11px;padding:8px}}
+@media(max-width:370px){.academy-soundbar-art{display:none}}
+@media(prefers-reduced-motion:reduce){.academy-soundbar.playing .academy-soundbar-art{animation:none}}

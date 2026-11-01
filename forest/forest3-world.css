@@ -69,3 +69,8 @@
 .app.reduce-motion .world-activity.reacting,.app.reduce-motion .world-activity-sparks span,
 .app.reduce-motion .world-scene.world-wind .tree .crown,.app.reduce-motion .world-scene.world-rain .flower-bed,
 .app.reduce-motion .world-scene.world-bug .forest-shrub,.app.reduce-motion .world-scene.world-ripples .river{animation:none!important}
+
+/* Keep the dragon clearing crystal clear of the feather on 320px phones. */
+@media(max-width:370px){
+ .world-scene.clearing .world-activity[data-object="crystal"]{top:18%!important}
+}

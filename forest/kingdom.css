@@ -36,3 +36,7 @@
  .top-btn.tiny{width:44px;min-height:44px;min-width:44px;padding:4px}
  .top-btn:not(.tiny){padding:5px 6px}
 }
+
+/* Forest treasure collection is visible in the main Academy, too. */
+.forest3-secrets-status{display:inline-flex;align-items:center;gap:4px;margin:5px 0 0 8px;padding:6px 11px;border:1px solid #f0dfaa8a;border-radius:100px;background:#fff2d32c;color:#f8e9b8;font-size:12px;font-weight:850;line-height:1.4;white-space:normal}
+@media(max-width:540px){.forest3-secrets-status{display:flex;max-width:max-content;margin:7px 0 0;font-size:11px;padding:6px 9px}}

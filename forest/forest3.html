@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#132d35">
+<meta name="description" content="Зачарованный лес: первая большая сюжетная глава игры «Князь и Кудрявый». Для Кости и Кирилла.">
+<title>Зачарованный лес 3.0 | Князь и Кудрявый</title>
+<link rel="stylesheet" href="./forest3.css?v=1">
+</head>
+<body>
+<div class="app" id="forestApp">
+  <header class="topbar">
+    <a class="home-link" href="./?v=30" aria-label="Вернуться в Академию">← <span>АКАДЕМИЯ</span></a>
+    <span class="game-brand">✦ КНЯЗЬ И КУДРЯВЫЙ</span>
+    <button class="icon-button" id="voiceToggle" aria-label="Отключить голос">🔊</button>
+  </header>
+
+  <section class="story-head">
+    <div class="eyebrow">ГЛАВА I · ЖИВОЕ ПРИКЛЮЧЕНИЕ</div>
+    <h1>Зачарованный <em>лес</em></h1>
+    <p>Помоги лесу вернуть свет. Каждый твой поступок меняет этот мир.</p>
+    <div class="status-row">
+      <span class="hero-pill"><span id="heroSmall">🧙‍♂️</span> <strong id="heroName">Костя</strong></span>
+      <span class="progress-pill">✦ <span id="progressTitle">Пролог</span></span>
+      <button class="small-link" id="switchHero">Сменить героя</button>
+    </div>
+    <div class="quest-track"><div id="questTrackFill"></div></div>
+    <div class="quest-count" id="questCount">0 из 7 главных этапов</div>
+  </section>
+
+  <section class="world-frame" id="worldFrame" aria-label="Интерактивная карта Зачарованного леса">
+    <div class="world-scene grove" id="worldScene">
+      <div class="sun"></div>
+      <div class="sky-cloud cloud-a"></div><div class="sky-cloud cloud-b"></div>
+      <div class="mountain mountain-a"></div><div class="mountain mountain-b"></div>
+      <div class="tree tree-a"><div class="crown"></div><div class="trunk"></div></div>
+      <div class="tree tree-b"><div class="crown"></div><div class="trunk"></div></div>
+      <div class="tree tree-c"><div class="crown"></div><div class="trunk"></div></div>
+      <div class="tree tree-d"><div class="crown"></div><div class="trunk"></div></div>
+      <div class="world-path"></div><div class="river"></div>
+      <div class="bridge" id="worldBridge"><span class="rope"></span><span class="planks" id="bridgePlanks"></span></div>
+      <div class="flower-bed bed-a" id="bedArt0">🌱</div>
+      <div class="flower-bed bed-b" id="bedArt1">🌱</div>
+      <div class="flower-bed bed-c" id="bedArt2">🌱</div>
+      <div class="world-portal" id="worldPortal">🏡</div>
+      <div class="world-nest" id="worldNest">🥚</div>
+      <div class="forest-lights" id="forestLights"></div>
+      <div class="hero-figure" id="heroActor" aria-hidden="true"></div>
+      <div class="scene-badge" id="sceneBadge">🌲 Лесная опушка</div>
+      <button class="scene-hotspot owl" id="owlHotspot" aria-label="Поговорить с мудрой совой"><span class="hotspot-emoji">🦉</span><span class="hotspot-label">Сова Луна</span></button>
+      <button class="scene-hotspot sapling" id="saplingHotspot" aria-label="Открыть волшебный сад"><span class="hotspot-emoji">🌱</span><span class="hotspot-label">Живой сад</span></button>
+      <button class="scene-hotspot riverstone" id="riverHotspot" aria-label="Исследовать реку"><span class="hotspot-emoji">🪨</span><span class="hotspot-label">Поющие камни</span></button>
+      <button class="scene-hotspot nest" id="nestHotspot" aria-label="Осмотреть драконье гнездо"><span class="hotspot-emoji">✨</span><span class="hotspot-label">Гнездо</span></button>
+    </div>
+    <div class="scene-picker" id="scenePicker" aria-label="Места леса">
+      <button data-scene="grove" class="selected">🌲 Опушка</button>
+      <button data-scene="garden">🌼 Сад</button>
+      <button data-scene="river">🌊 Река</button>
+      <button data-scene="clearing">🐲 Поляна</button>
+    </div>
+  </section>
+
+  <section class="companion-story" aria-live="polite">
+    <div class="owl-face">🦉</div>
+    <div class="speech-content"><div class="speech-byline" id="speakerName">Сова Луна</div><p id="storyText">В нашем лесу пропал свет! Поможешь его вернуть?</p></div>
+    <button class="replay-voice" id="sayStory" aria-label="Повторить слова совы">🔊</button>
+  </section>
+
+  <section class="mission-panel">
+    <div class="mission-heading">
+      <div><div class="overline">СЕЙЧАС В ПРИКЛЮЧЕНИИ</div><h2 id="missionTitle">Поговори с совой</h2></div>
+      <span class="mission-stage" id="missionIcon">🦉</span>
+    </div>
+    <p id="missionDescription">Сова Луна знает, почему лес потускнел.</p>
+    <div class="mission-body" id="missionBody"></div>
+    <div class="mission-feedback" id="missionFeedback" aria-live="polite"></div>
+    <div class="mission-footer">
+      <button id="missionHint" class="quiet-button">💡 Помоги мне</button>
+      <button id="missionReset" class="quiet-button">↶ Начать главу заново</button>
+    </div>
+  </section>
+
+  <div class="ending-panel hidden" id="endingPanel">
+    <div class="ending-stars">✨ 🏆 ✨</div>
+    <h2>Лес снова живой!</h2>
+    <p id="endingMessage"></p>
+    <div class="ending-visual">🌳 🦋 🐲 🌈</div>
+    <div class="ending-actions">
+      <button id="replayChapter" class="gold-button">🌲 Ещё одно приключение</button>
+      <a href="./?v=30" class="secondary-link">🏰 Вернуться в Академию</a>
+    </div>
+  </div>
+
+  <footer class="footer-note">Без таймера и штрафов. Играть можно вместе со взрослым. Достижения сохраняются на этом устройстве.</footer>
+</div>
+
+<div class="dialog-overlay hidden" id="talkOverlay" role="dialog" aria-modal="true" aria-labelledby="talkTitle">
+  <div class="talk-card">
+    <div class="talk-owl">🦉</div>
+    <div class="overline">МУДРАЯ СОВА ЛУНА</div>
+    <h2 id="talkTitle">Добро пожаловать!</h2>
+    <p id="talkText"></p>
+    <button class="gold-button" id="talkAccept">✨ Я помогу!</button>
+    <button class="quiet-button" id="talkClose">Сначала осмотрюсь</button>
+  </div>
+</div>
+
+<script defer src="./forest3.js?v=1"></script>
+</body>
+</html>

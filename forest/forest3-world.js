@@ -62,7 +62,11 @@ function mount(){
   b.style.left=item.x+"%";b.style.top=item.y+"%";
   b.setAttribute("aria-label","Оживить: "+item.name);
   b.innerHTML='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-hidden="true" focusable="false">'+ICONS[item.icon]+'</svg><small>'+item.name+'</small>';
-  b.addEventListener("click",()=>activate(item,b));
+  b.addEventListener("click",()=>{
+   const play=()=>activate(item,b);
+   if(root.ForestExplorer)root.ForestExplorer.walkToObject(item,play);
+   else play()
+  });
   layer.appendChild(b)
  }
  mounted=true

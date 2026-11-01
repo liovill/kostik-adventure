@@ -2,15 +2,15 @@
 (function(root){
  "use strict";
  const PRESETS={
-  fairy:{name:"Сказочная история",rate:.94,pitch:1.02},
-  gentle:{name:"Спокойный голос",rate:.86,pitch:.96},
-  clear:{name:"Чёткое объяснение",rate:1,pitch:1.00}
+  fairy:{name:"Сказочная история",rate:1.0,pitch:1.01},
+  gentle:{name:"Спокойный голос",rate:.90,pitch:.98},
+  clear:{name:"Чёткое объяснение",rate:1.08,pitch:1.00}
  };
  const ROLES={
-  wizard:{name:"Звездочёт",rate:.92,pitch:.88},
-  owl:{name:"Сова Луна",rate:.92,pitch:1.08},
-  dragon:{name:"Искрик",rate:1.04,pitch:1.16},
-  helper:{name:"Помощник",rate:1.00,pitch:1.02}
+  wizard:{name:"Звездочёт",rate:.98,pitch:.95},
+  owl:{name:"Сова Луна",rate:1.02,pitch:1.07},
+  dragon:{name:"Искрик",rate:1.08,pitch:1.12},
+  helper:{name:"Помощник",rate:1.03,pitch:1.01}
  };
  const EXAMPLES={
   wizard:"Привет, юный волшебник! Перед нами новая загадка. Вместе мы обязательно её решим.",
@@ -50,7 +50,7 @@
  }
  function voiceForRole(role){
   const opts=options(),specified=role==="owl"?opts.voiceOwl:opts.voiceWizard;
-  return voices.find(v=>keyForVoice(v)===specified)||voices.find(v=>v.default)||voices[0]||null
+  return voices.find(v=>keyForVoice(v)===specified)||voices[0]||null
  }
  function cleanText(text){
   let s=String(text==null?"":text);

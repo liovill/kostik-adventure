@@ -47,7 +47,7 @@ function generateHallTask(hero,subject,index){
    else if(variant===1){const x=pick(["🍎","🚗","🏠","⚽","🧸","📘"]);q=hallAnswer("Найди такой же предмет",x,x,shuffle(["🍎","🚗","🏠","⚽","🧸","📘"].filter(t=>t!==x)).slice(0,2),"Найди такую же картинку.")}
    else if(variant===2){const x=pick(HALL_ITEMS.colors);q=hallAnswer("Найди "+x.color+" цвет","",x.icon,shuffle(HALL_ITEMS.colors.filter(c=>c.icon!==x.icon)).slice(0,2).map(c=>c.icon),"Найди "+x.color+" цвет.")}
    else if(variant===3){const group=["🐶","🐱","🐰","🦊","🐻","🐸"];const x=pick(group);q=hallAnswer("Где "+({"🐶":"собачка","🐱":"кошечка","🐰":"зайчик","🦊":"лиса","🐻":"медведь","🐸":"лягушка"}[x])+"?","",x,shuffle(group.filter(t=>t!==x)).slice(0,2),"Посмотри и найди животное.")}
-   else {const x=pick(HALL_ITEMS.shapes);q=hallAnswer("Найди "+x.name,"",x.icon,shuffle(HALL_ITEMS.shapes.filter(t=>t.icon!==x.icon)).slice(0,2).map(t=>t.icon),"Найди "+x.name+".")}
+   else {const x=pick(HALL_ITEMS.shapes),objectName=x.name==="звезда"?"звезду":x.name;q=hallAnswer("Найди "+objectName,"",x.icon,shuffle(HALL_ITEMS.shapes.filter(t=>t.icon!==x.icon)).slice(0,2).map(t=>t.icon),"Найди "+objectName+".")}
   }else{
    if(variant===0){const x=pick(HALL_ITEMS.animals);const letters=shuffle([...new Set(HALL_ITEMS.animals.map(a=>a.letter).filter(c=>c!==x.letter))]).slice(0,2);q=hallAnswer("С какого звука начинается название животного?",x.icon,x.letter,letters,"Посмотри на картинку. Это "+x.name+". С какого звука начинается название?")}
    else if(variant===1){const x=pick(HALL_ITEMS.words),others=shuffle(HALL_ITEMS.words.filter(a=>a.word!==x.word)).slice(0,2);q=hallAnswer("Выбери слово по картинке",x.icon,x.word,others.map(a=>a.word),"Посмотри на картинку и найди слово "+x.word.toLowerCase()+".")}

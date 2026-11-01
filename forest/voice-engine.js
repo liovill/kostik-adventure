@@ -253,6 +253,12 @@
    volumeField.appendChild(volLabel);
    vol.addEventListener("input",()=>{root.AcademySound.setVolume(Number(vol.value));volLabel.textContent=Math.round(Number(vol.value)*100)+"%"});
    panel.appendChild(volumeField);
+   panel.appendChild(createButton("🎬 Включить сказочную атмосферу",()=>{
+    setSetting("voicePreset","fairy");preset.value="fairy";
+    root.AcademySound.setEffects(true);effects.value="on";
+    const enabled=root.AcademySound.setAmbient(true);ambience.value=enabled?"on":"off";
+    updateStatus(enabled?"🌲 Сказочная атмосфера включена. Слушай лес!":"Фоновые звуки недоступны на этом устройстве.")
+   },"voice-action voice-cinema-btn primary"));
   }
   const note=node("p","voice-device-note","");
   note.setAttribute("data-voice-count","");

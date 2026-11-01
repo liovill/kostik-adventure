@@ -81,7 +81,6 @@
  function speak(text,opts={}){
   const force=opts.force===true;
   if(!options().voice&&!force)return false;
-  if(!voiceSupported()){updateStatus("Этот браузер не поддерживает голосовое воспроизведение.");return false}
   const spoken=cleanText(text);
   if(!spoken)return false;
   const role=ROLES[opts.role]?opts.role:"wizard";
@@ -100,6 +99,7 @@
     return true
    }catch(e){currentClip=null}
   }
+  if(!voiceSupported()){updateStatus("На устройстве нет системного голосового воспроизведения.");return false}
   const utterance=new root.SpeechSynthesisUtterance(spoken);
   const preset=pickPreset(),character=ROLES[role];
   utterance.lang="ru-RU";

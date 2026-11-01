@@ -16,7 +16,7 @@ function hallRender(){
  for(const subject of HALL_SUBJECTS){
   const btn=document.createElement("button");btn.className="hall-subject";btn.style.setProperty("--accent",subject.tone);
   const icon=document.createElement("span");icon.className="sub-icon";icon.textContent=subject.icon;
-  const content=document.createElement("span");const title=document.createElement("strong");title.textContent=subject.name;const sub=document.createElement("small");sub.textContent=subject.desc;const progress=document.createElement("span");progress.className="subject-progress";progress.textContent="⭐ "+hallProfile().subjects[subject.id]+" выполненных заданий";
+  const content=document.createElement("span");const title=document.createElement("strong");title.textContent=state.active==="kirill"?({math:"Ищем одинаковое",letters:"Картинки",logic:"Цвета и формы",nature:"Мир вокруг"}[subject.id]||subject.name):subject.name;const sub=document.createElement("small");sub.textContent=state.active==="kirill"?"Трогай большие картинки":subject.desc;const progress=document.createElement("span");progress.className="subject-progress";progress.textContent="⭐ "+hallProfile().subjects[subject.id]+" выполненных заданий";
   content.appendChild(title);content.appendChild(sub);content.appendChild(progress);btn.appendChild(icon);btn.appendChild(content);btn.onclick=()=>hallStartLesson(subject.id);root.appendChild(btn)
  }
  hallSection(hallMode);
@@ -34,19 +34,19 @@ function hallDrawLesson(){
  hallAnswered=false;
  const sub=HALL_SUBJECTS.find(s=>s.id===hallLesson.subject),count=hallProfile().subjects[sub.id];
  hallTask=generateHallTask(state.active,sub.id,count);
- $("hallLessonSubject").textContent=sub.icon+" "+sub.name;
+ $("hallLessonSubject").textContent=sub.icon+" "+(state.active==="kirill"?({math:"Группы предметов",letters:"Картинки",logic:"Цвета и формы",nature:"Мир вокруг"}[sub.id]||sub.name):sub.name);
  $("hallLessonStep").textContent="Задание "+(hallLesson.step+1)+" из 5";
  $("hallLessonBest").textContent="⭐ Выполнено: "+count;
  $("hallLessonProgress").style.width=(hallLesson.step*20)+"%";
  $("hallStageIcon").textContent=sub.icon;
  $("hallQuestion").textContent=hallTask.q;
- $("hallQuestionHint").textContent=state.active==="kirill"?"Посмотри и выбери правильную картинку":"Подумай и выбери один правильный ответ";
+ $("hallQuestionHint").textContent=state.active==="kirill"?"Нажми на такую же картинку. Можно вместе со взрослым!":"Подумай и выбери один правильный ответ";
  $("hallVisual").textContent=hallTask.visual||"";
  $("hallFeedback").textContent="";
  $("hallContinue").classList.add("hidden");
- const choices=$("hallAnswers");choices.innerHTML="";
+ const choices=$("hallAnswers");choices.innerHTML="";choices.classList.toggle("baby-mode",state.active==="kirill");
  for(const value of hallTask.options){
-  const btn=document.createElement("button");btn.className="hall-answer"+(String(value).length>3?" word":"");
+  const btn=document.createElement("button");btn.className="hall-answer"+(String(value).length>3?" word":"")+(state.active==="kirill"?" baby":"");
   btn.textContent=value;btn.onclick=()=>hallCheckAnswer(value,btn);choices.appendChild(btn)
  }
 }
@@ -72,7 +72,7 @@ function hallCompleteLesson(){
  const sub=HALL_SUBJECTS.find(s=>s.id===hallLesson.subject);
  $("hallEarnedStars").textContent=hallLesson.earned;
  $("hallNewTotal").textContent=hallStars();
- $("hallFinishMessage").textContent=NAMES[state.active]+", сегодня ты решил ещё пять заданий по теме «"+sub.name+"». Академия становится сильнее!";
+ $("hallFinishMessage").textContent=state.active==="kirill"?"Кирилл, ты здорово поиграл с картинками! Искрик гордится тобой.":NAMES[state.active]+", сегодня ты решил ещё пять заданий по теме «"+sub.name+"». Академия становится сильнее!";
  hallSection("complete");if(window.AcademySound)window.AcademySound.cue("medal");
  if(!state.settings.reduceMotion&&typeof confetti==="function")confetti();
  if(state.settings.voice)speak("Ура! Урок пройден!")

@@ -7,6 +7,7 @@
 <meta name="description" content="Князь и Кудрявый: семейная Академия волшебства для Кости и Кирилла. Приключения, задания, карта и общий замок.">
 <title>Князь и Кудрявый | Академия волшебства</title>
 <link rel="stylesheet" href="./kingdom.css?v=1">
+<link rel="stylesheet" href="./dragon-garden.css?v=1">
 </head>
 <body>
 <div id="app">
@@ -59,7 +60,8 @@
     <div><span class="chip" id="nextChapter">Глава 1</span><h3 id="nextTitle" style="margin:11px 0 6px">Лес искр</h3><p id="nextDesc">Найди потерянные волшебные кристаллы.</p><button class="button small" id="nextMission">Отправиться ✨</button></div>
     <div class="art" id="nextEmoji">🌲</div>
   </div>
-  <div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
+  <button class="pet-promo" data-go="garden" aria-label="Отправиться в Драконий сад"><span><strong>🐉 Познакомься с Искриком!</strong><small>Покорми дракончика, сыграй в волшебные игры и помоги братьям вырастить общего друга.</small></span><span class="pet-promo-art" aria-hidden="true">🐲</span></button>
+<div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
   <div class="quick-grid">
     <button class="quick" data-go="castle"><span class="emoji">🏰</span><strong>Семейный замок</strong><span>Расти вместе и украшай комнаты</span></button>
     <button class="quick" data-go="journal"><span class="emoji">🏅</span><strong>Мои открытия</strong><span>Посмотри достижения и пройденные главы</span></button>
@@ -113,7 +115,39 @@
     <div class="section-head"><div><h2>Мастерская замка</h2><p class="muted small">Доступность зависит от общих открытий на этом устройстве.</p></div><span class="chip" id="familyTotal">0 💎</span></div>
     <div class="deco-grid" id="decoGrid"></div>
   </div>
-  <div class="panel" style="margin-top:15px"><h3>🐲 Наш питомец Искрик</h3><p class="muted" id="petDescription">Отыщите первый кристалл леса, чтобы познакомиться с маленьким дракончиком.</p></div>
+  <div class="panel" style="margin-top:15px"><h3>🐲 Наш питомец Искрик</h3><p class="muted" id="petDescription">Дракончик уже ждёт вас в саду!</p><button class="button secondary" data-go="garden">🐉 Отправиться в Драконий сад</button></div>
+</section>
+<section class="screen hidden" id="garden">
+  <div class="overline">Новый дом волшебного друга</div>
+  <div class="garden-hero">
+    <div><h1 id="gardenHeading">Драконий сад</h1><p id="gardenDescription">Поможем дракончику Искрику вылупиться и вырасти вместе с братьями.</p><span class="chip" id="petHearts">❤️ 0 / 24</span></div>
+    <div class="hero-fig" id="gardenHero" aria-hidden="true"></div>
+  </div>
+  <div class="garden-field" style="margin-top:14px">
+    <span class="garden-cloud">☁️</span><span class="garden-cloud two">☁️</span>
+    <span class="garden-ground"></span>
+    <span class="flower a" aria-hidden="true">🌷</span><span class="flower b" aria-hidden="true">🌼</span><span class="flower c" aria-hidden="true">🌸</span><span class="flower d" aria-hidden="true">🍀</span>
+    <span class="pet-bubble" style="height:25px;width:25px;left:11%;top:68%;animation-delay:.7s"></span>
+    <span class="pet-bubble" style="height:14px;width:14px;right:17%;top:70%;animation-delay:3s"></span>
+    <span class="pet-level-tag" id="petLevelTag">🥚 Волшебное яйцо</span>
+    <button class="dragon-stage" id="petTouch" style="border:0;background:transparent;cursor:pointer;pointer-events:auto;width:100%;padding:0" aria-label="Погладить дракончика или потрогать яйцо"></button>
+    <div class="pet-message" id="petMessage">Поможем Искрику проснуться!</div>
+  </div>
+  <div class="panel" style="margin-top:14px">
+    <div class="section-head"><div><h2>❤️ Сердечки заботы</h2><p class="muted small">Получайте по сердечку за каждое новое открытие. Без таймеров и обязательных ежедневных заданий.</p></div></div>
+    <div class="pet-progress-track"><span id="petProgress"></span></div>
+    <div class="garden-family" id="gardenFamily" style="margin-top:12px"></div>
+  </div>
+  <div class="section-head" style="margin-top:22px"><div><div class="overline">Играть вместе с Искриком</div><h2>Три волшебные игры</h2></div></div>
+  <div class="pet-activity-grid">
+    <button class="pet-activity" data-pet="feed"><span class="symbol">🍎</span><strong>Угощение</strong><small>Фрукты и счёт</small><span class="chip" id="petCount-feed">0 / 4</span></button>
+    <button class="pet-activity" data-pet="colors"><span class="symbol">🎨</span><strong>Магия цветов</strong><small>Цвета и узоры</small><span class="chip" id="petCount-colors">0 / 4</span></button>
+    <button class="pet-activity" data-pet="memory"><span class="symbol">🧠</span><strong>Память Искрика</strong><small>Запомни символ</small><span class="chip" id="petCount-memory">0 / 4</span></button>
+  </div>
+  <div class="panel" style="margin-top:16px">
+    <div class="pet-hatch-banner"><span class="symbol">✨</span><div><strong>Секрет Искрика</strong><div class="muted small">После трёх общих сердечек дракончик проснётся. После десяти станет ещё больше и веселее. Даже когда игры пройдены, к нему всегда можно вернуться.</div></div></div>
+    <button class="button secondary small" id="petBackMap" style="margin-top:12px">🗺️ Вернуться к приключениям</button>
+  </div>
 </section>
 <section class="screen hidden" id="journal">
   <div class="overline">Моя собственная история</div><h1>🏅 Книга достижений</h1>
@@ -134,7 +168,7 @@
 </section>
 </div>
 <nav class="bottom-nav hidden" id="bottomNav" aria-label="Основная навигация">
-  <button data-nav="home"><span>🏡</span>Главная</button><button data-nav="map"><span>🗺️</span>Карта</button><button data-nav="castle"><span>🏰</span>Замок</button><button data-nav="journal"><span>🏅</span>Успехи</button><button data-nav="parents"><span>⚙️</span>Родителям</button>
+  <button data-nav="home"><span>🏡</span>Главная</button><button data-nav="map"><span>🗺️</span>Карта</button><button data-nav="garden"><span>🐲</span>Искрик</button><button data-nav="castle"><span>🏰</span>Замок</button><button data-nav="parents"><span>⚙️</span>Родителям</button>
 </nav>
 <div class="question-overlay hidden" id="questionOverlay" role="dialog" aria-modal="true" aria-labelledby="questionTitle">
   <div class="question-card">
@@ -149,6 +183,23 @@
     <div class="question-foot"><button class="button secondary small" id="questionVoice">🔊 Послушать</button><button class="button ghost small" id="questionClose">← В приключение</button><button class="button small hidden" id="questionContinue">Продолжить ✨</button></div>
   </div>
 </div>
+<div class="question-overlay hidden" id="petOverlay" role="dialog" aria-modal="true" aria-labelledby="petTitle">
+  <div class="question-card pet-question-card">
+    <div class="pet-lesson-icon">🐲</div>
+    <div class="pet-task-progress" id="petActivityLabel">Волшебное угощение</div>
+    <h2 id="petTitle">Найди предмет</h2>
+    <p class="pet-task-caption" id="petSubtitle">Помоги Искрику!</p>
+    <div class="question-visual" id="petVisual"></div>
+    <div class="hidden" id="petMemory"></div>
+    <div class="pet-answer-choices" id="petAnswers"></div>
+    <div class="question-feedback" id="petFeedback" aria-live="polite"></div>
+    <div class="question-foot">
+      <button class="button secondary small" id="petSpeak">🔊 Послушать</button>
+      <button class="button ghost small" id="petClose">← В сад</button>
+      <button class="button small hidden" id="petContinue">🐲 К Искрику</button>
+    </div>
+  </div>
+</div>
 <div class="question-overlay hidden" id="parentGate" role="dialog" aria-modal="true" aria-labelledby="parentGateTitle">
   <div class="question-card" style="max-width:370px">
     <div class="quest-symbol">🔐</div><h2 id="parentGateTitle">Вход для взрослых</h2>
@@ -159,6 +210,7 @@
 </div>
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <script defer src="./kingdom-data.js?v=1"></script>
-<script defer src="./kingdom.js?v=2"></script>
+<script defer src="./kingdom.js?v=3"></script>
+<script defer src="./dragon-garden.js?v=1"></script>
 </body>
 </html>

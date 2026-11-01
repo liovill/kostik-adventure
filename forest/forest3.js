@@ -32,7 +32,7 @@ function f3EnsureFamily(){
  if(!family.forest3||typeof family.forest3!=="object")family.forest3={heroes:{}};
  if(!family.forest3.heroes||typeof family.forest3.heroes!=="object")family.forest3.heroes={};
  for(const key of ["kostya","kirill"])family.forest3.heroes[key]=f3Clean(family.forest3.heroes[key]);
- if(!family.settings||typeof family.settings!=="object")family.settings={voice:true,reduceMotion:false};if(typeof family.settings.voice!=="boolean")family.settings.voice=true;if(!["fairy","gentle","clear"].includes(family.settings.voicePreset))family.settings.voicePreset="fairy";if(!Number.isFinite(family.settings.voiceSpeed))family.settings.voiceSpeed=.94;if(typeof family.settings.voiceWizard!=="string")family.settings.voiceWizard="";if(typeof family.settings.voiceOwl!=="string")family.settings.voiceOwl="";
+ if(!family.settings||typeof family.settings!=="object")family.settings={voice:true,reduceMotion:false};if(typeof family.settings.voice!=="boolean")family.settings.voice=true;if(!["fairy","gentle","clear"].includes(family.settings.voicePreset))family.settings.voicePreset="fairy";if(!Number.isFinite(family.settings.voiceSpeed))family.settings.voiceSpeed=.94;if(typeof family.settings.voiceWizard!=="string")family.settings.voiceWizard="";if(typeof family.settings.voiceOwl!=="string")family.settings.voiceOwl="";if(typeof family.settings.ambientOn!=="boolean")family.settings.ambientOn=false;if(typeof family.settings.fxOn!=="boolean")family.settings.fxOn=true;if(!Number.isFinite(family.settings.audioVolume))family.settings.audioVolume=.38;
 }
 f3EnsureFamily();
 let hero=(localStorage.getItem(F3_HERO_STORAGE)||family.active)==="kirill"?"kirill":"kostya";
@@ -52,6 +52,8 @@ function save(){
  }catch(e){$("missionFeedback").textContent="⚠️ Не удалось сохранить игру в браузере. Возможно, включён приватный режим."}
 }
 function say(text,force=false,role="owl"){return window.AcademyVoice?window.AcademyVoice.speak(text,{force,role}):false}
+function narrate(id,fallback,force=false){if(window.AcademyVoice&&window.AcademyVoice.line(id,{force}))return true;return say(fallback,force,"owl")}
+function sound(name){if(window.AcademySound)window.AcademySound.cue(name)}
 function missionSpeech(){
  const stage=state().stage;
  if(stage===3)return F3_PATTERN[hero][state().patterns]?.say||"Продолжи волшебный узор.";
@@ -92,14 +94,14 @@ function unlocked(name){return state().stage>=F3_SCENE_NEEDS[name]}
 function chooseScene(name,read=false){
  if(!F3_SCENES.includes(name))return;
  if(!unlocked(name)){feedback("🔒 Это место откроется по сюжету.");return}
- if(window.AcademyVoice)window.AcademyVoice.stop();scene=name;render();if(read)say(F3_SCENE_NAMES[name])
+ if(window.AcademyVoice)window.AcademyVoice.stop();scene=name;if(window.AcademySound)window.AcademySound.setScene(scene);render();if(read)say(F3_SCENE_NAMES[name])
 }
 function advance(){
  if(state().stage>=7)return;
  state().stage++;
  if(state().stage===7)state().medal=true;
  selectedSeed=null;selectedPlank=null;memoryShowing=true;memoryInput=[];
- scene=activeSceneForStage();save();render();story(F3_TEXT[state().stage],"🦉 Сова Луна");say(F3_TEXT[state().stage]+(state().stage===7?"":" "+missionSpeech()));
+ scene=activeSceneForStage();if(window.AcademySound)window.AcademySound.setScene(scene);save();render();story(F3_TEXT[state().stage],"🦉 Сова Луна");sound(state().stage===7?"medal":"good");narrate("forest."+hero+".stage"+state().stage,F3_TEXT[state().stage]+(state().stage===7?"":" "+missionSpeech()));
  if(state().stage===7)feedback("🏆 Ты получил медаль Хранителя леса! Она сохранена.")
 }
 function render(){
@@ -172,7 +174,7 @@ function openTalk(){
  "Костя, наш лес теряет своё волшебство! Огоньки исчезли, цветы спят, мост рухнул, а в гнезде никто не просыпается. Ты поможешь нам вернуть свет?":
  "Кирилл, посмотри! Лес загрустил, а маленький дракончик спит. Давай вместе найдём огоньки, посадим цветочки и поможем всем друзьям!";
  $("talkTitle").textContent=hero==="kostya"?"Князь, лес зовёт тебя!":"Кудрявый, привет!";
- $("talkOverlay").classList.remove("hidden");say($("talkText").textContent)
+ $("talkOverlay").classList.remove("hidden");sound("owl");narrate("forest."+hero+".open", $("talkText").textContent)
 }
 function renderLights(root){
  put(root,"div","activity-head","Найдено огоньков: "+state().lights.filter(Boolean).length+" / 3");
@@ -187,7 +189,7 @@ function renderLights(root){
 }
 function takeLight(i){
  if(state().stage!==1||!Number.isInteger(i)||i<0||i>=3||state().lights[i])return;
- state().lights[i]=true;const done=state().lights.filter(Boolean).length;moveActor(F3_FIRE[i].x,F3_FIRE[i].y);
+ state().lights[i]=true;sound("firefly");const done=state().lights.filter(Boolean).length;moveActor(F3_FIRE[i].x,F3_FIRE[i].y);
  if(done===3){save();advance();return}save();render();feedback("✨ "+F3_FIRE[i].label+" вернулся! Осталось "+(3-done)+".");say("Отлично! Ты нашёл огонёк!")
 }
 function renderGarden(root){
@@ -216,8 +218,8 @@ function renderGardenInline(){
 function plantSeed(i){
  if(state().stage!==2||state().seeds[i])return;
  if(selectedSeed===null){feedback("Сначала выбери семечко сверху.");say("Сначала выбери семечко.",false,"owl");return}
- if(selectedSeed!==i){feedback("💛 Цвета пока не совпадают. Попробуй другую клумбу.");say("Найди клумбу такого же цвета.",false,"owl");return}
- state().seeds[i]=true;selectedSeed=null;const count=state().seeds.filter(Boolean).length;
+ if(selectedSeed!==i){sound("try");feedback("💛 Цвета пока не совпадают. Попробуй другую клумбу.");say("Найди клумбу такого же цвета.",false,"owl");return}
+ state().seeds[i]=true;sound("flower");selectedSeed=null;const count=state().seeds.filter(Boolean).length;
  if(count===3){save();advance();return}save();render();feedback("🌸 Цветок вырос! Осталось "+(3-count)+".");say("Смотри! Цветочек вырос!")
 }
 function renderPatterns(root){
@@ -230,8 +232,8 @@ function renderPatterns(root){
   const b=put(choices,"button","task-choice"+(String(value).length>2?" textual":""),value);
   b.onclick=()=>{
    if(state().stage!==3)return;
-   if(value!==t.correct){b.classList.add("wrong");feedback("💛 Посмотри на узор ещё раз. Попробуй другой вариант.");say("Посмотри на узор ещё раз. У тебя получится!",false,"owl");return}
-   state().patterns++;if(state().patterns===3){save();advance();return}
+   if(value!==t.correct){sound("try");b.classList.add("wrong");feedback("💛 Посмотри на узор ещё раз. Попробуй другой вариант.");say("Посмотри на узор ещё раз. У тебя получится!",false,"owl");return}
+   state().patterns++;sound("good");if(state().patterns===3){save();advance();return}
    save();render();feedback("✨ Верно! Мозаика становится ярче.");say("Молодец! Узор оживает. "+missionSpeech())
   }
  })
@@ -262,8 +264,8 @@ function renderBridgeInline(){
 function installPlank(i){
  if(state().stage!==4||state().planks[i])return;
  if(selectedPlank===null){feedback("Сначала выбери дощечку выше.");say("Сначала выбери дощечку.",false,"owl");return}
- if(selectedPlank!==i){feedback("💛 Эта дощечка подходит другому месту. Попробуй ещё.");say("Давай попробуем другое место.",false,"owl");return}
- state().planks[i]=true;selectedPlank=null;const done=state().planks.filter(Boolean).length;
+ if(selectedPlank!==i){sound("try");feedback("💛 Эта дощечка подходит другому месту. Попробуй ещё.");say("Давай попробуем другое место.",false,"owl");return}
+ state().planks[i]=true;sound("bridge");selectedPlank=null;const done=state().planks.filter(Boolean).length;
  if(done===3){save();advance();return}save();render();feedback("🌉 Одна часть моста готова! Осталось "+(3-done)+".");say("Ура! Мост становится крепче!")
 }
 function bindDrag(btn,index,kind){
@@ -313,8 +315,8 @@ function renderMemory(root){
 function memoryPress(value){
  if(state().stage!==5||memoryShowing)return;
  const info=F3_MEMORY[hero][state().memory],n=memoryInput.length;
- if(value!==info.sequence[n]){memoryInput=[];feedback("💛 Попробуем снова. Можно посмотреть последовательность ещё раз.");render();feedback("💛 Давай попробуем снова. У тебя получится!");say("Попробуем снова. Ты можешь посмотреть последовательность ещё раз.",false,"owl");return}
- memoryInput.push(value);
+ if(value!==info.sequence[n]){sound("try");memoryInput=[];feedback("💛 Попробуем снова. Можно посмотреть последовательность ещё раз.");render();feedback("💛 Давай попробуем снова. У тебя получится!");say("Попробуем снова. Ты можешь посмотреть последовательность ещё раз.",false,"owl");return}
+ memoryInput.push(value);sound("select");
  if(memoryInput.length===info.sequence.length){
   state().memory++;memoryShowing=true;memoryInput=[];
   if(state().memory===2){save();advance();return}save();render();feedback("🎵 Камни запели! Следующая мелодия.");say("Молодец! Мелодия получилась! "+missionSpeech())
@@ -331,8 +333,8 @@ function renderEgg(root){
   const b=put(choices,"button","task-choice"+(String(value).length>2?" textual":""),value);
   b.onclick=()=>{
    if(state().stage!==6)return;
-   if(value!==t.correct){b.classList.add("wrong");feedback("💛 Почти! Дракончик верит в тебя. Попробуй ещё.");say("Почти! Давай попробуем ещё.",false,"owl");return}
-   state().eggs++;
+   if(value!==t.correct){sound("try");b.classList.add("wrong");feedback("💛 Почти! Дракончик верит в тебя. Попробуй ещё.");say("Почти! Давай попробуем ещё.",false,"owl");return}
+   state().eggs++;sound("dragon");
    if(state().eggs===3){save();advance();return}
    save();render();feedback("✨ Яйцо засветилось ещё ярче!");say("Ура! Дракончик скоро проснётся! "+missionSpeech())
   }
@@ -346,14 +348,15 @@ function renderFinish(root){
 function resetChapter(){
  if(window.AcademyVoice)window.AcademyVoice.stop();if(!window.confirm("Начать главу сначала? Медаль за первое прохождение сохранится."))return;
  const previous=state(),replay=f3Empty();replay.medal=previous.medal;replay.replays=previous.replays+1;
- family.forest3.heroes[hero]=replay;scene="grove";selectedSeed=null;selectedPlank=null;
+ family.forest3.heroes[hero]=replay;scene="grove";if(window.AcademySound)window.AcademySound.setScene(scene);selectedSeed=null;selectedPlank=null;
  save();render();story("Лес готов к новому приключению! Поговори с совой Луной.","🦉 Сова Луна",true)
 }
 function switchHero(){
- if(window.AcademyVoice)window.AcademyVoice.stop();hero=hero==="kostya"?"kirill":"kostya";save();scene=activeSceneForStage();selectedSeed=null;selectedPlank=null;memoryShowing=true;memoryInput=[];
+ if(window.AcademyVoice)window.AcademyVoice.stop();hero=hero==="kostya"?"kirill":"kostya";save();scene=activeSceneForStage();if(window.AcademySound)window.AcademySound.setScene(scene);selectedSeed=null;selectedPlank=null;memoryShowing=true;memoryInput=[];
  render();story("Привет, "+F3_NAMES[hero]+"! Твой лес и твои открытия ждут тебя.","🦉 Сова Луна",true)
 }
 function init(){
+ if(window.AcademySound)window.AcademySound.configure({getSettings:()=>family.settings,save,scene});
  if(window.AcademyVoice)window.AcademyVoice.configure({getSettings:()=>family.settings,save,onChange:()=>{const button=$("voiceToggle");button.textContent=family.settings.voice?"🔊":"🔇";button.setAttribute("aria-label",family.settings.voice?"Выключить озвучку":"Включить озвучку")}});
  $("voiceToggle").onclick=()=>{
   window.AcademyVoice.setEnabled(!family.settings.voice);

@@ -240,7 +240,8 @@
   if(root.AcademySound){
    const ambience=controlSelect([{label:"🌲 Атмосфера включена",value:"on"},{label:"Тихо: без фоновых звуков",value:"off"}],options().ambientOn?"on":"off",v=>{
     const enabled=root.AcademySound.setAmbient(v==="on");
-    updateStatus(enabled?"🌿 Играет тихая музыка леса.":"Фоновые звуки выключены.")
+    if(v==="on"&&!enabled)ambience.value="off";
+    updateStatus(enabled?"🌿 Играет тихая музыка леса.":v==="on"?"На этом устройстве пока недоступны фоновые звуки.":"Фоновые звуки выключены.")
    });
    panel.appendChild(field("🌿 Атмосфера волшебного мира",ambience));
    const effects=controlSelect([{label:"✨ Эффекты включены",value:"on"},{label:"Без звуков действий",value:"off"}],options().fxOn===false?"off":"on",v=>root.AcademySound.setEffects(v==="on"));

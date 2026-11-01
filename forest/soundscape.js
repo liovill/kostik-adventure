@@ -120,7 +120,8 @@ function note(dest,midi,when,duration,kind="harp",strength=.16){
  const spec=kinds[kind]||kinds.harp;
  const t=Math.max(ctx.currentTime+.005,when),end=t+Math.max(.16,duration);
  const envelope=gainNode(.0001);envelope.connect(dest);
- if(room&&strength>.02){const send=gainNode(.22);envelope.connect(send);send.connect(room)}
+ let roomSend=null;
+ if(room&&strength>.02){roomSend=gainNode(.22);envelope.connect(roomSend);roomSend.connect(room)}
  const gain=envelope.gain,attack=spec.attack;
  try{
   gain.setValueAtTime(.0001,t);
@@ -129,14 +130,16 @@ function note(dest,midi,when,duration,kind="harp",strength=.16){
   else{gain.setValueAtTime(Math.max(.001,strength),Math.max(t+attack,end-.08));gain.exponentialRampToValueAtTime(.0001,end+spec.release)}
  }catch(e){gain.value=strength}
  const base=pitch(midi);
+ let liveParts=0;
  for(const [factor,weight,wave]of spec.parts){
   try{
    const osc=ctx.createOscillator(),level=gainNode(weight/spec.parts.length);
    osc.type=wave;
    osc.frequency.value=base*factor;
    osc.connect(level);level.connect(envelope);
+   liveParts++;
+   osc.onended=()=>{try{osc.disconnect();level.disconnect()}catch(e){}liveParts--;if(liveParts===0){try{envelope.disconnect();if(roomSend)roomSend.disconnect()}catch(e){}}};
    osc.start(t);osc.stop(end+spec.release+.06);
-   osc.onended=()=>{try{osc.disconnect();level.disconnect()}catch(e){}}
   }catch(e){}
  }
 }

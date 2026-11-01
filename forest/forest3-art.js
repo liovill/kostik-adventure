@@ -46,9 +46,14 @@ function mount(){
   b.appendChild(emoji);b.appendChild(label);
   b.onclick=()=>{
    if(!player()||player().scene()!==item.scene)return;
-   const fresh=player().discover(item.id,item.text);
-   if(fresh)celebrate(b);
-   render()
+   const findSecret=()=>{
+    if(!player()||player().scene()!==item.scene)return;
+    const fresh=player().discover(item.id,item.text);
+    if(fresh)celebrate(b);
+    render()
+   };
+   if(root.ForestExplorer)root.ForestExplorer.walkToObject(item,findSecret);
+   else findSecret()
   };
   container.appendChild(b)
  }

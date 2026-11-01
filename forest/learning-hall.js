@@ -5,8 +5,8 @@ let hallMode="intro",hallOwner=null,hallLesson=null,hallTask=null,hallAnswered=f
 function hallProfile(hero){return state.hall.heroes[hero||state.active||"kostya"]}
 function hallStars(hero){const p=hallProfile(hero);return Object.values(p.subjects).reduce((a,b)=>a+b,0)+Object.keys(p.traceAwards).filter(k=>p.traceAwards[k]).length+p.pairAwards.length*4}
 function hallFamilyStars(){return hallStars("kostya")+hallStars("kirill")}
-function hallResetForHero(){hallMode="intro";hallOwner=null;hallLesson=null;hallTask=null;hallAnswered=false}
-function hallSection(mode){hallMode=mode;const views={intro:"hallIntro",lesson:"hallLesson",complete:"hallComplete",trace:"hallTrace",pairs:"hallPairs"};for(const key of Object.values(views))$(key).classList.toggle("hidden",key!==views[mode])}
+function hallResetForHero(){hallMode="intro";hallOwner=null;hallLesson=null;hallTask=null;hallAnswered=false;if(typeof hallWorkshopCurrent!=="undefined")hallWorkshopCurrent=null}
+function hallSection(mode){hallMode=mode;const views={intro:"hallIntro",lesson:"hallLesson",complete:"hallComplete",trace:"hallTrace",pairs:"hallPairs",workshop:"hallWorkshop"};for(const key of Object.values(views))$(key).classList.toggle("hidden",key!==views[mode])}
 function hallRender(){
  if(hallOwner!==state.active){hallResetForHero();hallOwner=state.active}
  $("hallHero").innerHTML=avatar(state.active);
@@ -23,6 +23,7 @@ function hallRender(){
  if(hallMode==="lesson"&&hallLesson){if(hallAnswered){if(hallLesson.step===4)hallCompleteLesson();else{hallLesson.step++;hallDrawLesson()}}else hallDrawLesson()}
  if(hallMode==="trace"&&typeof hallShowTrace==="function")hallShowTrace();
  if(hallMode==="pairs"&&typeof hallShowPairs==="function")hallShowPairs();
+ if(hallMode==="workshop"&&typeof hallWorkshopRender==="function")hallWorkshopRender();
 }
 function hallStartLesson(subject){
  const item=HALL_SUBJECTS.find(s=>s.id===subject);if(!item)return;

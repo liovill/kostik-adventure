@@ -2,15 +2,18 @@
 (function(root){
  "use strict";
  const PRESETS={
-  fairy:{name:"Сказочная история",rate:1.0,pitch:1.01},
-  gentle:{name:"Спокойный голос",rate:.90,pitch:.98},
-  clear:{name:"Чёткое объяснение",rate:1.08,pitch:1.00}
+  natural:{name:"Максимально естественно ★",rate:1,pitch:1},
+  fairy:{name:"Сказочная история",rate:1,pitch:1},
+  gentle:{name:"Спокойный голос",rate:.96,pitch:1},
+  clear:{name:"Чёткое объяснение",rate:1.04,pitch:1}
  };
+ // Avoid pitch shifting synthesized voices: it exaggerates metallic timbre,
+ // especially on mobile voices and makes the dragon sound like a cartoon robot.
  const ROLES={
-  wizard:{name:"Звездочёт",rate:.98,pitch:.95},
-  owl:{name:"Сова Луна",rate:1.02,pitch:1.07},
-  dragon:{name:"Искрик",rate:1.08,pitch:1.12},
-  helper:{name:"Помощник",rate:1.03,pitch:1.01}
+  wizard:{name:"Звездочёт",rate:.99,pitch:1},
+  owl:{name:"Сова Луна",rate:1,pitch:1},
+  dragon:{name:"Искрик",rate:1.025,pitch:1},
+  helper:{name:"Помощник",rate:1,pitch:1}
  };
  const EXAMPLES={
   wizard:"Привет, юный волшебник! Перед нами новая загадка. Вместе мы обязательно её решим.",
@@ -33,8 +36,8 @@
   refreshVoices()
  }
  function options(){return readSettings()||{voice:true}}
- function pickPreset(){return PRESETS[options().voicePreset]||PRESETS.fairy}
- function normalizedSpeed(){const s=Number(options().voiceSpeed);return Number.isFinite(s)?Math.max(.72,Math.min(1.12,s)):.94}
+ function pickPreset(){return PRESETS[options().voicePreset]||PRESETS.natural}
+ function normalizedSpeed(){const s=Number(options().voiceSpeed);return Number.isFinite(s)?Math.max(.84,Math.min(1.12,s)):1}
  function keyForVoice(v){return (v.voiceURI||v.name)+"|"+(v.lang||"")+"|"+v.name}
  function refreshVoices(){
   if(!voiceSupported()){voices=[];return voices}
@@ -49,7 +52,7 @@
   return voices
  }
  function voiceForRole(role){
-  const opts=options(),specified=role==="owl"?opts.voiceOwl:opts.voiceWizard;
+  const opts=options(),specified=role==="owl"?opts.voiceOwl:role==="dragon"?opts.voiceDragon:opts.voiceWizard;
   return voices.find(v=>keyForVoice(v)===specified)||voices[0]||null
  }
  function cleanText(text){
@@ -103,8 +106,8 @@
   const utterance=new root.SpeechSynthesisUtterance(spoken);
   const preset=pickPreset(),character=ROLES[role];
   utterance.lang="ru-RU";
-  utterance.rate=Math.min(1.3,Math.max(.65,normalizedSpeed()*preset.rate*character.rate));
-  utterance.pitch=Math.min(1.4,Math.max(.75,preset.pitch*character.pitch));
+  utterance.rate=Math.min(1.12,Math.max(.84,normalizedSpeed()*preset.rate*character.rate));
+  utterance.pitch=1;
   utterance.volume=1;
   refreshVoices();
   const selected=voiceForRole(role);
@@ -140,7 +143,7 @@
   if(!enabled)stop()
  }
  function setSetting(name,value){
-  if(!["voicePreset","voiceSpeed","voiceWizard","voiceOwl"].includes(name))return;
+  if(!["voicePreset","voiceSpeed","voiceWizard","voiceOwl","voiceDragon"].includes(name))return;
   const s=options();s[name]=value;
   try{writeSettings()}catch(e){}
   try{onSettingsChange()}catch(e){}
@@ -175,15 +178,15 @@
  }
  function refreshStudioVoiceChoices(){
   if(!studio)return;
-  for(const role of ["wizard","owl"]){
+  for(const role of ["wizard","owl","dragon"]){
    const select=studio.querySelector('[data-voice-select="'+role+'"]');
    if(!select)continue;
-   const keep=role==="owl"?options().voiceOwl:options().voiceWizard;
+   const keep=role==="owl"?options().voiceOwl:role==="dragon"?options().voiceDragon:options().voiceWizard;
    select.replaceChildren();
-   let fallback=node("option","",voices.length?"Автоматически: русский голос":"Системный голос (список пока пуст)");
+   let fallback=node("option","",voices.length?"Авто: "+voices[0].name:"Русский голос пока не найден");
    fallback.value="";select.appendChild(fallback);
    voices.forEach(v=>{
-    const op=node("option","",v.name+" ("+v.lang+")");
+    const advanced=/premium|enhanced|natural|neural|siri|улучш/i.test(v.name);const op=node("option","",v.name+(advanced?" ✨":"")+" ("+v.lang+")");
     op.value=keyForVoice(v);
     select.appendChild(op)
    });
@@ -191,8 +194,8 @@
   }
   const note=studio.querySelector("[data-voice-count]");
   if(note)note.textContent=voices.length?
-   "Доступных русских голосов: "+voices.length+". Звучание зависит от установленных голосов устройства.":
-   "Русские голоса ещё не найдены. iPhone может показать их после первого прослушивания; используется системный голос.";
+   "Русских голосов доступно: "+voices.length+". Это голоса устройства; для настоящей актёрской речи нужны аудиозаписи.":
+   "Русские голоса не обнаружены. Попробуй загрузить русский голос в настройках iPhone и нажать «Обновить голоса».";
  }
  function closeStudio(){
   stop();
@@ -217,13 +220,13 @@
   heading.appendChild(headingText);
   heading.appendChild(createButton("✕",closeStudio,"voice-close"));
   panel.appendChild(heading);
-  panel.appendChild(node("p","voice-studio-description","Выбери тембр, темп и настроение речи. Послушай героев перед тем, как сохранить выбор."));
+  panel.appendChild(node("p","voice-studio-description","Мы убрали искусственное повышение тона: оно делало голос металлическим. Выбери самый приятный русский голос для каждого героя и сравни звучание."));
   const on=controlSelect([{label:"🔊 Голос включён",value:"on"},{label:"🔇 Голос выключен",value:"off"}],options().voice?"on":"off",v=>{setEnabled(v==="on");updateStatus(v==="on"?"Голос включён.":"Голос выключен.")});
   panel.appendChild(field("Озвучка",on));
-  const preset=controlSelect(Object.entries(PRESETS).map(([value,v])=>({value,label:v.name})),options().voicePreset||"fairy",v=>setSetting("voicePreset",v));
+  const preset=controlSelect(Object.entries(PRESETS).map(([value,v])=>({value,label:v.name})),options().voicePreset||"natural",v=>setSetting("voicePreset",v));
   panel.appendChild(field("Манера речи",preset));
   const rate=node("input","voice-speed");
-  rate.type="range";rate.min="0.72";rate.max="1.12";rate.step="0.02";rate.value=String(normalizedSpeed());
+  rate.type="range";rate.min="0.84";rate.max="1.12";rate.step="0.02";rate.value=String(normalizedSpeed());
   const rateValue=node("span","voice-speed-label",Math.round(normalizedSpeed()*100)+"%");
   const speedField=field("Темп речи",rate);
   speedField.appendChild(rateValue);
@@ -232,11 +235,20 @@
   const speakers=node("div","voice-speakers");
   const wizard=controlSelect([{label:"Автоматически",value:""}],"",v=>setSetting("voiceWizard",v));
   const owl=controlSelect([{label:"Автоматически",value:""}],"",v=>setSetting("voiceOwl",v));
+  const dragon=controlSelect([{label:"Автоматически",value:""}],"",v=>setSetting("voiceDragon",v));
   wizard.setAttribute("data-voice-select","wizard");
   owl.setAttribute("data-voice-select","owl");
+  dragon.setAttribute("data-voice-select","dragon");
   speakers.appendChild(field("🧙‍♂️ Голос Звездочёта",wizard));
   speakers.appendChild(field("🦉 Голос совы Луны",owl));
+  speakers.appendChild(field("🐲 Голос Искрика",dragon));
   panel.appendChild(speakers);
+  panel.appendChild(createButton("↻ Обновить русские голоса",()=>{
+   refreshVoices();refreshStudioVoiceChoices();
+   updateStatus(voices.length?"Нашёл русских голосов: "+voices.length+". Сравни их на репликах героев.":"Русских голосов пока нет. Попробуй установить их в настройках iPhone.")
+  },"voice-action secondary voice-refresh"));
+  const advice=node("p","voice-device-note","Совет для iPhone: Настройки → Универсальный доступ → Чтение вслух → Голоса → Русский. Если доступен голос улучшенного качества, загрузи его, вернись в игру и обнови список.");
+  panel.appendChild(advice);
   if(root.AcademySound){
    const ambience=controlSelect([{label:"🌲 Атмосфера включена",value:"on"},{label:"Тихо: без фоновых звуков",value:"off"}],options().ambientOn?"on":"off",v=>{
     const enabled=root.AcademySound.setAmbient(v==="on");
@@ -276,7 +288,7 @@
   footer.appendChild(createButton("⏹ Остановить",stop,"voice-action secondary"));
   footer.appendChild(createButton("✓ Готово",closeStudio,"voice-action primary"));
   panel.appendChild(footer);
-  panel.appendChild(node("p","voice-studio-disclaimer","Сейчас голоса произносит устройство, а звуки и музыка созданы для Академии. Для настоящих актёрских голосов предусмотрена поддержка записанных реплик."));
+  panel.appendChild(node("p","voice-studio-disclaimer","Браузерная речь даже с хорошим русским голосом может звучать механически. Актёрское звучание появится после подключения записанных реплик."));
   overlay.addEventListener("click",e=>{if(e.target===overlay)closeStudio()});
   overlay.addEventListener("keydown",e=>{if(e.key==="Escape"){e.preventDefault();closeStudio()}});
   document.body.appendChild(overlay);

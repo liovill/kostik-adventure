@@ -21,6 +21,33 @@ function syncForest3(){
  if(newest.resetEpoch>state.resetEpoch){state=newest;lastSaved=clean(newest);return}
  for(const h of Object.keys(NAMES))state.forest3.heroes[h]=forest3Merge(state.forest3.heroes[h],newest.forest3.heroes[h])
 }
+function mergeLatestProgress(){
+ const latest=latestSaved(),old=lastSaved;
+ if(latest.resetEpoch>state.resetEpoch){
+  state=latest;lastSaved=clean(latest);return false
+ }
+ if(latest.resetEpoch<state.resetEpoch)return true;
+ const merged=latest;
+ for(const h of Object.keys(NAMES)){
+  for(const r of REGIONS)for(let i=0;i<4;i++)
+   merged.profiles[h].done[r.key][i]||=state.profiles[h].done[r.key][i];
+  for(const kind of ["feed","colors","memory"])for(let i=0;i<4;i++)
+   merged.pet.done[h][kind][i]||=state.pet.done[h][kind][i];
+  for(const subject of ["math","letters","logic","nature"]){
+   const delta=Math.max(0,state.hall.heroes[h].subjects[subject]-old.hall.heroes[h].subjects[subject]);
+   merged.hall.heroes[h].subjects[subject]=Math.min(1000000,merged.hall.heroes[h].subjects[subject]+delta)
+  }
+  for(const [id,awarded] of Object.entries(state.hall.heroes[h].traceAwards))
+   if(awarded)merged.hall.heroes[h].traceAwards[id]=true;
+  merged.hall.heroes[h].pairAwards=[...new Set([...merged.hall.heroes[h].pairAwards,...state.hall.heroes[h].pairAwards])];
+  merged.forest3.heroes[h]=forest3Merge(latest.forest3.heroes[h],state.forest3.heroes[h])
+ }
+ for(const d of DECOR)merged.castle.items[d.key]||=state.castle.items[d.key];
+ if(state.active!==old.active)merged.active=state.active;
+ for(const key of Object.keys(merged.settings))
+  if(state.settings[key]!==old.settings[key])merged.settings[key]=state.settings[key];
+ state=merged;return true
+}
 function save(merge=true){
  try{
   if(merge&&!mergeLatestProgress())return false;

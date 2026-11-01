@@ -48,20 +48,31 @@ function f3MergeCurrent(a,b){
  x.medal=x.medal||y.medal;
  return x
 }
+let lastStorySettings={...family.settings};
 function save(resetChapterNow=false){
  try{
-  // Preserve the other brother's chapter on concurrent tabs.
   const latest=f3ReadFamily();
+  const globalReset=Number.isSafeInteger(latest.resetEpoch)?latest.resetEpoch:0;
+  const knownReset=Number.isSafeInteger(family.resetEpoch)?family.resetEpoch:0;
+  if(globalReset>knownReset){family=latest;f3EnsureFamily();lastStorySettings={...family.settings};return false}
   const latestHeroes=latest.forest3&&latest.forest3.heroes||{};
   const current=f3Clean(family.forest3.heroes[hero]);
+  if(resetChapterNow)current.generation=Math.min(1000000,Math.max(current.generation,f3Clean(latestHeroes[hero]).generation)+1);
   const merged=resetChapterNow?current:f3MergeCurrent(current,latestHeroes[hero]);
   latest.forest3={heroes:{...latestHeroes,[hero]:merged}};
-  latest.settings=family.settings;
+  // Only write settings the player actually changed on this page.
+  const prefs={...latest.settings};
+  for(const key of Object.keys(family.settings))
+   if(family.settings[key]!==lastStorySettings[key])prefs[key]=family.settings[key];
+  latest.settings=prefs;
   latest.active=hero;
-  family=latest;f3EnsureFamily();
+  const outdated=current.generation<merged.generation;
+  family=latest;f3EnsureFamily();lastStorySettings={...family.settings};
   localStorage.setItem(F3_STORAGE,JSON.stringify(family));
   localStorage.setItem(F3_HERO_STORAGE,hero);
- }catch(e){$("missionFeedback").textContent="⚠️ Не удалось сохранить игру в браузере. Возможно, включён приватный режим."}
+  if(outdated){scene=activeSceneForStage();selectedSeed=null;selectedPlank=null;memoryInput=[];setTimeout(render,0)}
+  return true
+ }catch(e){$("missionFeedback").textContent="⚠️ Не удалось сохранить игру в браузере. Возможно, включён приватный режим.";return false}
 }
 function say(text,force=false,role="owl"){return window.AcademyVoice?window.AcademyVoice.speak(text,{force,role}):false}
 function narrate(id,fallback,force=false){if(window.AcademyVoice&&window.AcademyVoice.line(id,{force}))return true;return say(fallback,force,"owl")}

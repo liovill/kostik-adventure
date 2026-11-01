@@ -54,6 +54,17 @@ function save(){
 function say(text,force=false,role="owl"){return window.AcademyVoice?window.AcademyVoice.speak(text,{force,role}):false}
 function narrate(id,fallback,force=false){if(window.AcademyVoice&&window.AcademyVoice.line(id,{force}))return true;return say(fallback,force,"owl")}
 function sound(name){if(window.AcademySound)window.AcademySound.cue(name)}
+function updateSoundtrack(){
+ const player=window.AcademySound;
+ const info=player&&typeof player.getSceneInfo==="function"?player.getSceneInfo():{title:"Мелодия волшебного леса",icon:"🌲"};
+ const enabled=!!family.settings.ambientOn;
+ $("forestSoundName").textContent=info.icon+" "+info.title;
+ $("forestSoundSub").textContent=enabled?"Флейта, арфа и тихие звуки природы":"Нажми, чтобы услышать музыку этого места";
+ $("forestSoundToggle").textContent=enabled?"🔇 Выключить":"🎶 Оживить лес";
+ $("forestSoundToggle").setAttribute("aria-pressed",enabled?"true":"false");
+ $("forestSoundToggle").setAttribute("aria-label",enabled?"Выключить сказочную музыку":"Включить сказочную музыку");
+ $("forestSoundToggle").closest(".soundtrack-bar")?.classList.toggle("playing",enabled)
+}
 function missionSpeech(){
  const stage=state().stage;
  if(stage===3)return F3_PATTERN[hero][state().patterns]?.say||"Продолжи волшебный узор.";
@@ -124,7 +135,7 @@ function render(){
  $("worldBridge").classList.toggle("built",p.planks.every(Boolean));
  const slots=$("bridgePlanks");slots.innerHTML="";for(let i=0;i<3;i++){const plank=document.createElement("span");plank.className=p.planks[i]?"present":"";slots.appendChild(plank)}
  F3_SEEDS.forEach((s,i)=>{$("bedArt"+i).textContent=p.seeds[i]?s.flower:"🌱"});
- $("worldNest").textContent=p.stage>=7?"🐲":"🥚";
+ $("worldNest").textContent=p.stage>=7?"🐲":"🥚";updateSoundtrack();
  const lights=$("forestLights");lights.innerHTML="";
  if(scene==="grove"&&p.stage>=1){F3_FIRE.forEach((f,i)=>{
   if(p.lights[i])return;
@@ -356,13 +367,20 @@ function switchHero(){
  render();story("Привет, "+F3_NAMES[hero]+"! Твой лес и твои открытия ждут тебя.","🦉 Сова Луна",true)
 }
 function init(){
- if(window.AcademySound)window.AcademySound.configure({getSettings:()=>family.settings,save,scene});
+ if(window.AcademySound)window.AcademySound.configure({getSettings:()=>family.settings,save,onChange:updateSoundtrack,scene});
  if(window.AcademyVoice)window.AcademyVoice.configure({getSettings:()=>family.settings,save,onChange:()=>{const button=$("voiceToggle");button.textContent=family.settings.voice?"🔊":"🔇";button.setAttribute("aria-label",family.settings.voice?"Выключить озвучку":"Включить озвучку")}});
  $("voiceToggle").onclick=()=>{
   window.AcademyVoice.setEnabled(!family.settings.voice);
   if(family.settings.voice)say("Привет! Я сова Луна. Добро пожаловать в волшебный лес!")
  };
  $("voiceStudioButton").onclick=()=>window.AcademyVoice.openStudio();
+ $("forestSoundToggle").onclick=()=>{
+  if(!window.AcademySound)return;
+  const enabled=window.AcademySound.setAmbient(!family.settings.ambientOn);
+  updateSoundtrack();
+  if(enabled)story("Прислушайся! Лес рассказывает свою сказку: слышны флейта, арфа и шёпот волшебных деревьев.","🦉 Сова Луна");
+  else story("Музыка стихла, но лес всё ещё ждёт тебя.","🦉 Сова Луна");
+ };
  $("sayMission").onclick=()=>say(missionSpeech(),true);
  $("sayStory").onclick=()=>say($("storyText").textContent,true);
  $("switchHero").onclick=switchHero;

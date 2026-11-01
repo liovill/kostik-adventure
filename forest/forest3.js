@@ -430,7 +430,7 @@ function init(){
  $("talkClose").onclick=()=>{$("talkOverlay").classList.add("hidden");if(window.AcademyVoice)window.AcademyVoice.stop()};
  $("talkAccept").onclick=()=>{$("talkOverlay").classList.add("hidden");if(state().stage===0)advance()};
  document.addEventListener("keydown",e=>{if(e.key==="Escape")$("talkOverlay").classList.add("hidden")});
- render()
+ render();if(window.AcademyBoot)window.AcademyBoot.ready()
 }
 window.Forest3Public={
  hero:()=>hero,stage:()=>state().stage,scene:()=>scene,

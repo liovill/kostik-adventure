@@ -141,6 +141,8 @@ function advance(){
 }
 function render(){
  const p=state(),stage=F3_STAGES[p.stage];
+ $("forestApp").classList.toggle("reduce-motion",family.settings.reduceMotion===true);
+ $("heroActor").setAttribute("aria-label","Помахать герою: "+F3_NAMES[hero]);
  $("heroName").textContent=F3_NAMES[hero];$("heroSmall").textContent=hero==="kirill"?"🐲":"🧙‍♂️";
  $("voiceToggle").textContent=family.settings.voice?"🔊":"🔇";$("voiceToggle").setAttribute("aria-label",family.settings.voice?"Выключить озвучку":"Включить озвучку");
  $("progressTitle").textContent=p.stage>=7?"Победа!":stage.name;
@@ -408,6 +410,15 @@ function init(){
  $("sayMission").onclick=()=>say(missionSpeech(),true);
  $("sayStory").onclick=()=>say($("storyText").textContent,true);
  $("switchHero").onclick=switchHero;
+ $("heroActor").onclick=()=>{
+  const actor=$("heroActor");
+  actor.classList.remove("cheer");
+  void actor.offsetWidth;
+  actor.classList.add("cheer");
+  setTimeout(()=>actor.classList.remove("cheer"),850);
+  sound("select");
+  story(hero==="kirill"?"Кирилл радостно помахал тебе и зовёт исследовать лес!":"Костик улыбается и готов к следующему волшебному открытию!","✨ Наш герой",true)
+ };
  document.querySelectorAll("[data-scene]").forEach(b=>b.onclick=()=>chooseScene(b.dataset.scene,true));
  $("owlHotspot").onclick=openTalk;
  $("saplingHotspot").onclick=()=>{if(state().stage===2){chooseScene("garden");feedback("Выбери цвет семечка и подходящую клумбу.")}else story("Сад оживает от твоей заботы!","🦉 Сова Луна",true)};

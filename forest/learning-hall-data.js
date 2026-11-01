@@ -20,18 +20,18 @@ function hallSeed(hero,subject,index){let s=2166136261;const str=hero+"|"+subjec
 function hallPick(random,list){return list[Math.floor(random()*list.length)]}
 function hallShuffle(random,arr){const out=arr.slice();for(let i=out.length-1;i>0;i--){let j=Math.floor(random()*(i+1));[out[i],out[j]]=[out[j],out[i]]}return out}
 function hallAnswer(q,visual,answer,distractors,say,kind){const choices=[String(answer),...distractors.map(String)].filter((v,i,a)=>a.indexOf(v)===i);if(choices.length<3)throw new Error("Hall: not enough unique choices");return{kind:kind||"choice",q,visual,answer:String(answer),options:choices.slice(0,3),say:say||q}}
-function generateHallTask(hero,subject,index){
- const rand=hallRandom(hallSeed(hero,subject,index)),pick=x=>hallPick(rand,x),shuffle=x=>hallShuffle(rand,x),easy=hero==="kirill";
+function hallGenerateCandidate(hero,subject,index,attempt=0){
+ const rand=hallRandom(hallSeed(hero,subject,index)^Math.imul(attempt,0x7feb352d)),pick=x=>hallPick(rand,x),shuffle=x=>hallShuffle(rand,x),easy=hero==="kirill";
  // Shuffle task types per lesson instead of repeating the same five in the same order.
- const round=Math.floor(index/5),sequence=hallShuffle(hallRandom(hallSeed(hero,subject,round)^0x5A17F00D),[0,1,2,3,4]);
+ const round=Math.floor(index/5),sequence=hallShuffle(hallRandom(hallSeed(hero,subject,round)^0x5A17F00D^Math.imul(attempt,0x67b3ac17)),[0,1,2,3,4]);
  const variant=sequence[index%5];let q;
  if(subject==="math"){
   if(easy){
    if(variant===0){const icon=pick(["⭐","🌸","🐞","🍓","🧸","🐟","🍎","🦋"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди столько же предметов",icon.repeat(n),icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Посмотри на предметы сверху. Найди внизу такую же группу.")}
-   else if(variant===1){const icon=pick(["⚽","🐻","🧸","🍪","🚗","🐶"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди нужное количество предметов","",icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Найди "+n+" одинаковых предмета.")}
+   else if(variant===1){const icon=pick(["⚽","🐻","🧸","🍪","🚗","🐶"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди нужное количество предметов",icon.repeat(n),icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Найди "+n+" одинаковых предмета.")}
    else if(variant===2){const icon=pick(["🍎","🍌","🥕","🍄","🐬","🌻"]),n=1+Math.floor(rand()*3);q=hallAnswer("Найди такую же группу",icon.repeat(n),icon.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>icon.repeat(x)),"Найди точно такую же группу предметов.")}
    else if(variant===3){const group=pick(["🍓","🍐","🧸","🐣","🚀","🌼","🐢","🍒"]);const n=1+Math.floor(rand()*3);q=hallAnswer("Найди столько же предметов",group.repeat(n),group.repeat(n),[1,2,3].filter(x=>x!==n).map(x=>group.repeat(x)),"Найди столько же предметов, сколько показано сверху.")}
-   else {const animal=pick(["🐱","🐶","🐰","🐥","🐼","🐭"]),n=2+Math.floor(rand()*2);q=hallAnswer("Найди зверят","",animal.repeat(n),[1,3,4].filter(x=>x!==n).slice(0,2).map(x=>animal.repeat(x)),"Найди "+(n===2?"двух":"трёх")+" одинаковых зверят.")}
+   else {const animal=pick(["🐱","🐶","🐰","🐥","🐼","🐭"]),n=2+Math.floor(rand()*2);q=hallAnswer("Найди зверят",animal.repeat(n),animal.repeat(n),[1,3,4].filter(x=>x!==n).slice(0,2).map(x=>animal.repeat(x)),"Найди "+(n===2?"двух":"трёх")+" одинаковых зверят.")}
   }else{
    const level=Math.min(3,Math.floor(index/16)),lim=[5,10,15,20][level];
    if(variant===0){const n=2+Math.floor(rand()*Math.min(lim-1,9)),emoji=pick(["🍄","⭐","🍓","🐞","🍎"]);q=hallAnswer("Сколько предметов ты видишь?",Array(n).fill(emoji).join(" "),n,shuffle([n+1,n-1,n+2,n-2]).filter(x=>x>=1).slice(0,2),"Посчитай предметы и выбери число.")}
@@ -43,11 +43,11 @@ function generateHallTask(hero,subject,index){
  }
  else if(subject==="letters"){
   if(easy){
-   if(variant===0){const x=pick(HALL_ITEMS.animals);q=hallAnswer("Найди животное","",x.icon,shuffle(HALL_ITEMS.animals.filter(a=>a.icon!==x.icon)).slice(0,2).map(a=>a.icon),"Найди: "+x.name+".")}
+   if(variant===0){const x=pick(HALL_ITEMS.animals);q=hallAnswer("Найди животное",x.icon,x.icon,shuffle(HALL_ITEMS.animals.filter(a=>a.icon!==x.icon)).slice(0,2).map(a=>a.icon),"Найди: "+x.name+".")}
    else if(variant===1){const x=pick(["🍎","🚗","🏠","⚽","🧸","📘"]);q=hallAnswer("Найди такой же предмет",x,x,shuffle(["🍎","🚗","🏠","⚽","🧸","📘"].filter(t=>t!==x)).slice(0,2),"Найди такую же картинку.")}
-   else if(variant===2){const x=pick(HALL_ITEMS.colors);q=hallAnswer("Найди "+x.color+" цвет","",x.icon,shuffle(HALL_ITEMS.colors.filter(c=>c.icon!==x.icon)).slice(0,2).map(c=>c.icon),"Найди "+x.color+" цвет.")}
-   else if(variant===3){const group=["🐶","🐱","🐰","🦊","🐻","🐸"];const x=pick(group);q=hallAnswer("Где "+({"🐶":"собачка","🐱":"кошечка","🐰":"зайчик","🦊":"лиса","🐻":"медведь","🐸":"лягушка"}[x])+"?","",x,shuffle(group.filter(t=>t!==x)).slice(0,2),"Посмотри и найди животное.")}
-   else {const x=pick(HALL_ITEMS.shapes),objectName=x.name==="звезда"?"звезду":x.name;q=hallAnswer("Найди "+objectName,"",x.icon,shuffle(HALL_ITEMS.shapes.filter(t=>t.icon!==x.icon)).slice(0,2).map(t=>t.icon),"Найди "+objectName+".")}
+   else if(variant===2){const x=pick(HALL_ITEMS.colors);q=hallAnswer("Найди "+x.color+" цвет",x.icon,x.icon,shuffle(HALL_ITEMS.colors.filter(c=>c.icon!==x.icon)).slice(0,2).map(c=>c.icon),"Найди "+x.color+" цвет.")}
+   else if(variant===3){const group=["🐶","🐱","🐰","🦊","🐻","🐸"];const x=pick(group);q=hallAnswer("Где "+({"🐶":"собачка","🐱":"кошечка","🐰":"зайчик","🦊":"лиса","🐻":"медведь","🐸":"лягушка"}[x])+"?",x,x,shuffle(group.filter(t=>t!==x)).slice(0,2),"Посмотри и найди животное.")}
+   else {const x=pick(HALL_ITEMS.shapes),objectName=x.name==="звезда"?"звезду":x.name;q=hallAnswer("Найди "+objectName,x.icon,x.icon,shuffle(HALL_ITEMS.shapes.filter(t=>t.icon!==x.icon)).slice(0,2).map(t=>t.icon),"Найди "+objectName+".")}
   }else{
    if(variant===0){const x=pick(HALL_ITEMS.animals);const letters=shuffle([...new Set(HALL_ITEMS.animals.map(a=>a.letter).filter(c=>c!==x.letter))]).slice(0,2);q=hallAnswer("С какого звука начинается название животного?",x.icon,x.letter,letters,"Посмотри на картинку. Это "+x.name+". С какого звука начинается название?")}
    else if(variant===1){const x=pick(HALL_ITEMS.words),others=shuffle(HALL_ITEMS.words.filter(a=>a.word!==x.word)).slice(0,2);q=hallAnswer("Выбери слово по картинке",x.icon,x.word,others.map(a=>a.word),"Посмотри на картинку и найди слово "+x.word.toLowerCase()+".")}
@@ -74,9 +74,9 @@ function generateHallTask(hero,subject,index){
  }
  else if(subject==="nature"){
   if(easy){
-   if(variant===0){const animal=pick(HALL_ITEMS.animals);q=hallAnswer("Где животное?","",animal.icon,shuffle(HALL_ITEMS.animals.filter(a=>a.icon!==animal.icon)).slice(0,2).map(a=>a.icon),"Найди животное: "+animal.name+".")}
+   if(variant===0){const animal=pick(HALL_ITEMS.animals);q=hallAnswer("Где животное?",animal.icon,animal.icon,shuffle(HALL_ITEMS.animals.filter(a=>a.icon!==animal.icon)).slice(0,2).map(a=>a.icon),"Найди животное: "+animal.name+".")}
    else if(variant===1){let x=pick(["☀️","🌙","🌧️","❄️","🌈"]);q=hallAnswer("Найди такую же картинку",x,x,shuffle(["☀️","🌙","🌧️","❄️","🌈"].filter(t=>t!==x)).slice(0,2),"Найди такую же картинку.")}
-   else if(variant===2){let x=pick([{q:"Где солнышко?",v:"☀️"},{q:"Где дождик?",v:"🌧️"},{q:"Где снег?",v:"❄️"},{q:"Где радуга?",v:"🌈"}]);q=hallAnswer(x.q,"",x.v,shuffle(["☀️","🌧️","❄️","🌈"].filter(v=>v!==x.v)).slice(0,2),x.q)}
+   else if(variant===2){let x=pick([{q:"Где солнышко?",v:"☀️"},{q:"Где дождик?",v:"🌧️"},{q:"Где снег?",v:"❄️"},{q:"Где радуга?",v:"🌈"}]);q=hallAnswer(x.q,x.v,x.v,shuffle(["☀️","🌧️","❄️","🌈"].filter(v=>v!==x.v)).slice(0,2),x.q)}
    else if(variant===3){let x=pick(["🍎","🥕","🍌","🍓"]);q=hallAnswer("Найди такой же продукт",x,x,shuffle(["🍎","🥕","🍌","🍓"].filter(t=>t!==x)).slice(0,2),"Найди такую же еду.")}
    else {let x=pick(["🐦","🐟","🦋","🐝"]);q=hallAnswer("Найди такое же живое существо",x,x,shuffle(["🐦","🐟","🦋","🐝"].filter(t=>t!==x)).slice(0,2),"Найди такое же существо.")}
   }else{
@@ -88,4 +88,38 @@ function generateHallTask(hero,subject,index){
   }
  }else throw new Error("unknown hall subject "+subject);
  q.options=shuffle(q.options);q.id=hero+"-"+subject+"-"+index;q.subject=subject;q.number=index;return q
+}
+
+
+/* v43: A deterministic rolling anti-repeat queue shared by both short lessons
+   and resumed sessions. New tasks are created in sequence so the same progress
+   number always yields the same result after reloading the game. */
+const HALL_RECENT_WINDOW=20;
+const hallTaskCache=new Map();
+function hallTaskFingerprint(task){
+ return [task.kind,task.q,task.visual,task.answer].map(v=>String(v??"")).join("\u241f")
+}
+function generateHallTask(hero,subject,index){
+ if(!Number.isSafeInteger(index)||index<0)throw new Error("Hall: invalid progress index");
+ const cacheKey=hero+"|"+subject;
+ let stored=hallTaskCache.get(cacheKey);
+ if(!stored){stored=[];hallTaskCache.set(cacheKey,stored)}
+ // Protect a corrupted progress counter from allocating an unbounded array.
+ if(index>2000)return hallGenerateCandidate(hero,subject,index,0);
+ for(let i=stored.length;i<=index;i++){
+  const recent=new Set(stored.slice(-HALL_RECENT_WINDOW).map(hallTaskFingerprint));
+  let best=null,bestGap=-1;
+  for(let attempt=0;attempt<96;attempt++){
+   const candidate=hallGenerateCandidate(hero,subject,i,attempt);
+   const fingerprint=hallTaskFingerprint(candidate);
+   if(!recent.has(fingerprint)){best=candidate;break}
+   const previous=stored.findLastIndex(task=>hallTaskFingerprint(task)===fingerprint);
+   const gap=previous<0?Infinity:i-previous;
+   if(gap>bestGap){bestGap=gap;best=candidate}
+  }
+  stored.push(best)
+ }
+ const t=stored[index];
+ // Return a copy so UI code cannot accidentally mutate the cached template.
+ return {...t,options:t.options.slice()}
 }

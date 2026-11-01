@@ -1,0 +1,49 @@
+/* Forest Explorer v42: character locomotion, tap destination and helpful touch feedback. */
+.world-scene .hero-figure.exploring{
+ z-index:10;pointer-events:none;
+ filter:drop-shadow(0 10px 10px #122c3e91);
+ will-change:left,top;
+}
+.world-scene .hero-figure.exploring svg{
+ animation:forest-explorer-steps .32s ease-in-out infinite alternate!important;
+}
+.forest-walk-marker{
+ position:absolute;z-index:6;pointer-events:none;display:block;
+ width:36px;height:20px;border-radius:50%;
+ border:3px solid #fff7b1;background:#fff2a533;
+ box-shadow:0 0 18px 5px #ffeba66b;
+ transform:translate(-50%,-50%);
+ animation:forest-explorer-marker .85s ease-in-out infinite alternate;
+}
+.forest-walk-marker::after{
+ content:"✦";position:absolute;left:50%;top:-14px;
+ transform:translateX(-50%);color:#fff6af;font-size:20px;
+ text-shadow:0 0 10px #ffe79a;
+}
+.forest-walk-status{
+ display:flex;align-items:center;justify-content:center;min-height:33px;
+ padding:6px 10px;background:#1d4852;color:#e5f6d7;
+ border-top:1px solid #b6e2c06b;
+ text-align:center;font-size:12px;font-weight:800;line-height:1.3;
+}
+.world-scene{cursor:crosshair}
+.world-activity,.forest-discovery,.scene-hotspot,.hero-figure{cursor:pointer}
+@keyframes forest-explorer-steps{
+ from{transform:translateY(0) rotate(-2deg)}
+ to{transform:translateY(-7px) rotate(2deg)}
+}
+@keyframes forest-explorer-marker{
+ from{opacity:.55;transform:translate(-50%,-50%) scale(.85)}
+ to{opacity:1;transform:translate(-50%,-50%) scale(1.14)}
+}
+@media(max-width:610px){
+ .forest-walk-marker{width:29px;height:17px}
+ .forest-walk-status{font-size:11px;min-height:32px}
+}
+@media(prefers-reduced-motion:reduce){
+ .world-scene .hero-figure.exploring svg,.forest-walk-marker{animation:none!important}
+ .world-scene .hero-figure.exploring{will-change:auto}
+}
+.app.reduce-motion .world-scene .hero-figure.exploring svg,
+.app.reduce-motion .forest-walk-marker{animation:none!important}
+.app.reduce-motion .world-scene .hero-figure.exploring{will-change:auto}

@@ -23,3 +23,16 @@
 @media(max-width:520px){.academy-soundbar{padding:10px;gap:8px;margin-top:11px}.academy-soundbar-art{font-size:24px;width:38px;height:38px}.academy-soundbar-label strong{font-size:12px}.academy-soundbar-label small{font-size:11px}.academy-soundbar-toggle{min-width:97px;min-height:44px;font-size:11px;padding:8px}}
 @media(max-width:370px){.academy-soundbar-art{display:none}}
 @media(prefers-reduced-motion:reduce){.academy-soundbar.playing .academy-soundbar-art{animation:none}}
+
+/* QA: informational toasts cannot cover or block gameplay controls. */
+.toast{pointer-events:none}
+@media(max-width:450px){
+ .top-btn.tiny{width:44px;min-height:44px;min-width:44px}
+ .top-btn:not(.tiny){min-height:44px}
+ .wordmark .emblem{min-height:44px;min-width:38px;display:grid;place-items:center}
+}
+@media(max-width:350px){
+ .topbar{gap:2px}.top-actions{gap:2px}
+ .top-btn.tiny{width:44px;min-height:44px;min-width:44px;padding:4px}
+ .top-btn:not(.tiny){padding:5px 6px}
+}

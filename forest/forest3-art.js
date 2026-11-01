@@ -89,10 +89,10 @@ function render(){
  const count=find("forestSecretCount");if(count)count.textContent=discovered.size+" / "+SECRETS.length;
  const hint=find("forestSecretHint");if(hint)hint.textContent=discovered.size===SECRETS.length?"Все тайны найдены! Лес благодарит тебя.":"Потрогай волшебные предметы на карте";
  const nest=find("worldNest");
- if(nest&&api.stage()>=7&&nest.dataset.dragonArt!=="ready"){nest.innerHTML=DRAGON;nest.dataset.dragonArt="ready"}
- else if(nest&&api.stage()<7&&nest.dataset.dragonArt==="ready"){nest.textContent="🥚";nest.dataset.dragonArt="egg"}
+ if(nest&&api.stage()>=7&&!nest.querySelector(".forest-dragon-svg")){nest.innerHTML=DRAGON;nest.dataset.dragonArt="ready"}
+ else if(nest&&api.stage()<7&&nest.querySelector(".forest-dragon-svg")){nest.textContent="🥚";nest.dataset.dragonArt="egg"}
  const hotspot=find("nestHotspot")?.querySelector(".hotspot-emoji");
- if(hotspot)hotspot.innerHTML=api.stage()>=7?DRAGON:"✨";
+ if(hotspot)hotspot.textContent=api.stage()>=7?"✨":"✨";
 }
 root.ForestArt={render,secretCount:()=>SECRETS.length};
 })(window,document);

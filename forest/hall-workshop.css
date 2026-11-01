@@ -63,3 +63,135 @@
  .workshop-bin-name{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){.workshop-piece,.workshop-bin,.workshop-plant{animation:none!important;transition:none!important}}
+
+
+/* v45 | Living bridge: artwork made of lightweight CSS and existing hero SVG. */
+.workshop-bridge-scene{
+ position:relative;isolation:isolate;width:100%;height:clamp(250px,61vw,365px);overflow:hidden;
+ border:2px solid #dbf6c7;border-radius:24px;
+ background:linear-gradient(180deg,#7ccef1 0%,#c2eddb 48%,#9bd2a0 51%,#549b72 100%);
+ box-shadow:inset 0 -18px 35px #214a5370,0 9px 18px #071d3166
+}
+.bridge-clouds{position:absolute;inset:0;pointer-events:none}
+.bridge-cloud{position:absolute;top:6%;font-size:43px;opacity:.88;filter:drop-shadow(0 4px 3px #518eb259)}
+.bridge-cloud:first-child{left:14%;animation:bridge-cloud-float 9s ease-in-out infinite alternate}
+.bridge-cloud:last-child{right:15%;top:13%;font-size:32px;animation:bridge-cloud-float 11s ease-in-out infinite alternate-reverse}
+.bridge-hills{position:absolute;inset:22% 0 24%;z-index:0;pointer-events:none}
+.bridge-hills:before,.bridge-hills:after{content:"";position:absolute;bottom:0;width:66%;height:77%;border-radius:80% 70% 0 0}
+.bridge-hills:before{left:-20%;background:#79b58a}
+.bridge-hills:after{right:-21%;background:#5f9e8e}
+.bridge-water{
+ position:absolute;z-index:1;inset:49% 0 0;
+ background:repeating-linear-gradient(174deg,#ffffff24 0 6px,transparent 7px 21px),
+ linear-gradient(165deg,#64bfcb,#287eaf 44%,#4bafc0 72%,#277da0);
+ clip-path:polygon(0 10%,100% 8%,100% 100%,0 100%);
+ animation:bridge-water-flow 4s ease-in-out infinite alternate;
+ pointer-events:none
+}
+.bridge-water-sparkles{position:absolute;inset:54% 8% 8%;z-index:2;pointer-events:none;color:#c6fdff}
+.bridge-water-sparkles span{position:absolute;text-shadow:0 0 9px #efffff;font-size:22px;animation:bridge-twinkle 2.4s ease-in-out infinite alternate}
+.bridge-water-sparkles span:nth-child(1){top:19%;left:10%}
+.bridge-water-sparkles span:nth-child(2){top:70%;left:37%;animation-delay:.7s}
+.bridge-water-sparkles span:nth-child(3){top:23%;left:70%;animation-delay:1s}
+.bridge-water-sparkles span:nth-child(4){top:67%;left:91%;animation-delay:1.4s}
+.bridge-bank{
+ position:absolute;z-index:4;bottom:-8%;width:16%;height:53%;
+ background:linear-gradient(165deg,#e4d18c 0 14%,#7fba73 15%,#397e68);
+ border-top:8px solid #b4d788;box-shadow:0 -8px 15px #254b5550;
+ pointer-events:none
+}
+.bridge-bank-left{left:-5%;border-radius:34% 60% 0 0;transform:rotate(4deg)}
+.bridge-bank-right{right:-5%;border-radius:60% 34% 0 0;transform:rotate(-4deg)}
+.bridge-slots{
+ position:absolute;z-index:7;left:10%;right:10%;top:58%;height:clamp(64px,14vw,86px);
+ display:grid;grid-template-columns:repeat(var(--bridge-count),minmax(0,1fr));gap:3px;
+ border-left:6px solid #6e4b35;border-right:6px solid #6e4b35;
+ border-radius:10px;
+ background:linear-gradient(180deg,transparent 44%,#5e4234 45% 54%,transparent 55%);
+ filter:drop-shadow(0 11px 4px #10324c70)
+}
+.bridge-slot{
+ display:flex;min-width:0;align-items:center;justify-content:center;flex-direction:column;gap:3px;
+ color:#fff8d2;border:2px dashed #dbd7a2;background:#153f63c9;border-radius:9px;
+ padding:6px 1px;font-weight:850;font-size:12px;touch-action:manipulation;
+ text-shadow:0 2px 2px #10344d;cursor:pointer
+}
+.bridge-slot-board{font-size:clamp(17px,4vw,29px);line-height:1.13;white-space:nowrap}
+.bridge-slot-caption{font-size:clamp(8px,1.8vw,11px);line-height:1.1;text-align:center;overflow-wrap:anywhere;max-width:100%}
+.bridge-slot.built{
+ position:relative;border:2px solid #7a4b30;
+ color:#fff8df;text-shadow:0 1px 2px #472814;
+ background:repeating-linear-gradient(3deg,#a77445 0 6px,#cf9a5d 7px 14px,#b17a4a 15px 21px);
+ box-shadow:inset 0 3px 2px #f9cf8980,inset 0 -5px 5px #65432663,0 3px 0 #49382e
+}
+.bridge-slot.built .bridge-slot-board{font-size:25px;opacity:.95}
+.bridge-slot.built.newly-built{animation:bridge-plank-place .42s cubic-bezier(.1,1.4,.4,1) both}
+.bridge-slot:focus-visible{outline:4px solid #fff6b3;outline-offset:4px}
+.bridge-slot:disabled{opacity:1;cursor:default}
+.bridge-traveler{
+ position:absolute;z-index:8;top:26%;left:11%;height:112px;width:88px;transform:translateX(-50%);pointer-events:none;
+ filter:drop-shadow(0 11px 5px #24495785)
+}
+.bridge-traveler .hero-fig,.bridge-traveler svg{width:100%;height:100%;display:block}
+.bridge-crossed .bridge-traveler{animation:bridge-hero-walk 2.5s ease-in-out .42s both}
+.bridge-crossed .bridge-traveler > svg{animation:bridge-hero-steps .35s ease-in-out .42s 7 alternate}
+.bridge-dragon{position:absolute;z-index:8;top:26%;right:3%;font-size:clamp(43px,8vw,64px);pointer-events:none;
+ filter:drop-shadow(0 8px 5px #21586e9c);animation:bridge-dragon-breathe 2.7s ease-in-out infinite}
+.bridge-gift{position:absolute;z-index:8;top:10%;right:16%;font-size:30px;pointer-events:none;filter:drop-shadow(0 0 11px #fff3b9)}
+.bridge-crossed .bridge-gift{font-size:47px;animation:bridge-gift-pop .75s ease-out 2.5s both}
+.bridge-celebration{
+ position:absolute;z-index:10;left:50%;top:5%;transform:translateX(-50%);
+ border:2px solid #fff3bc;border-radius:999px;padding:7px 14px;
+ background:#144d63e8;color:#fff4ad;font-size:clamp(12px,3vw,18px);font-weight:900;
+ white-space:nowrap;text-align:center;box-shadow:0 7px 22px #1f425b8f;
+ animation:bridge-victory .7s ease-out 2.6s both;pointer-events:none
+}
+.bridge-materials{background:linear-gradient(145deg,#8f6242,#5d473b);border-color:#e8c89c;
+ box-shadow:inset 0 4px 17px #2a24294d}
+.bridge-materials .bridge-piece{background:repeating-linear-gradient(165deg,#e5bf83 0 9px,#cf9c62 10px 21px);
+ border-color:#ffe7b8;color:#43352c;box-shadow:0 5px 0 #73543c}
+.bridge-materials .bridge-piece.selected{outline:4px solid #baf4bb;transform:translateY(-3px)}
+.bridge-materials .bridge-piece.placed{box-shadow:none;opacity:.35}
+.bridge-mobile-help{margin:10px 3px 2px;text-align:center;font-size:13px;color:#d6f6ef}
+@keyframes bridge-water-flow{from{filter:hue-rotate(-6deg);transform:translateX(-2%)}to{filter:hue-rotate(9deg);transform:translateX(2%)}}
+@keyframes bridge-cloud-float{from{transform:translateX(-7px)}to{transform:translateX(19px)}}
+@keyframes bridge-twinkle{from{opacity:.2;transform:scale(.8)}to{opacity:1;transform:scale(1.25)}}
+@keyframes bridge-dragon-breathe{from,to{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-5px) rotate(4deg)}}
+@keyframes bridge-plank-place{0%{opacity:.25;transform:translateY(-50px) scale(.88)}75%{opacity:1;transform:translateY(7px) scale(1.03)}100%{transform:none}}
+@keyframes bridge-hero-walk{0%{left:11%;top:26%;transform:translateX(-50%) scale(1)}20%{top:36%}70%{top:36%}100%{left:73%;top:26%;transform:translateX(-50%) scale(.85)}}
+@keyframes bridge-hero-steps{from{transform:translateY(0) rotate(-2deg)}to{transform:translateY(-5px) rotate(2deg)}}
+@keyframes bridge-gift-pop{from{opacity:0;transform:scale(.1)}80%{opacity:1;transform:scale(1.2)}to{transform:scale(1)}}
+@keyframes bridge-victory{from{opacity:0;transform:translate(-50%,-15px) scale(.8)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@media(max-width:600px){
+ .workshop-bridge-scene{height:clamp(236px,73vw,330px)}
+ .bridge-traveler{height:96px;width:77px;top:29%}
+ .bridge-dragon{top:31%;right:2%}
+ .bridge-slots{top:60%;height:67px}
+ .bridge-gift{right:15%;top:11%}
+ .bridge-celebration{top:3%}
+ .bridge-slot{padding:4px 0}
+ .bridge-slot.built .bridge-slot-board{font-size:20px}
+ .bridge-slot-caption{font-size:8px;letter-spacing:-.05em}
+ .bridge-mobile-help{font-size:11px}
+}
+@media(max-width:365px){
+ .bridge-traveler{width:61px;height:84px;top:35%}
+ .bridge-dragon{font-size:36px;top:35%}
+ .bridge-slots{left:8%;right:8%;height:62px;top:59%;gap:2px;border-left-width:4px;border-right-width:4px}
+ .bridge-slot{border-width:1px;border-radius:6px}
+ .bridge-slot-board{font-size:17px}
+ .bridge-slot-caption{font-size:7px}
+}
+@media(prefers-reduced-motion:reduce){
+ .bridge-water,.bridge-cloud,.bridge-water-sparkles span,.bridge-dragon,.bridge-slot.built.newly-built,
+ .bridge-crossed .bridge-traveler,.bridge-crossed .bridge-traveler > svg,.bridge-crossed .bridge-gift,.bridge-celebration{animation:none!important}
+ .bridge-crossed .bridge-traveler{left:73%!important;top:26%!important;transform:translateX(-50%) scale(.85)}
+ .bridge-crossed .bridge-gift,.bridge-celebration{opacity:1!important;transform:none}
+ .bridge-celebration{transform:translateX(-50%)}
+}
+body.reduce-motion .bridge-water,body.reduce-motion .bridge-cloud,body.reduce-motion .bridge-water-sparkles span,
+body.reduce-motion .bridge-dragon,body.reduce-motion .bridge-slot.built.newly-built,
+body.reduce-motion .bridge-crossed .bridge-traveler,body.reduce-motion .bridge-crossed .bridge-traveler > svg,body.reduce-motion .bridge-crossed .bridge-gift,
+body.reduce-motion .bridge-celebration{animation:none!important}
+body.reduce-motion .bridge-crossed .bridge-traveler{left:73%!important;top:26%!important;transform:translateX(-50%) scale(.85)}
+body.reduce-motion .bridge-crossed .bridge-gift,body.reduce-motion .bridge-celebration{opacity:1!important}

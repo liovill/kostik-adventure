@@ -25,3 +25,16 @@
 @media(max-width:530px){.soundtrack-bar{gap:9px;padding:10px;margin:10px 0 12px}.soundtrack-icon{width:36px;height:36px;font-size:23px}.soundtrack-details strong{font-size:12px}.soundtrack-details small{font-size:11px}.soundtrack-toggle{min-width:102px;padding:7px;font-size:11px;min-height:45px}}
 @media(max-width:360px){.soundtrack-icon{display:none}.soundtrack-toggle{min-width:97px}}
 @media(prefers-reduced-motion:reduce){.soundtrack-bar.playing .soundtrack-icon{animation:none}}
+
+/* QA: child-friendly touch targets and narrow-screen header. */
+.home-link{min-height:44px}
+.scene-picker button{min-height:46px}
+.mission-read{min-width:48px;min-height:48px}
+@media(max-width:470px){
+ .voice-top-actions .icon-button{width:44px;height:44px;min-width:44px}
+}
+@media(max-width:390px){
+ .game-brand{display:none}
+ .topbar{gap:4px}
+ .scene-picker button{min-height:48px}
+}

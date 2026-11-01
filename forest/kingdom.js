@@ -102,7 +102,30 @@ function drawHome(){updateAcademySoundbar();const h=state.active,r=REGIONS[nextR
 function drawMap(){const grid=$("mapGrid");grid.innerHTML="";REGIONS.forEach((r,i)=>{const n=count(r),locked=!canOpen(i),b=document.createElement("button");b.className="map-card"+(locked?" locked":"")+(n===4?" completed":"");b.disabled=locked;b.style.setProperty("--region-bright",r.colors[0]);b.style.setProperty("--region-dark",r.colors[3]);b.innerHTML='<span class="chapter">'+r.chapter+(locked?" · 🔒":n===4?" · 🏅":"")+'</span><span class="map-emoji">'+r.emoji+'</span><h3>'+r.title+'</h3><p>'+r.desc+'</p><span class="progress-track"><span style="width:'+(n*25)+'%"></span></span>';b.onclick=()=>openRegion(i);grid.appendChild(b)})}
 function openRegion(i){if(!canOpen(i)){notify("🔒 Сначала открой предыдущую главу.");return}ri=i;position={x:50,y:88};show("world");if(state.settings.voice)speak(REGIONS[i].intro)}
 function tell(t){$("worldStory").textContent=t;$("fieldBubble").textContent=t}
-function drawWorld(){const r=REGIONS[ri],f=$("playfield");r.colors.forEach((color,i)=>f.style.setProperty(["--sky1","--sky2","--land1","--land2"][i],color));$("worldChapter").textContent=r.chapter;$("worldTitle").textContent=r.title;$("worldGate").textContent=r.gate;$("actorArt").innerHTML=avatar(state.active);$("actorName").textContent=NAMES[state.active];const d=$("worldDecor");d.innerHTML="";r.decor.forEach(x=>{const node=document.createElement("span");node.className="landscape-icon";node.textContent=x[0];node.style.left=x[1]+"%";node.style.top=x[2]+"%";d.appendChild(node)});drawTokens();drawSteps();drawActor();tell(r.intro)}
+function drawWorld(){const r=REGIONS[ri],f=$("playfield");r.colors.forEach((color,i)=>f.style.setProperty(["--sky1","--sky2","--land1","--land2"][i],color));$("worldChapter").textContent=r.chapter;$("worldTitle").textContent=r.title;$("worldGate").textContent=r.gate;$("actorArt").innerHTML=avatar(state.active);$("actorName").textContent=NAMES[state.active];const d=$("worldDecor");d.innerHTML="";r.decor.forEach(x=>{const node=document.createElement("span");node.className="landscape-icon";node.textContent=x[0];node.style.left=x[1]+"%";node.style.top=x[2]+"%";d.appendChild(node)});drawTokens();drawSteps();drawActor();tell(r.intro);fitWorldDecor()}
+/* v43: decorative emoji must never cover puzzle buttons on narrow phones.
+   Recheck after layout changes and after browsers calculate real font metrics. */
+function fitWorldDecor(){
+ const board=$("playfield"),decor=$("worldDecor"),tokens=$("worldTokens");
+ if(!board||!decor||!tokens)return;
+ const illustrations=[...decor.querySelectorAll(".landscape-icon")];
+ const obstacles=[...tokens.querySelectorAll(".quest-token"),$("worldGate"),$("fieldHud")].filter(Boolean);
+ const overlaps=(a,b)=>{
+  if(!a||!b||!a.width||!b.width)return false;
+  const pad=5;
+  return a.left<b.right+pad&&a.right+pad>b.left&&a.top<b.bottom+pad&&a.bottom+pad>b.top
+ };
+ for(const item of illustrations)item.style.visibility="visible";
+ const retained=[];
+ for(const item of illustrations){
+  const box=item.getBoundingClientRect();
+  if(obstacles.some(other=>overlaps(box,other.getBoundingClientRect()))||
+    retained.some(other=>overlaps(box,other))){
+   item.style.visibility="hidden";
+  }else retained.push(box)
+ }
+}
+window.addEventListener("resize",()=>{if(view==="world")fitWorldDecor()});
 function drawActor(){$("worldActor").style.left=position.x+"%";$("worldActor").style.top=position.y+"%";const pet=$("worldPet");if(pet){pet.classList.toggle("hidden",!petHatched());pet.style.left=Math.min(90,position.x+16)+"%";pet.style.top=Math.max(34,position.y-6)+"%"}}
 function drawTokens(){const r=REGIONS[ri],box=$("worldTokens");box.innerHTML="";POINTS.forEach((pos,i)=>{const b=document.createElement("button"),ok=p().done[r.key][i];b.className="quest-token"+(ok?" done":"");b.style.left=pos.x+"%";b.style.top=pos.y+"%";b.textContent=ok?"✨":"💎";b.setAttribute("aria-label",r.stages[i]+(ok?" выполнено":""));b.onclick=()=>travel(i);box.appendChild(b)});$("fieldHud").textContent="💎 "+count(r)+" / 4";$("worldGate").classList.toggle("ready",cleared(r))}
 function drawSteps(){const r=REGIONS[ri],box=$("missionSteps");box.innerHTML="";r.stages.forEach((name,i)=>{const el=document.createElement("div");el.className="mission-step"+(p().done[r.key][i]?" done":"");el.textContent=(p().done[r.key][i]?"✅ ":"💎 ")+name;box.appendChild(el)})}

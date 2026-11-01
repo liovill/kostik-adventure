@@ -25,7 +25,7 @@ function hallTraceResample(path,step=.018){if(!Array.isArray(path)||!path.length
 function hallTraceLength(a){let total=0;for(let i=1;i<a.length;i++)total+=Math.hypot(a[i][0]-a[i-1][0],a[i][1]-a[i-1][1]);return total}
 function hallTraceDist(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1])}
 function hallTraceScore(guide,points){
- if(!Array.isArray(points)||points.length<6)return{ok:false,coverage:0,accuracy:0,reason:"Проведи линию пальцем от начала до конца."};
+ if(!Array.isArray(points)||points.length<2)return{ok:false,coverage:0,accuracy:0,reason:"Проведи линию пальцем от начала до конца."};
  const expected=hallTraceResample(guide,.015),actual=hallTraceResample(points,.015);
  const close=(p,array,radius)=>array.some(x=>hallTraceDist(p,x)<=radius);
  const coverage=expected.filter(x=>close(x,actual,.108)).length/expected.length;

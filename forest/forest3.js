@@ -19,12 +19,12 @@ const F3_TEXT={
  6:"Камни запели! На поляне ждёт волшебное яйцо. Поможем дракону!",
  7:"Ты спас Зачарованный лес. Каждое твоё действие вернуло ему свет!"
 };
-function f3Empty(){return{stage:0,lights:[false,false,false],seeds:[false,false,false],patterns:0,planks:[false,false,false],memory:0,eggs:0,medal:false,replays:0,generation:0}}
+function f3Empty(){return{stage:0,lights:[false,false,false],seeds:[false,false,false],patterns:0,planks:[false,false,false],memory:0,eggs:0,medal:false,replays:0,generation:0,discoveries:[]}}
 function f3Clamp(x,max){return Number.isSafeInteger(x)?Math.max(0,Math.min(max,x)):0}
 function f3Clean(p){
  const v=f3Empty();if(!p||typeof p!=="object")return v;
  v.stage=f3Clamp(p.stage,7);for(const key of ["lights","seeds","planks"])v[key]=Array.from({length:3},(_,i)=>Array.isArray(p[key])&&p[key][i]===true);
- v.patterns=f3Clamp(p.patterns,3);v.memory=f3Clamp(p.memory,2);v.eggs=f3Clamp(p.eggs,3);v.medal=p.medal===true||v.stage===7;v.replays=f3Clamp(p.replays,100000);v.generation=f3Clamp(p.generation,1000000);return v
+ v.patterns=f3Clamp(p.patterns,3);v.memory=f3Clamp(p.memory,2);v.eggs=f3Clamp(p.eggs,3);v.medal=p.medal===true||v.stage===7;v.replays=f3Clamp(p.replays,100000);v.generation=f3Clamp(p.generation,1000000);v.discoveries=Array.isArray(p.discoveries)?[...new Set(p.discoveries.filter(x=>typeof x==="string"&&/^(grove|garden|river|clearing)-[a-z-]{1,26}$/.test(x)))].slice(0,12):[];return v
 }
 function f3ReadFamily(){try{const x=JSON.parse(localStorage.getItem(F3_STORAGE)||"{}");return x&&typeof x==="object"&&!Array.isArray(x)?x:{}}catch(e){return{}}}
 let family=f3ReadFamily();
@@ -46,6 +46,7 @@ function f3MergeCurrent(a,b){
  for(const key of ["lights","seeds","planks"])x[key]=x[key].map((v,i)=>v||y[key][i]);
  for(const key of ["patterns","memory","eggs","replays"])x[key]=Math.max(x[key],y[key]);
  x.medal=x.medal||y.medal;
+ x.discoveries=[...new Set([...x.discoveries,...y.discoveries])].slice(0,12);
  return x
 }
 let lastStorySettings={...family.settings};
@@ -185,7 +186,7 @@ function render(){
  $("endingPanel").classList.toggle("hidden",p.stage!==7);
  if(p.stage===7)$("endingMessage").textContent=F3_NAMES[hero]+", ты вернул свет в лес, помог сове Луне и разбудил дракончика. Медаль Хранителя леса навсегда осталась в твоей книге приключений.";
  $("missionHint").disabled=p.stage===7;
- story(F3_TEXT[p.stage]);if(window.PotionAtelier)window.PotionAtelier.render()
+ story(F3_TEXT[p.stage]);if(window.PotionAtelier)window.PotionAtelier.render();if(window.ForestArt)window.ForestArt.render()
 }
 function element(tag,cls,text){
  const el=document.createElement(tag);if(cls)el.className=cls;
@@ -381,7 +382,7 @@ function renderFinish(root){
 }
 function resetChapter(){
  if(window.AcademyVoice)window.AcademyVoice.stop();if(!window.confirm("Начать главу сначала? Медаль за первое прохождение сохранится."))return;
- const previous=state(),replay=f3Empty();replay.medal=previous.medal;replay.replays=previous.replays+1;
+ const previous=state(),replay=f3Empty();replay.medal=previous.medal;replay.replays=previous.replays+1;replay.discoveries=[...previous.discoveries];
  family.forest3.heroes[hero]=replay;scene="grove";if(window.AcademySound)window.AcademySound.setScene(scene);selectedSeed=null;selectedPlank=null;
  save(true);render();story("Лес готов к новому приключению! Поговори с совой Луной.","🦉 Сова Луна",true)
 }
@@ -420,5 +421,16 @@ function init(){
  document.addEventListener("keydown",e=>{if(e.key==="Escape")$("talkOverlay").classList.add("hidden")});
  render()
 }
-window.Forest3Public={hero:()=>hero,stage:()=>state().stage,scene:()=>scene,voiceEnabled:()=>family.settings.voice===true};
+window.Forest3Public={
+ hero:()=>hero,stage:()=>state().stage,scene:()=>scene,
+ voiceEnabled:()=>family.settings.voice===true,
+ discoveries:()=>[...state().discoveries],
+ discover:(id,message)=>{
+  if(typeof id!=="string"||!/^(grove|garden|river|clearing)-[a-z-]{1,26}$/.test(id))return false;
+  if(state().discoveries.includes(id)){story("Эту тайну ты уже открыл. Поищи следующую!","✨ Тайны леса");return false}
+  state().discoveries.push(id);
+  if(!save())return false;
+  story(message,"✨ Тайны леса",true);sound("firefly");return true
+ }
+};
 document.addEventListener("DOMContentLoaded",init,{once:true});

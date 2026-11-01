@@ -8,6 +8,7 @@
 <title>Князь и Кудрявый | Академия волшебства</title>
 <link rel="stylesheet" href="./kingdom.css?v=1">
 <link rel="stylesheet" href="./dragon-garden.css?v=2">
+<link rel="stylesheet" href="./learning-hall.css?v=1">
 </head>
 <body>
 <div id="app">
@@ -15,7 +16,7 @@
   <a class="wordmark" href="./" aria-label="На главную"><span class="emblem">🏰</span><span>КНЯЗЬ И КУДРЯВЫЙ<small>АКАДЕМИЯ ВОЛШЕБСТВА</small></span></a>
   <div class="top-actions">
     <button class="top-btn tiny" id="audioToggle" aria-label="Включить или выключить голос" title="Голос">🔇</button>
-    <button class="top-btn" id="profileSwitch">👑 Герои</button>
+    <button class="top-btn tiny" id="parentsShortcut" aria-label="Родительские настройки" title="Родителям">⚙️</button><button class="top-btn" id="profileSwitch">👑 Герои</button>
   </div>
 </header>
 <section class="screen" id="intro">
@@ -61,10 +62,12 @@
     <div class="art" id="nextEmoji">🌲</div>
   </div>
   <button class="pet-promo" data-go="garden" aria-label="Отправиться в Драконий сад"><span><strong>🐉 Познакомься с Искриком!</strong><small>Покорми дракончика, сыграй в волшебные игры и помоги братьям вырастить общего друга.</small><span class="chip" id="homePetHearts">❤️ 0 из 24 сердечек</span></span><span class="pet-promo-art" aria-hidden="true">🐲</span></button>
+<button class="pet-promo" data-go="hall" aria-label="Открыть Учебный зал" style="background:linear-gradient(125deg,#494c85,#6a548c 55%,#825c8d)"><span><strong>📚 Учебный зал открыт!</strong><small>Четыре предмета, множество новых заданий, прописи и игра «Соедини пары».</small><span class="chip">✨ Новые уроки</span></span><span class="pet-promo-art" aria-hidden="true">📖</span></button>
 <div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
   <div class="quick-grid">
     <button class="quick" data-go="castle"><span class="emoji">🏰</span><strong>Семейный замок</strong><span>Расти вместе и украшай комнаты</span></button>
     <button class="quick" data-go="journal"><span class="emoji">🏅</span><strong>Мои открытия</strong><span>Посмотри достижения и пройденные главы</span></button>
+    <button class="quick" data-go="hall"><span class="emoji">📚</span><strong>Учебный зал</strong><span>Четыре предмета и мини-игры</span></button>
     <button class="quick" data-go="map"><span class="emoji">🗺️</span><strong>Карта королевства</strong><span>Шесть удивительных регионов</span></button>
     <button class="quick" id="classicLink"><span class="emoji">✍️</span><strong>Девять учебных башен</strong><span>Письмо, музыка, чтение и другие занятия</span></button>
   </div>
@@ -75,6 +78,42 @@
   <p class="muted">Проходи главы, собирай кристаллы и возвращай магию в королевство. Новые регионы открываются по сюжету.</p>
   <div class="map-grid" id="mapGrid"></div>
   <div class="panel" style="margin-top:14px"><h3>🌟 Магистр Звездочёт</h3><p class="muted" style="margin:0">Не бойся ошибаться. У каждой загадки есть решение, а у каждого героя собственный темп!</p></div>
+</section>
+
+<section class="screen hidden" id="hall">
+  <div class="hall-hero">
+    <div><div class="overline">Новая башня Академии · Учебный зал</div><h1>✨ Учёба как приключение</h1><p id="hallWelcome">Здесь каждый день можно открывать новые задания: считать, читать, искать закономерности и исследовать мир.</p><span class="hall-mini-tag" id="hallTotalXP">⭐ 0 звёзд знаний</span></div>
+    <div class="hero-fig" id="hallHero" aria-hidden="true"></div>
+  </div>
+  <div id="hallIntro">
+    <div class="section-head" style="margin-top:20px"><div><div class="overline">Выбери путь</div><h2>Четыре предмета</h2><p class="muted small">Короткие занятия по 5 заданий. Можно делать перерывы и возвращаться позже.</p></div></div>
+    <div class="hall-subjects" id="hallSubjects"></div>
+    <div class="section-head" style="margin-top:22px"><div><div class="overline">Занятия пальчиками</div><h2>Настоящие мини-игры</h2></div></div>
+    <div class="hall-play-options">
+      <button class="hall-play" id="hallOpenTrace"><span class="symbol">✍️</span><strong>Волшебные прописи</strong><small>Проведи линию по образцу. Игра действительно проверяет рисунок.</small></button>
+      <button class="hall-play" id="hallOpenPairs"><span class="symbol">🧩</span><strong>Соедини пары</strong><small>Находи соответствия, выбирая предметы с двух сторон.</small></button>
+    </div>
+    <div class="hall-illustrated-note"><span class="em">🧙‍♂️</span><p>Неудача не отнимает звёзды, и никто не торопит. У Кости и Кирилла отдельные задания и собственный темп.</p></div>
+  </div>
+  <div id="hallLesson" class="hidden">
+    <div class="hall-nav-sub"><button class="button secondary small" id="hallBackLesson">← К предметам</button><span class="hall-mini-tag" id="hallLessonSubject">🧮 Математика</span></div>
+    <div class="hall-lesson-head"><span id="hallLessonStep">Задание 1 из 5</span><span id="hallLessonBest">⭐ Звёзд знаний: 0</span></div>
+    <div class="hall-lesson-bar"><span id="hallLessonProgress"></span></div>
+    <div class="hall-stage"><span class="stage-icon" id="hallStageIcon">🧮</span><h2 id="hallQuestion">Волшебное задание</h2><p class="muted small" id="hallQuestionHint">Выбери подходящий ответ</p><div class="hall-visual" id="hallVisual"></div><div class="hall-answers" id="hallAnswers"></div><div class="hall-feedback" id="hallFeedback" aria-live="polite"></div><div class="hall-lesson-footer"><button class="button secondary small" id="hallSpeak">🔊 Послушать</button><button class="button hidden" id="hallContinue">Дальше ✨</button></div></div>
+    <p class="muted small" style="text-align:center">Вопросы меняются с каждым новым занятием, а звёзды сохраняются отдельно для каждого брата.</p>
+  </div>
+  <div id="hallComplete" class="hidden">
+    <div class="hall-stage"><div class="hall-reward">🏆✨</div><h2>Занятие пройдено!</h2><p class="muted" id="hallFinishMessage">Магистр Звездочёт тобой гордится.</p><div class="hall-summary-stats"><span><b id="hallEarnedStars">5</b>звёзд за занятие</span><span><b id="hallNewTotal">0</b>всего звёзд знаний</span></div><div class="hall-lesson-footer"><button class="button" id="hallAgain">🔁 Ещё пять задач</button><button class="button secondary" id="hallFinishBack">← Выбрать предмет</button></div></div>
+  </div>
+  <div id="hallTrace" class="hidden">
+    <div class="hall-nav-sub"><button class="button secondary small" id="hallTraceBack">← К предметам</button><span class="hall-mini-tag">✍️ Волшебные прописи</span></div>
+    <div class="hall-stage"><span class="stage-icon">✍️</span><h2 id="hallTraceTitle">Обведи линию</h2><p class="muted small" id="hallTraceInstruction">Начни с зелёной точки, веди пальцем по пунктиру и закончи у золотой.</p><div class="hall-trace-targets" id="hallTraceTargets"></div><div class="hall-canvas-stage"><canvas class="hall-canvas" id="hallTraceCanvas" width="360" height="360" aria-label="Поле для рисования пальцем"></canvas></div><div class="hall-trace-tip"><span><i class="hall-trace-dot start"></i>Начало линии</span><span><i class="hall-trace-dot end"></i>Конец линии</span></div><div class="hall-trace-feedback" id="hallTraceFeedback" aria-live="polite"></div><div class="hall-tracing-toolbar"><button class="button secondary small" id="hallTraceClear">↺ Попробовать снова</button><button class="button small" id="hallTraceCheck">✨ Проверить рисунок</button><button class="button small hidden" id="hallTraceNext">Следующая фигура →</button></div></div>
+    <p class="muted small" style="text-align:center">Проверяются форма линии, её начало, конец и аккуратность. Это игровой тренажёр, а не экспертная оценка почерка.</p>
+  </div>
+  <div id="hallPairs" class="hidden">
+    <div class="hall-nav-sub"><button class="button secondary small" id="hallPairsBack">← К предметам</button><span class="hall-mini-tag">🧩 Соедини пары</span></div>
+    <div class="hall-stage"><span class="stage-icon">🧩</span><h2 id="hallPairsTitle">Найди четыре пары</h2><p class="muted small" id="hallPairsInstruction">Выбери картинку слева, затем её пару справа.</p><div class="hall-pair-progress" id="hallPairsProgress"><span></span><span></span><span></span><span></span></div><div class="hall-pairs-board"><div class="hall-pairs-col" id="hallPairsLeft"></div><div class="hall-pairs-col" id="hallPairsRight"></div></div><div class="hall-feedback" id="hallPairsFeedback" aria-live="polite"></div><div class="hall-lesson-footer"><button class="button secondary small" id="hallPairsSpeak">🔊 Послушать правила</button><button class="button hidden" id="hallPairsNext">🔁 Новые пары</button></div></div>
+  </div>
 </section>
 <section class="screen hidden" id="world">
   <div class="world-header">
@@ -169,7 +208,7 @@
 </section>
 </div>
 <nav class="bottom-nav hidden" id="bottomNav" aria-label="Основная навигация">
-  <button data-nav="home"><span>🏡</span>Главная</button><button data-nav="map"><span>🗺️</span>Карта</button><button data-nav="garden"><span>🐲</span>Искрик</button><button data-nav="castle"><span>🏰</span>Замок</button><button data-nav="parents"><span>⚙️</span>Родителям</button>
+  <button data-nav="home"><span>🏡</span>Главная</button><button data-nav="hall"><span>📚</span>Учёба</button><button data-nav="map"><span>🗺️</span>Карта</button><button data-nav="garden"><span>🐲</span>Искрик</button><button data-nav="castle"><span>🏰</span>Замок</button>
 </nav>
 <div class="question-overlay hidden" id="questionOverlay" role="dialog" aria-modal="true" aria-labelledby="questionTitle">
   <div class="question-card">
@@ -213,5 +252,7 @@
 <script defer src="./kingdom-data.js?v=1"></script>
 <script defer src="./kingdom.js?v=4"></script>
 <script defer src="./dragon-garden.js?v=1"></script>
+<script defer src="./learning-hall-data.js?v=1"></script>
+<script defer src="./learning-hall.js?v=1"></script>
 </body>
 </html>

@@ -421,9 +421,9 @@ function init(){
  };
  document.querySelectorAll("[data-scene]").forEach(b=>b.onclick=()=>chooseScene(b.dataset.scene,true));
  $("owlHotspot").onclick=()=>{if(window.ForestExplorer)window.ForestExplorer.walkToElement($("owlHotspot"),openTalk);else openTalk()};
- $("saplingHotspot").onclick=()=>{if(state().stage===2){chooseScene("garden");feedback("Выбери цвет семечка и подходящую клумбу.")}else story("Сад оживает от твоей заботы!","🦉 Сова Луна",true)};
- $("riverHotspot").onclick=()=>{if(state().stage===5)story("Посмотри на камни и запомни их мелодию.","🦉 Сова Луна",true);else story("Вода несёт в лес новые песни.","🦉 Сова Луна",true)};
- $("nestHotspot").onclick=()=>{if(state().stage===6)story("Скорее помоги дракончику выбраться из яйца!","🦉 Сова Луна",true);else story("Теперь здесь живёт наш новый друг, Искрик!","🦉 Сова Луна",true)};
+ $("saplingHotspot").onclick=()=>{const run=()=>{if(state().stage===2){chooseScene("garden");feedback("Выбери цвет семечка и подходящую клумбу.")}else story("Сад оживает от твоей заботы!","🦉 Сова Луна",true)};if(window.ForestExplorer)window.ForestExplorer.walkToElement($("saplingHotspot"),run);else run()};
+ $("riverHotspot").onclick=()=>{const run=()=>{if(state().stage===5)story("Посмотри на камни и запомни их мелодию.","🦉 Сова Луна",true);else story("Вода несёт в лес новые песни.","🦉 Сова Луна",true)};if(window.ForestExplorer)window.ForestExplorer.walkToElement($("riverHotspot"),run);else run()};
+ $("nestHotspot").onclick=()=>{const run=()=>{if(state().stage===6)story("Скорее помоги дракончику выбраться из яйца!","🦉 Сова Луна",true);else story("Теперь здесь живёт наш новый друг, Искрик!","🦉 Сова Луна",true)};if(window.ForestExplorer)window.ForestExplorer.walkToElement($("nestHotspot"),run);else run()};
  $("missionHint").onclick=()=>{const t=F3_HINTS[state().stage];feedback("💡 "+t);say(t,true)};
  $("missionReset").onclick=resetChapter;
  $("replayChapter").onclick=resetChapter;

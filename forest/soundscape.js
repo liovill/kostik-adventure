@@ -122,6 +122,7 @@ function stopAmbient(){
  if(ambient&&ctx)gainTo(ambient.gain,0,.35)
 }
 function setAmbient(enabled){
+ if(enabled&&!support())return false;
  config().ambientOn=!!enabled;
  try{persist()}catch(e){}
  try{onChange()}catch(e){}

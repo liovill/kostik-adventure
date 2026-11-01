@@ -69,10 +69,10 @@ function hallWorkshopPlace(binId){
   if(window.AcademySound)window.AcademySound.cue("try");
   return false
  }
- round.placed.push(item.id);round.selected=null;
- if(window.AcademySound)window.AcademySound.cue("good");
+ round.placed.push(item.id);round.lastPlaced=item.bin;round.selected=null;
+ if(window.AcademySound)window.AcademySound.cue(round.mode==="bridge"?"bridge":"good");
  if(round.placed.length===round.total)hallWorkshopFinish();
- else hallWorkshopRender("🌟 Получилось! Выбери следующую находку.");
+ else hallWorkshopRender(round.mode==="bridge"?"🪵 Дощечка встала на место! Ищем следующую.":"🌟 Получилось! Выбери следующую находку.");
  return true
 }
 function hallWorkshopDoStep(stepId){
@@ -102,7 +102,7 @@ function hallWorkshopFinish(){
   if(!save())delete hallProfile(round.hero).traceAwards[key];
   else first=true
  }
- hallWorkshopRender(first?"🏅 Новая звезда мастерской!":"🌟 Отличная работа! Можно сыграть ещё.");
+ hallWorkshopRender((round.mode==="bridge"?"🌉 Мост готов! Герой перешёл к Искрику. ":"")+(first?"🏅 Новая звезда мастерской!":"🌟 Отличная работа! Можно сыграть ещё."));
  if(window.AcademySound)window.AcademySound.cue("medal");
  if(state.settings.voice)speak("Ура! Всё получилось! Молодец!",false,"wizard")
 }
@@ -182,16 +182,90 @@ function hallWorkshopDrawObjects(round,root){
  }
  root.appendChild(boxes)
 }
+
+/* v45: a real scenic bridge that visibly grows after every correct placement.
+ * The existing workshop routing, awards and pointer handling remain unchanged. */
+function hallWorkshopDrawBridge(round,root){
+ const plan=hallWorkshopPlan(round.hero,"bridge");
+ const scene=hallWorkshopEl("div","workshop-bridge-scene"+(round.finished?" bridge-crossed":""));
+ scene.setAttribute("role","group");
+ scene.setAttribute("aria-label","Река и строящийся мост, готово "+round.placed.length+" из "+round.total);
+ const cloud=hallWorkshopEl("div","bridge-clouds");
+ for(const cloudIcon of ["☁️","☁️"]){const c=hallWorkshopEl("span","bridge-cloud",cloudIcon);cloud.appendChild(c)}
+ scene.appendChild(cloud);
+ scene.appendChild(hallWorkshopEl("div","bridge-hills"));
+ scene.appendChild(hallWorkshopEl("div","bridge-water"));
+ const sparkles=hallWorkshopEl("div","bridge-water-sparkles");
+ for(const icon of ["✧","✦","✧","✦"]){const s=hallWorkshopEl("span","",icon);sparkles.appendChild(s)}
+ scene.appendChild(sparkles);
+ scene.appendChild(hallWorkshopEl("div","bridge-bank bridge-bank-left"));
+ scene.appendChild(hallWorkshopEl("div","bridge-bank bridge-bank-right"));
+ const traveler=hallWorkshopEl("div","bridge-traveler");
+ traveler.setAttribute("aria-label","Герой на мосту: "+(round.hero==="kostya"?"Костик":"Кирилл"));
+ traveler.innerHTML=avatar(round.hero);
+ scene.appendChild(traveler);
+ const target=hallWorkshopEl("div","bridge-dragon","🐲");
+ target.setAttribute("aria-hidden","true");
+ scene.appendChild(target);
+ const gift=hallWorkshopEl("div","bridge-gift",round.finished?"🎁":"✨");
+ gift.setAttribute("aria-hidden","true");
+ scene.appendChild(gift);
+ const slots=hallWorkshopEl("div","bridge-slots");
+ slots.style.setProperty("--bridge-count",String(plan.bins.length));
+ slots.setAttribute("aria-label","Поставь дощечки в пролёты моста");
+ for(const bin of plan.bins){
+  const item=plan.items.find(x=>x.bin===bin.id);
+  const placed=!!item&&round.placed.includes(item.id);
+  const slot=hallWorkshopEl("button","bridge-slot"+(placed?" built":"")+(round.lastPlaced===bin.id?" newly-built":""));
+  slot.type="button";
+  slot.dataset.workshopBin=bin.id;
+  slot.disabled=placed||round.finished;
+  slot.setAttribute("aria-label",placed?"Дощечка установлена":"Место для дощечки: "+bin.name);
+  const board=hallWorkshopEl("span","bridge-slot-board",placed?"🪵":bin.icon);
+  board.setAttribute("aria-hidden","true");
+  const caption=hallWorkshopEl("span","bridge-slot-caption",placed?"✓":round.hero==="kostya"?bin.name:"");
+  slot.appendChild(board);slot.appendChild(caption);
+  slot.onclick=()=>hallWorkshopPlace(bin.id);
+  slots.appendChild(slot);
+ }
+ scene.appendChild(slots);
+ if(round.finished){
+  const celebration=hallWorkshopEl("div","bridge-celebration","✨ Ура! Мост построен!");
+  celebration.setAttribute("role","status");
+  scene.appendChild(celebration)
+ }
+ root.appendChild(scene);
+ const deck=hallWorkshopEl("div","workshop-deck bridge-materials");
+ deck.setAttribute("aria-label","Доски для строительства моста");
+ for(const item of plan.items){
+  const placed=round.placed.includes(item.id);
+  const button=hallWorkshopEl("button","workshop-piece bridge-piece"+(placed?" placed":"")+(round.selected===item.id?" selected":""));
+  button.type="button";
+  button.disabled=placed||round.finished;
+  button.textContent=item.icon;
+  button.setAttribute("aria-label",placed?"Установлена дощечка "+item.icon:"Взять дощечку "+item.icon);
+  button.onclick=()=>hallWorkshopTapItem(item.id);
+  hallWorkshopPointerDrag(button,item);
+  deck.appendChild(button)
+ }
+ root.appendChild(deck);
+ const hint=hallWorkshopEl("p","bridge-mobile-help",round.finished?
+  "✨ Герой добрался до Искрика. Можно построить новый мост!":
+  "👆 Нажми дощечку снизу, а затем пролёт над водой. Или перетащи дощечку пальцем.");
+ root.appendChild(hint)
+}
+
 function hallWorkshopRender(message){
  if(hallMode!=="workshop"||!hallWorkshopCurrent)return;
  const r=hallWorkshopCurrent;
  if(r.hero!==state.active){hallWorkshopCurrent=null;hallSection("intro");return}
  const mode=HALL_WORKSHOP_MODES[r.mode],root=$("hallWorkshopBoard");root.innerHTML="";
  hallWorkshopText("hallWorkshopTitle",mode.icon+" "+mode.name);
- hallWorkshopText("hallWorkshopInstruction",r.mode==="sort"?"Возьми предмет, затем нажми на его домик. Можно перетаскивать пальцем.":r.mode==="bridge"?"Возьми деталь и поставь в подходящий пролёт моста. Можно перетаскивать.":"Нажимай на инструменты в правильном порядке.");
+ hallWorkshopText("hallWorkshopInstruction",r.mode==="sort"?"Возьми предмет, затем нажми на его домик. Можно перетаскивать пальцем.":r.mode==="bridge"?"Помоги герою перейти реку. Сначала выбери дощечку, затем подходящий пролёт. Можно перетаскивать пальцем.":"Нажимай на инструменты в правильном порядке.");
  hallWorkshopText("hallWorkshopProgress",r.mode==="garden"?r.step+" / "+r.total:r.placed.length+" / "+r.total);
  hallWorkshopText("hallWorkshopFeedback",message||(r.finished?"✨ Всё готово!":"Выбери первый предмет."));
  if(r.mode==="garden")hallWorkshopDrawGarden(r,root);
+ else if(r.mode==="bridge")hallWorkshopDrawBridge(r,root);
  else hallWorkshopDrawObjects(r,root);
  $("hallWorkshopAgain").classList.toggle("hidden",!r.finished);
  $("hallWorkshopSpeak").onclick=()=>speak($("hallWorkshopInstruction").textContent,true);

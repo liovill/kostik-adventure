@@ -20,7 +20,7 @@ function canOpen(i){return i===0||cleared(REGIONS[i-1])}
 function nextRegion(){let i=REGIONS.findIndex(r=>!cleared(r));return i===-1?5:i}
 function avatar(h){const kid=h==="kirill",cape=kid?"#26936f":"#3f65bd",body=kid?"#5bd1a0":"#61a2ed";const hair=kid?
 '<circle cx="34" cy="36" r="13" fill="#e8c16a"/><circle cx="47" cy="26" r="13" fill="#f9dc88"/><circle cx="61" cy="25" r="13" fill="#eec96e"/><circle cx="75" cy="31" r="13" fill="#f6d784"/><circle cx="82" cy="42" r="12" fill="#e9c36d"/>':
-'<path d="M27 53Q22 33 32 25Q45 17 67 21Q83 23 86 38L83 52L78 48L77 42Q57 44 38 39L35 52Z" fill="#302933"/><path d="M36 38Q54 41 77 36" fill="none" stroke="#56434d" stroke-width="3" stroke-linecap="round"/>';
+'<path d="M23 57C18 46 20 26 31 16Q43 6 59 7C78 7 90 18 92 35Q95 46 87 58L82 56L80 44Q73 46 65 45Q57 47 48 45L37 48L32 59Z" fill="#27232c"/><path d="M31 34Q39 13 57 15Q74 13 83 29" fill="none" stroke="#4e4149" stroke-width="3" stroke-linecap="round" opacity=".55"/><path d="M34 43Q45 47 55 42Q65 46 78 41" fill="none" stroke="#40333e" stroke-width="2.5" stroke-linecap="round"/><path d="M27 47Q25 32 33 24" fill="none" stroke="#171822" stroke-width="3" stroke-linecap="round"/>';
 return '<svg viewBox="0 0 120 150" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="'+NAMES[h]+'">'+
 '<ellipse cx="60" cy="141" rx="37" ry="6" fill="#132943" opacity=".3"/>'+
 '<path d="M31 84Q14 109 13 135L105 135Q102 101 79 84Z" fill="'+cape+'"/>'+

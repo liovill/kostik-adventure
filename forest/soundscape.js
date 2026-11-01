@@ -155,6 +155,20 @@ function chirp(when,scene){
   osc.connect(g);g.connect(nature);osc.start(when);osc.stop(when+.31)
  }catch(e){}
 }
+function droplet(when){
+ if(!ctx||!nature)return;
+ try{
+  const osc=ctx.createOscillator(),gain=gainNode(.0001);
+  osc.type="sine";osc.frequency.setValueAtTime(950+random()*420,when);
+  osc.frequency.exponentialRampToValueAtTime(230+random()*80,when+.24);
+  gain.gain.setValueAtTime(.0001,when);
+  gain.gain.exponentialRampToValueAtTime(.14,when+.025);
+  gain.gain.exponentialRampToValueAtTime(.0001,when+.31);
+  osc.connect(gain);gain.connect(nature);
+  osc.onended=()=>{try{osc.disconnect();gain.disconnect()}catch(e){}};
+  osc.start(when);osc.stop(when+.33)
+ }catch(e){}
+}
 function createNature(){
  if(!ctx||noiseSource||!ctx.createBufferSource)return;
  try{
@@ -194,8 +208,11 @@ function scheduleTick(){
   if(scene.foliage==="birds"&&i%24===5)chirp(nextStep+.14,"grove");
   if(scene.foliage==="garden"&&i%20===9)chirp(nextStep+.13,"garden");
   if(scene.foliage==="water"&&i%8===3){
-   note(nature,chord[2]+24,nextStep+.1,tick*.8,"bell",.05)
+   note(nature,chord[2]+24,nextStep+.1,tick*.8,"bell",.05);
+   droplet(nextStep+.07)
   }
+  if(scene.foliage==="birds"&&i%16===0&&noiseGain)paramTo(noiseGain.gain,.07+random()*.07,1.8);
+  if(scene.foliage==="garden"&&i%16===0&&noiseGain)paramTo(noiseGain.gain,.06+random()*.04,1.5);
   if(scene.foliage==="magic"&&i%16===11){
    note(nature,chord[3]+24,nextStep,tick*4,"musicbox",.065)
   }

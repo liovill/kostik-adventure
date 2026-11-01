@@ -62,7 +62,7 @@
     <div class="art" id="nextEmoji">🌲</div>
   </div>
   <button class="pet-promo" data-go="garden" aria-label="Отправиться в Драконий сад"><span><strong>🐉 Познакомься с Искриком!</strong><small>Покорми дракончика, сыграй в волшебные игры и помоги братьям вырастить общего друга.</small><span class="chip" id="homePetHearts">❤️ 0 из 24 сердечек</span></span><span class="pet-promo-art" aria-hidden="true">🐲</span></button>
-<button class="pet-promo" data-go="hall" aria-label="Открыть Учебный зал" style="background:linear-gradient(125deg,#494c85,#6a548c 55%,#825c8d)"><span><strong>📚 Учебный зал открыт!</strong><small>Четыре предмета, множество новых заданий, прописи и игра «Соедини пары».</small><span class="chip">✨ Новые уроки</span></span><span class="pet-promo-art" aria-hidden="true">📖</span></button>
+<button class="pet-promo" data-go="hall" aria-label="Открыть Учебный зал" style="background:linear-gradient(125deg,#494c85,#6a548c 55%,#825c8d)"><span><strong>📚 Учебный зал открыт!</strong><small>Четыре предмета, множество новых заданий, прописи и игра «Соедини пары».</small><span class="chip" id="homeHallXP">⭐ 0 звёзд знаний</span></span><span class="pet-promo-art" aria-hidden="true">📖</span></button>
 <div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
   <div class="quick-grid">
     <button class="quick" data-go="castle"><span class="emoji">🏰</span><strong>Семейный замок</strong><span>Расти вместе и украшай комнаты</span></button>
@@ -191,7 +191,7 @@
 </section>
 <section class="screen hidden" id="journal">
   <div class="overline">Моя собственная история</div><h1>🏅 Книга достижений</h1>
-  <div class="panel"><div class="row"><div class="hero-fig" id="journalHero"></div><div><h2 id="journalName">Приключения Кости</h2><p class="muted" id="journalText">Сколько новых мест уже открыто?</p></div></div><div class="progress-bar"><span id="journalProgress" style="width:0"></span></div><span class="muted small" id="journalPercent"></span></div>
+  <div class="panel"><div class="row"><div class="hero-fig" id="journalHero"></div><div><h2 id="journalName">Приключения Кости</h2><p class="muted" id="journalText">Сколько новых мест уже открыто?</p></div></div><div class="progress-bar"><span id="journalProgress" style="width:0"></span></div><span class="muted small" id="journalPercent"></span><p class="muted small" id="journalHallSummary" style="margin-top:12px"></p></div>
   <div class="section-head" style="margin-top:20px"><div><h2>Медали регионов</h2></div></div>
   <div class="achievement-grid" id="achievementGrid"></div>
   <div class="panel" style="margin-top:16px"><h3>✍️ Учебные башни</h3><p class="muted">Старая Академия со всеми девятью направлениями сохранена. Письмо, чтение, музыка и прежние достижения не исчезли.</p><button class="button secondary" id="openClassic">Открыть учебные башни</button></div>
@@ -250,9 +250,10 @@
 </div>
 <div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
 <script defer src="./kingdom-data.js?v=1"></script>
-<script defer src="./kingdom.js?v=4"></script>
+<script defer src="./kingdom.js?v=5"></script>
 <script defer src="./dragon-garden.js?v=1"></script>
 <script defer src="./learning-hall-data.js?v=1"></script>
-<script defer src="./learning-hall.js?v=1"></script>
+<script defer src="./learning-hall.js?v=2"></script>
+<script defer src="./learning-hall-minigames.js?v=1"></script>
 </body>
 </html>

@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b1531">
+<meta name="description" content="Князь и Кудрявый: семейная Академия волшебства для Кости и Кирилла. Приключения, задания, карта и общий замок.">
+<title>Князь и Кудрявый | Академия волшебства</title>
+<link rel="stylesheet" href="./kingdom.css?v=1">
+</head>
+<body>
+<div id="app">
+<header class="topbar">
+  <a class="wordmark" href="./" aria-label="На главную"><span class="emblem">🏰</span><span>КНЯЗЬ И КУДРЯВЫЙ<small>АКАДЕМИЯ ВОЛШЕБСТВА</small></span></a>
+  <div class="top-actions">
+    <button class="top-btn tiny" id="audioToggle" aria-label="Включить или выключить голос" title="Голос">🔇</button>
+    <button class="top-btn" id="profileSwitch">👑 Герои</button>
+  </div>
+</header>
+<section class="screen" id="intro">
+  <div class="intro">
+    <div class="intro-copy">
+      <div class="overline">Два брата • Одна волшебная история</div>
+      <h1>Мир, который вы создаёте <span class="gold">вместе</span></h1>
+      <p>Костя и Кирилл отправляются в приключения, изучают новое, спасают драконов и возвращают магию в собственную Академию.</p>
+      <p class="muted small">Каждому герою свои задания и собственные достижения. Без гонки и наказаний.</p>
+    </div>
+    <div class="intro-art" aria-label="Волшебный замок и два брата">
+      <div class="moon"></div><div class="mist"></div><div class="island"></div>
+      <div class="castle-silhouette">🏰</div>
+      <span class="spark" style="top:14%;left:11%">✦</span><span class="spark" style="top:31%;right:14%">✧</span>
+      <div class="hero-fig first" id="introKostya"></div>
+      <div class="hero-fig second" id="introKirill"></div>
+    </div>
+  </div>
+  <div class="section-head" style="margin-top:26px"><div><div class="overline">С чего начнём?</div><h2>Выбери героя</h2></div></div>
+  <div class="profile-grid">
+    <button class="profile-card" id="selectKostya"><span class="hero-fig" id="pickKostya"></span><span><strong>Костя, Князь</strong><small>Буквы, чтение, математика, логика и настоящие загадки</small></span></button>
+    <button class="profile-card kirill" id="selectKirill"><span class="hero-fig" id="pickKirill"></span><span><strong>Кирилл, Кудрявый</strong><small>Цвета, формы, животные и простые открытия вместе со взрослым</small></span></button>
+  </div>
+  <div class="feature-list">
+    <div class="feature"><b>🗺️ Шесть регионов</b><span>История с открытиями и наградами</span></div>
+    <div class="feature"><b>🐲 Дракончик Искрик</b><span>Первый семейный питомец</span></div>
+    <div class="feature"><b>🏰 Общий замок</b><span>Украшения за знания и добрые дела</span></div>
+  </div>
+</section>
+<section class="screen hidden" id="home">
+  <div class="hero-banner">
+    <div><div class="overline" id="homeOverline">С возвращением в Академию!</div><h1 id="homeTitle">Привет, Костя!</h1><p id="homeSubtitle">Приключения ждут тебя.</p><button class="button" id="homeStart">▶ Продолжить приключение</button></div>
+    <div class="hero-fig" id="homeHero"></div>
+  </div>
+  <div class="stats">
+    <div class="stat"><strong id="statCrystals">0</strong><small>✨ Кристаллов</small></div>
+    <div class="stat"><strong id="statRegions">0/6</strong><small>🗺️ Регионов</small></div>
+    <div class="stat"><strong id="statAwards">0</strong><small>🏅 Наград</small></div>
+  </div>
+  <div class="section-head"><div><div class="overline">Основное приключение</div><h2>Новая глава</h2></div><button class="button small secondary" id="allRegions">Вся карта 🗺️</button></div>
+  <div class="play-card">
+    <div><span class="chip" id="nextChapter">Глава 1</span><h3 id="nextTitle" style="margin:11px 0 6px">Лес искр</h3><p id="nextDesc">Найди потерянные волшебные кристаллы.</p><button class="button small" id="nextMission">Отправиться ✨</button></div>
+    <div class="art" id="nextEmoji">🌲</div>
+  </div>
+  <div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
+  <div class="quick-grid">
+    <button class="quick" data-go="castle"><span class="emoji">🏰</span><strong>Семейный замок</strong><span>Расти вместе и украшай комнаты</span></button>
+    <button class="quick" data-go="journal"><span class="emoji">🏅</span><strong>Мои открытия</strong><span>Посмотри достижения и пройденные главы</span></button>
+    <button class="quick" data-go="map"><span class="emoji">🗺️</span><strong>Карта королевства</strong><span>Шесть удивительных регионов</span></button>
+    <button class="quick" id="classicLink"><span class="emoji">✍️</span><strong>Девять учебных башен</strong><span>Письмо, музыка, чтение и другие занятия</span></button>
+  </div>
+</section>
+<section class="screen hidden" id="map">
+  <div class="overline">Карта волшебного королевства</div>
+  <h1>Мир открытий 🗺️</h1>
+  <p class="muted">Проходи главы, собирай кристаллы и возвращай магию в королевство. Новые регионы открываются по сюжету.</p>
+  <div class="map-grid" id="mapGrid"></div>
+  <div class="panel" style="margin-top:14px"><h3>🌟 Магистр Звездочёт</h3><p class="muted" style="margin:0">Не бойся ошибаться. У каждой загадки есть решение, а у каждого героя собственный темп!</p></div>
+</section>
+<section class="screen hidden" id="world">
+  <div class="world-header">
+    <div><span class="overline" id="worldChapter">Глава 1</span><h2 id="worldTitle">Зачарованный лес</h2></div>
+    <button class="button secondary small" id="worldBack">🗺️ К карте</button>
+  </div>
+  <div class="world-layout">
+    <div class="playfield" id="playfield" aria-label="Игровое поле">
+      <div class="hill"></div><div class="hill two"></div><div class="trail"></div>
+      <div class="field-hud" id="fieldHud">💎 0 / 4</div>
+      <div id="worldDecor" aria-hidden="true"></div>
+      <button class="gate" id="worldGate" aria-label="Волшебные ворота">🏰</button>
+      <div id="worldTokens"></div>
+      <div class="hero-actor" id="worldActor"><div id="actorArt"></div><span class="name-tag" id="actorName">Костя</span></div>
+      <div class="field-speech" id="fieldBubble">Ищи волшебные предметы!</div>
+    </div>
+    <div class="world-sidebar">
+      <div class="mentor-panel"><div class="mentor-head"><span>🧙‍♂️</span> Магистр Звездочёт</div><p id="worldStory">Выполни задания и открой ворота.</p><button class="button small ghost" id="repeatStory">🔊 Рассказать</button></div>
+      <div class="mission-steps" id="missionSteps"></div>
+      <div class="controls-wrap"><div class="dpad" aria-label="Управление героем"><button class="up" data-dir="up" aria-label="Вверх">▲</button><button class="left" data-dir="left" aria-label="Влево">◀</button><button class="down" data-dir="down" aria-label="Вниз">▼</button><button class="right" data-dir="right" aria-label="Вправо">▶</button></div><p class="muted">Ходи стрелками или нажимай на светящиеся предметы.</p></div>
+      <div class="actions-wrap"><button class="button" id="worldInteract">✨ Исследовать</button><button class="button secondary" id="worldNext">🧩 К следующей загадке</button></div>
+    </div>
+  </div>
+</section>
+<section class="screen hidden" id="castle">
+  <div class="overline">Наш общий дом</div><h1>🏰 Семейный замок</h1>
+  <p class="muted">Каждая новая глава приносит частичку волшебства в замок Кости и Кирилла. Украшения можно включать и выключать.</p>
+  <div class="castle-view">
+    <span class="castle-title" id="castleLevel">Замок приключений</span>
+    <span class="castle-symbol">🏰</span>
+    <span class="castle-deco hidden" id="decoGarden" style="left:8%;bottom:6%">🌷🌻</span>
+    <span class="castle-deco hidden" id="decoFlag" style="right:16%;top:18%">🚩</span>
+    <span class="castle-deco hidden" id="decoDragon" style="right:3%;bottom:7%">🐲</span>
+    <span class="castle-deco hidden" id="decoFountain" style="left:38%;bottom:0%">⛲</span>
+    <span class="castle-deco hidden" id="decoStars" style="right:9%;top:5%">🌠</span>
+  </div>
+  <div class="panel" style="margin-top:15px">
+    <div class="section-head"><div><h2>Мастерская замка</h2><p class="muted small">Доступность зависит от общих открытий на этом устройстве.</p></div><span class="chip" id="familyTotal">0 💎</span></div>
+    <div class="deco-grid" id="decoGrid"></div>
+  </div>
+  <div class="panel" style="margin-top:15px"><h3>🐲 Наш питомец Искрик</h3><p class="muted" id="petDescription">Отыщите первый кристалл леса, чтобы познакомиться с маленьким дракончиком.</p></div>
+</section>
+<section class="screen hidden" id="journal">
+  <div class="overline">Моя собственная история</div><h1>🏅 Книга достижений</h1>
+  <div class="panel"><div class="row"><div class="hero-fig" id="journalHero"></div><div><h2 id="journalName">Приключения Кости</h2><p class="muted" id="journalText">Сколько новых мест уже открыто?</p></div></div><div class="progress-bar"><span id="journalProgress" style="width:0"></span></div><span class="muted small" id="journalPercent"></span></div>
+  <div class="section-head" style="margin-top:20px"><div><h2>Медали регионов</h2></div></div>
+  <div class="achievement-grid" id="achievementGrid"></div>
+  <div class="panel" style="margin-top:16px"><h3>✍️ Учебные башни</h3><p class="muted">Старая Академия со всеми девятью направлениями сохранена. Письмо, чтение, музыка и прежние достижения не исчезли.</p><button class="button secondary" id="openClassic">Открыть учебные башни</button></div>
+</section>
+<section class="screen hidden" id="parents">
+  <div class="overline">Только для взрослых</div><h1>⚙️ Родительский раздел</h1>
+  <div class="panel"><h3>Настройки</h3><div class="parent-grid">
+    <div class="setting"><label for="settingVoice">🔊 Озвучивать вопросы <input type="checkbox" id="settingVoice"></label><p class="muted small" style="margin:8px 0 0">Временный голос браузера. Улучшим в конце разработки.</p></div>
+    <div class="setting"><label for="settingMotion">🌿 Меньше анимаций <input type="checkbox" id="settingMotion"></label><p class="muted small" style="margin:8px 0 0">Спокойный режим без лишних движений.</p></div>
+  </div></div>
+  <div class="panel" style="margin-top:14px"><h3>📊 Как идут дела</h3><div id="parentProgress"></div><p class="muted small">Это игровая статистика. Она не предназначена для оценки развития ребёнка или сравнения братьев.</p></div>
+  <div class="panel" style="margin-top:14px"><h3>📱 Перенести сохранения на другое устройство</h3><p class="muted small">Пока облачного аккаунта нет, можно перенести прогресс вручную. Код содержит только игровые достижения, без фамилий, фотографий и контактов.</p><div class="row wrap"><button class="button secondary small" id="makeBackup">📋 Создать код сохранения</button><button class="button secondary small" id="copyBackup">Копировать</button></div><textarea class="save-box" id="backupText" aria-label="Код сохранения" placeholder="Здесь появится код сохранения. Его можно вставить на другом устройстве."></textarea><button class="button small" id="restoreBackup">📥 Объединить прогресс из кода</button><p class="muted small" id="backupStatus" aria-live="polite"></p></div>
+  <div class="panel" style="margin-top:14px"><h3>🔐 Сохранность</h3><p class="muted small">Сейчас данные хранятся в браузере и не синхронизируются автоматически. Для настоящего семейного аккаунта и совместных миссий между устройствами понадобится сервер с защищённой авторизацией. Старые учебные башни доступны отдельно.</p><button class="button ghost small" id="resetRequest">Очистить прогресс новой игры</button></div>
+</section>
+</div>
+<nav class="bottom-nav hidden" id="bottomNav" aria-label="Основная навигация">
+  <button data-nav="home"><span>🏡</span>Главная</button><button data-nav="map"><span>🗺️</span>Карта</button><button data-nav="castle"><span>🏰</span>Замок</button><button data-nav="journal"><span>🏅</span>Успехи</button><button data-nav="parents"><span>⚙️</span>Родителям</button>
+</nav>
+<div class="question-overlay hidden" id="questionOverlay" role="dialog" aria-modal="true" aria-labelledby="questionTitle">
+  <div class="question-card">
+    <div class="quest-symbol" id="questionSymbol">💎</div>
+    <h2 id="questionTitle">Волшебная загадка</h2>
+    <p class="muted" id="questionSubtitle">Помоги Академии!</p>
+    <div id="questionVisual" class="question-visual"></div>
+    <div id="memoryArea" class="hidden"></div>
+    <div class="answer-built hidden" id="builtAnswer"></div>
+    <div class="answers" id="answerButtons"></div>
+    <div class="question-feedback" id="questionFeedback" aria-live="polite"></div>
+    <div class="question-foot"><button class="button secondary small" id="questionVoice">🔊 Послушать</button><button class="button ghost small" id="questionClose">← В приключение</button><button class="button small hidden" id="questionContinue">Продолжить ✨</button></div>
+  </div>
+</div>
+<div class="question-overlay hidden" id="parentGate" role="dialog" aria-modal="true" aria-labelledby="parentGateTitle">
+  <div class="question-card" style="max-width:370px">
+    <div class="quest-symbol">🔐</div><h2 id="parentGateTitle">Вход для взрослых</h2>
+    <p class="muted">Сколько будет 8 + 7?</p><input type="number" inputmode="numeric" id="parentGateAnswer" style="width:130px;padding:12px;font-size:26px;text-align:center;border-radius:14px;border:2px solid #ffe29e;background:#fff;color:#2a2852">
+    <p id="parentGateFeedback" class="question-feedback"></p>
+    <div class="row wrap" style="justify-content:center"><button class="button" id="parentGateSubmit">Войти</button><button class="button secondary" id="parentGateCancel">Назад</button></div>
+  </div>
+</div>
+<div class="toast hidden" id="toast" role="status" aria-live="polite"></div>
+<script defer src="./kingdom.js?v=1"></script>
+</body>
+</html>

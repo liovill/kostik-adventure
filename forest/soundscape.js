@@ -85,7 +85,7 @@ function context(){
 }
 function resume(){
  const c=context();if(!c)return false;
- if(c.state==="suspended"&&c.resume)try{const p=c.resume();if(p?.catch)p.catch(()=>{})}catch(e){}
+ if(c.state!=="running"&&c.state!=="closed"&&c.resume)try{const p=c.resume();if(p?.catch)p.catch(()=>{})}catch(e){}
  return true
 }
 function paramTo(p,n,d=.18){
@@ -186,7 +186,7 @@ function theme(){return THEMES[themeName]||THEMES.academy}
 function ambienceLevel(){return !playing||!settings().ambientOn||!isVisible?0:ducked?.19:.75}
 function applyMix(){if(master)paramTo(master.gain,.84*vol());if(ambient)paramTo(ambient.gain,ambienceLevel(),ducked?.28:.72)}
 function scheduleTick(){
- if(!ctx||!playing||!isVisible)return;
+ if(!ctx||ctx.state!=="running"||!playing||!isVisible)return;
  const scene=theme(),tick=60/scene.bpm/2,horizon=ctx.currentTime+.58;
  let guard=0;
  while(nextStep<horizon&&guard++<16){
@@ -219,20 +219,25 @@ function scheduleTick(){
   step++;nextStep+=tick
  }
 }
+function clearScoreTimer(){if(scoreTimer!==null){root.clearInterval(scoreTimer);scoreTimer=null}}
+function ensureScoreTimer(){
+ if(scoreTimer!==null||!playing||!isVisible||!ctx)return;
+ scoreTimer=root.setInterval(scheduleTick,185)
+}
 function startMusic(){
  if(!settings().ambientOn||!isVisible)return false;
  if(!resume())return false;
  if(!playing){
   playing=true;step=0;nextStep=ctx.currentTime+.12;
-  if(scoreTimer!==null){root.clearInterval(scoreTimer);scoreTimer=null}
-  scheduleTick();
-  scoreTimer=root.setInterval(scheduleTick,185);
+  clearScoreTimer();
+  if(ctx.state==="running")scheduleTick();
+  ensureScoreTimer();
  }
  applyMix();return true
 }
 function stopMusic(){
  playing=false;
- if(scoreTimer!==null){root.clearInterval(scoreTimer);scoreTimer=null}
+ clearScoreTimer();
  applyMix()
 }
 function cue(kind){
@@ -267,8 +272,18 @@ function setAmbient(enabled){
 function setEffects(enabled){settings().fxOn=!!enabled;try{persist()}catch(e){}try{onChange()}catch(e){}if(enabled)cue("select");return settings().fxOn}
 function setVolume(value){const n=Number(value);settings().audioVolume=Number.isFinite(n)?clamp(n,.05,1):.38;applyMix();try{persist()}catch(e){}try{onChange()}catch(e){}}
 function duck(enabled){ducked=!!enabled;applyMix()}
-function pause(){isVisible=false;applyMix();if(scoreTimer!==null){root.clearInterval(scoreTimer);scoreTimer=null}}
-function unpause(){isVisible=true;if(playing&&ctx){nextStep=ctx.currentTime+.14;scoreTimer=root.setInterval(scheduleTick,185);applyMix()}else if(settings().ambientOn&&ctx)startMusic()}
+function pause(){
+ isVisible=false;clearScoreTimer();applyMix()
+}
+function unpause(){
+ isVisible=true;
+ if(!ctx)return;
+ if(playing){
+  if(ctx.state!=="running")resume();
+  nextStep=ctx.currentTime+.14;
+  ensureScoreTimer();applyMix()
+ }else if(settings().ambientOn)startMusic()
+}
 function configure(opts){
  if(opts&&typeof opts.getSettings==="function")settings=opts.getSettings;
  if(opts&&typeof opts.save==="function")persist=opts.save;
@@ -277,12 +292,17 @@ function configure(opts){
  // On iOS, audio must start from a tap. Do not produce sounds on initial load.
  if(typeof document!=="undefined"){
   const unlock=()=>{
-   if(settings().ambientOn)startMusic();
-   document.removeEventListener("pointerdown",unlock);
-   document.removeEventListener("keydown",unlock)
+   if(!settings().ambientOn)return;
+   if(playing){if(ctx&&ctx.state!=="running")resume();ensureScoreTimer()}
+   else startMusic()
   };
-  document.addEventListener("pointerdown",unlock,{once:true});
-  document.addEventListener("keydown",unlock,{once:true})
+  // Keep a lightweight gesture listener so iOS can recover after a phone call.
+  // Installing with configure is done once per page, never per view navigation.
+  if(!root.__academySoundWakeInstalled){
+   root.__academySoundWakeInstalled=true;
+   document.addEventListener("pointerdown",unlock);
+   document.addEventListener("keydown",unlock)
+  }
  }
 }
 if(typeof document!=="undefined")document.addEventListener("visibilitychange",()=>{if(document.hidden)pause();else unpause()});

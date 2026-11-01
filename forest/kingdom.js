@@ -12,21 +12,22 @@ let state=(()=>{try{return clean(JSON.parse(localStorage.getItem(KEY)||"null"))}
 // Enable narration once for existing players; afterwards respect their toggle.
 try{if(localStorage.getItem(VOICE_MIGRATION_KEY)!=="done"){state.settings.voice=true;localStorage.setItem(KEY,JSON.stringify(state));localStorage.setItem(VOICE_MIGRATION_KEY,"done")}}catch(e){state.settings.voice=true}
 let view="",ri=0,qi=-1,task=null,modal="",solved=false,built="",memoryVisible=false,position={x:50,y:88},walkTimer=null,toastTimer=null,parentAccess=false;
-function syncForest3(){
- try{
-  const latest=JSON.parse(localStorage.getItem(KEY)||"null");
-  if(latest&&latest.forest3&&latest.forest3.heroes)
-   for(const h of Object.keys(NAMES))state.forest3.heroes[h]=forest3Clean(latest.forest3.heroes[h]);
- }catch(e){}
+let lastSaved=clean(state);
+function latestSaved(){
+ try{return clean(JSON.parse(localStorage.getItem(KEY)||"null"))}catch(e){return blank()}
 }
-function save(preserveStory=true){
+function syncForest3(){
+ const newest=latestSaved();
+ if(newest.resetEpoch>state.resetEpoch){state=newest;lastSaved=clean(newest);return}
+ for(const h of Object.keys(NAMES))state.forest3.heroes[h]=forest3Merge(state.forest3.heroes[h],newest.forest3.heroes[h])
+}
+function save(merge=true){
  try{
-  // Forest 3.0 is played on a separate page. Never overwrite its newer progress
-  // with a stale snapshot held in the parent Academy tab.
-  if(preserveStory)syncForest3();
+  if(merge&&!mergeLatestProgress())return false;
   localStorage.setItem(KEY,JSON.stringify(state));
-  if(state.active)localStorage.setItem("academy-active-hero",state.active)
- }catch(e){notify("Не удалось сохранить данные. Проверь настройки браузера.")}
+  if(state.active)localStorage.setItem("academy-active-hero",state.active);
+  lastSaved=clean(state);return true
+ }catch(e){notify("Не удалось сохранить данные. Проверь настройки браузера.");return false}
 }
 function p(){return state.profiles[state.active||"kostya"]}
 function count(r,h){return state.profiles[h||state.active||"kostya"].done[r.key].filter(Boolean).length}

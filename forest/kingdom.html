@@ -9,6 +9,7 @@
 <link rel="stylesheet" href="./kingdom.css?v=6">
 <link rel="stylesheet" href="./dragon-garden.css?v=2">
 <link rel="stylesheet" href="./learning-hall.css?v=2">
+<link rel="stylesheet" href="./hall-workshop.css?v=1">
 <link rel="stylesheet" href="./voice-studio.css?v=2">
 <script src="./runtime-guard.js?v=1"></script>
 </head>
@@ -73,12 +74,12 @@
     <div class="art" id="nextEmoji">🌲</div>
   </div>
   <button class="pet-promo" data-go="garden" aria-label="Отправиться в Драконий сад"><span><strong>🐉 Познакомься с Искриком!</strong><small>Покорми дракончика, сыграй в волшебные игры и помоги братьям вырастить общего друга.</small><span class="chip" id="homePetHearts">❤️ 0 из 24 сердечек</span></span><span class="pet-promo-art" aria-hidden="true">🐲</span></button>
-<button class="pet-promo" data-go="hall" aria-label="Открыть Учебный зал" style="background:linear-gradient(125deg,#494c85,#6a548c 55%,#825c8d)"><span><strong>📚 Учебный зал открыт!</strong><small>Четыре предмета, множество новых заданий, прописи и игра «Соедини пары».</small><span class="chip" id="homeHallXP">⭐ 0 звёзд знаний</span></span><span class="pet-promo-art" aria-hidden="true">📖</span></button>
+<button class="pet-promo" data-go="hall" aria-label="Открыть Учебный зал" style="background:linear-gradient(125deg,#494c85,#6a548c 55%,#825c8d)"><span><strong>📚 Учебный зал открыт!</strong><small>Четыре предмета, прописи и новые игры: сортировка, мост и сад.</small><span class="chip" id="homeHallXP">⭐ 0 звёзд знаний</span></span><span class="pet-promo-art" aria-hidden="true">📖</span></button>
 <div class="section-head" style="margin-top:23px"><div><h2>В твоей Академии</h2></div></div>
   <div class="quick-grid">
     <button class="quick" data-go="castle"><span class="emoji">🏰</span><strong>Семейный замок</strong><span>Расти вместе и украшай комнаты</span></button>
     <button class="quick" data-go="journal"><span class="emoji">🏅</span><strong>Мои открытия</strong><span>Посмотри достижения и пройденные главы</span></button>
-    <button class="quick" data-go="hall"><span class="emoji">📚</span><strong>Учебный зал</strong><span>Четыре предмета и мини-игры</span></button>
+    <button class="quick" data-go="hall"><span class="emoji">📚</span><strong>Учебный зал</strong><span>Четыре предмета и три новые мастерские</span></button>
     <button class="quick" data-go="map"><span class="emoji">🗺️</span><strong>Карта королевства</strong><span>Шесть удивительных регионов</span></button>
     <button class="quick" id="classicLink"><span class="emoji">✍️</span><strong>Девять учебных башен</strong><span>Письмо, музыка, чтение и другие занятия</span></button>
   </div>
@@ -105,6 +106,12 @@
       <button class="hall-play" id="hallOpenTrace"><span class="symbol">✍️</span><strong>Волшебные прописи</strong><small>Проведи линию по образцу. Игра действительно проверяет рисунок.</small></button>
       <button class="hall-play" id="hallOpenPairs"><span class="symbol">🧩</span><strong>Соедини пары</strong><small>Находи соответствия, выбирая предметы с двух сторон.</small></button>
     </div>
+    <div class="workshop-lobby-title">🧰 Новая мастерская: не отвечай, а действуй!</div>
+    <div class="hall-workshop-options">
+      <button class="hall-workshop-launch" id="hallOpenSort"><span class="workshop-emoji">🧺</span><strong>Волшебная сортировка</strong><small>Разложи находки по домикам</small></button>
+      <button class="hall-workshop-launch" id="hallOpenBridge"><span class="workshop-emoji">🌉</span><strong>Построй мост</strong><small>Собери мост из деталей</small></button>
+      <button class="hall-workshop-launch" id="hallOpenGarden"><span class="workshop-emoji">🌻</span><strong>Вырасти цветок</strong><small>Посади, полей и подари свет</small></button>
+    </div>
     <div class="hall-illustrated-note"><span class="em">🧙‍♂️</span><p>Неудача не отнимает звёзды, и никто не торопит. У Кости и Кирилла отдельные задания и собственный темп.</p></div>
   </div>
   <div id="hallLesson" class="hidden">
@@ -116,6 +123,16 @@
   </div>
   <div id="hallComplete" class="hidden">
     <div class="hall-stage"><div class="hall-reward">🏆✨</div><h2>Занятие пройдено!</h2><p class="muted" id="hallFinishMessage">Магистр Звездочёт тобой гордится.</p><div class="hall-summary-stats"><span><b id="hallEarnedStars">5</b>звёзд за занятие</span><span><b id="hallNewTotal">0</b>всего звёзд знаний</span></div><div class="hall-lesson-footer"><button class="button" id="hallAgain">🔁 Ещё пять задач</button><button class="button secondary" id="hallFinishBack">← Выбрать предмет</button></div></div>
+  </div>
+    <div id="hallWorkshop" class="hidden">
+    <div class="hall-nav-sub"><button class="button secondary small" id="hallWorkshopBack">← К предметам</button><span class="hall-mini-tag">🧰 Мастерская приключений</span></div>
+    <div class="hall-workshop-stage">
+      <div class="row between wrap"><h2 id="hallWorkshopTitle">Волшебная мастерская</h2><span id="hallWorkshopProgress" class="workshop-progress">0 / 6</span></div>
+      <p class="muted" id="hallWorkshopInstruction">Выбери предмет, затем место для него.</p>
+      <div id="hallWorkshopBoard"></div>
+      <div id="hallWorkshopFeedback" class="workshop-feedback" role="status" aria-live="polite"></div>
+      <div class="workshop-footer"><button class="button secondary small" id="hallWorkshopSpeak">🔊 Послушать</button><button class="button hidden" id="hallWorkshopAgain">🔁 Сыграть снова</button></div>
+    </div>
   </div>
   <div id="hallTrace" class="hidden">
     <div class="hall-nav-sub"><button class="button secondary small" id="hallTraceBack">← К предметам</button><span class="hall-mini-tag">✍️ Волшебные прописи</span></div>
@@ -269,7 +286,8 @@
 <script defer src="./kingdom.js?v=18"></script>
 <script defer src="./dragon-garden.js?v=4"></script>
 <script defer src="./learning-hall-data.js?v=3"></script>
-<script defer src="./learning-hall.js?v=4"></script>
+<script defer src="./learning-hall.js?v=5"></script>
 <script defer src="./learning-hall-minigames.js?v=3"></script>
+<script defer src="./hall-workshop.js?v=1"></script>
 </body>
 </html>

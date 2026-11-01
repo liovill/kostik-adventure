@@ -19,12 +19,12 @@ const F3_TEXT={
  6:"Камни запели! На поляне ждёт волшебное яйцо. Поможем дракону!",
  7:"Ты спас Зачарованный лес. Каждое твоё действие вернуло ему свет!"
 };
-function f3Empty(){return{stage:0,lights:[false,false,false],seeds:[false,false,false],patterns:0,planks:[false,false,false],memory:0,eggs:0,medal:false,replays:0}}
+function f3Empty(){return{stage:0,lights:[false,false,false],seeds:[false,false,false],patterns:0,planks:[false,false,false],memory:0,eggs:0,medal:false,replays:0,generation:0}}
 function f3Clamp(x,max){return Number.isSafeInteger(x)?Math.max(0,Math.min(max,x)):0}
 function f3Clean(p){
  const v=f3Empty();if(!p||typeof p!=="object")return v;
  v.stage=f3Clamp(p.stage,7);for(const key of ["lights","seeds","planks"])v[key]=Array.from({length:3},(_,i)=>Array.isArray(p[key])&&p[key][i]===true);
- v.patterns=f3Clamp(p.patterns,3);v.memory=f3Clamp(p.memory,2);v.eggs=f3Clamp(p.eggs,3);v.medal=p.medal===true||v.stage===7;v.replays=f3Clamp(p.replays,100000);return v
+ v.patterns=f3Clamp(p.patterns,3);v.memory=f3Clamp(p.memory,2);v.eggs=f3Clamp(p.eggs,3);v.medal=p.medal===true||v.stage===7;v.replays=f3Clamp(p.replays,100000);v.generation=f3Clamp(p.generation,1000000);return v
 }
 function f3ReadFamily(){try{const x=JSON.parse(localStorage.getItem(F3_STORAGE)||"{}");return x&&typeof x==="object"&&!Array.isArray(x)?x:{}}catch(e){return{}}}
 let family=f3ReadFamily();
@@ -41,6 +41,7 @@ let selectedSeed=null,selectedPlank=null,memoryShowing=true,memoryInput=[],feedb
 function state(){return family.forest3.heroes[hero]}
 function f3MergeCurrent(a,b){
  const x=f3Clean(a),y=f3Clean(b);
+ if(x.generation!==y.generation){const recent=x.generation>y.generation?x:y;recent.medal=x.medal||y.medal;recent.replays=Math.max(x.replays,y.replays);return recent}
  x.stage=Math.max(x.stage,y.stage);
  for(const key of ["lights","seeds","planks"])x[key]=x[key].map((v,i)=>v||y[key][i]);
  for(const key of ["patterns","memory","eggs","replays"])x[key]=Math.max(x[key],y[key]);

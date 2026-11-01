@@ -25,7 +25,7 @@ function voice(message){
 }
 function sound(event){if(root.AcademySound)root.AcademySound.cue(event)}
 function reset(nextRecipe=false){
- steps=[];completed=false;
+ steps=[];completed=false;firstVisit=true;
  if(nextRecipe)round=(round+1)%RECIPES.length;
  render()
 }

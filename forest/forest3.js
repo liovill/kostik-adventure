@@ -188,7 +188,7 @@ function render(){
  $("endingPanel").classList.toggle("hidden",p.stage!==7);
  if(p.stage===7)$("endingMessage").textContent=F3_NAMES[hero]+", ты вернул свет в лес, помог сове Луне и разбудил дракончика. Медаль Хранителя леса навсегда осталась в твоей книге приключений.";
  $("missionHint").disabled=p.stage===7;
- story(F3_TEXT[p.stage]);if(window.PotionAtelier)window.PotionAtelier.render();if(window.ForestArt)window.ForestArt.render()
+ story(F3_TEXT[p.stage]);if(window.PotionAtelier)window.PotionAtelier.render();if(window.ForestArt)window.ForestArt.render();if(window.ForestWorld)window.ForestWorld.render()
 }
 function element(tag,cls,text){
  const el=document.createElement(tag);if(cls)el.className=cls;

@@ -274,6 +274,7 @@ function bindDrag(btn,index,kind){
  btn.addEventListener("pointerdown",e=>{
   if((kind==="seed"&&state().stage!==2)||(kind==="plank"&&state().stage!==4))return;
   start=[e.clientX,e.clientY];moving=false;
+  if(btn.setPointerCapture)try{btn.setPointerCapture(e.pointerId)}catch(err){}
   if(kind==="seed")selectedSeed=index;else selectedPlank=index;
   btn.classList.add("selected");
  });

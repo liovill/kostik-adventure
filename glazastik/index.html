@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#061c30">
+<title>Глазастик: Пробуждение | v0.2 для iPhone</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<style>
+:root{color-scheme:dark;--cyan:#5df3d2;--white:#eafaff;--dark:#051e33}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#041626;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#fff}
+body{display:block}
+#stage{width:100vw;width:100dvw;height:100vh;height:100dvh;position:relative;overflow:hidden;background:#0b3a5d;touch-action:none;user-select:none}
+canvas{display:block;width:100%;height:100%;touch-action:none}
+#hud{position:absolute;inset:0 0 auto;display:flex;align-items:flex-start;gap:10px;padding:max(7px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) 0 max(18px,env(safe-area-inset-left));pointer-events:none;font-size:clamp(11px,1.6vw,16px);font-weight:750;text-shadow:0 2px 4px #001827;z-index:2}
+.hud-pill{display:flex;align-items:center;gap:6px;border:1px solid #a3fff440;background:#021d2c9b;border-radius:999px;padding:7px 11px;backdrop-filter:blur(8px);white-space:nowrap}
+.hud-pill span{color:#8afce4}#progressWrap{width:150px;max-width:20vw;border-radius:40px;height:8px;overflow:hidden;background:#d7ffff35;margin:auto 0}#progress{height:100%;width:0;background:linear-gradient(90deg,#35bbfa,#78ffce);border-radius:20px}
+.hud-right{margin-left:auto;display:flex;gap:7px;pointer-events:auto}
+.iconBtn{border:1px solid #acfff355;background:#001e35bc;color:white;border-radius:13px;min-width:37px;min-height:35px;padding:5px 9px;font-size:17px;font-weight:750;cursor:pointer;touch-action:manipulation}
+.iconBtn:active{transform:scale(.95)}
+#pad{position:absolute;inset:auto 0 0;display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding:0 max(17px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(17px,env(safe-area-inset-left));z-index:4;pointer-events:none}
+.control-group{display:flex;gap:11px;align-items:center}
+.control{pointer-events:auto;touch-action:none;outline:none;width:65px;height:65px;border:1.5px solid #c1fff79e;background:linear-gradient(160deg,#64eef153,#0e527a6b);color:#f5ffff;font-size:27px;font-weight:800;border-radius:19px;box-shadow:inset 0 1px 0 #fff5,0 6px 16px #001c2d90;backdrop-filter:blur(7px);display:grid;place-items:center;cursor:pointer}
+.control.action{width:72px;height:72px;border-radius:50%;font-size:25px;background:linear-gradient(160deg,#53f5ba8c,#08777cac)}
+.control.duck{width:63px;height:63px;font-size:23px;background:linear-gradient(160deg,#8dc1ff7d,#385b9ba0)}
+.control.down,.control:active{background:#3bf6c0bd;transform:translateY(3px) scale(.95);color:#003f55}
+#toast{position:absolute;top:17%;left:50%;transform:translateX(-50%) translateY(-12px);background:#021b31da;border:1px solid #a9fff56e;white-space:nowrap;max-width:90%;padding:10px 19px;border-radius:40px;font-size:clamp(12px,1.7vw,18px);font-weight:700;opacity:0;transition:.3s;pointer-events:none;z-index:5;text-align:center;box-shadow:0 8px 30px #00192c99}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#overlay{position:absolute;inset:0;z-index:6;background:linear-gradient(150deg,#031f3edc,#034f5d83 48%,#041724e0);display:flex;align-items:center;justify-content:center;text-align:center;padding:6px max(12px,env(safe-area-inset-right)) 6px max(12px,env(safe-area-inset-left));backdrop-filter:blur(3px)}
+#overlay.hidden{display:none}
+.panel{width:min(820px,96%);max-height:98%;overflow-y:auto;padding:clamp(9px,2.4vh,24px);border:1px solid #9cffe290;background:linear-gradient(145deg,#06253eea,#0c4258e5);border-radius:28px;box-shadow:0 25px 60px #0008,inset 0 1px 0 #ffffff40}
+.eyebrow{color:#94ffe9;letter-spacing:.26em;font-size:clamp(10px,1.4vw,13px);font-weight:900;text-transform:uppercase}
+h1{margin:5px 0 2px;font-weight:1000;font-size:clamp(27px,5vw,52px);line-height:1.04;text-shadow:0 4px #003249;color:#f1ffff}
+h1 em{display:block;font-style:normal;color:#86ffe0;font-size:.56em;letter-spacing:.14em;margin-top:8px}
+.blob{font-size:clamp(32px,5vw,55px);line-height:1;margin:9px auto;filter:drop-shadow(0 4px 8px #0004)}
+.panel p{color:#d2f4fc;line-height:1.55;font-size:clamp(12px,1.85vw,17px);max-width:470px;margin:12px auto}
+.instructions{font-size:clamp(10px,1.6vw,14px);color:#9fd6e9;margin:8px 0 16px}
+.primary{border:0;border-radius:15px;padding:12px 28px;font-size:clamp(15px,2vw,19px);font-weight:950;color:#063843;background:linear-gradient(120deg,#91ffe6,#48dff9);box-shadow:0 6px 0 #176a78,0 12px 27px #0008;cursor:pointer;touch-action:manipulation}
+.primary:active{transform:translateY(4px);box-shadow:0 2px 0 #176a78}
+.small{margin-top:14px;font-size:11px;color:#88b9cc}
+#rotate{display:none;position:absolute;inset:0;z-index:10;background:#05253cec;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:15px;font-weight:750;line-height:1.4}
+@media (pointer:fine){#pad{opacity:.35}#pad:hover{opacity:.95}.control{width:55px;height:55px}.control.action{width:64px;height:64px}}
+@media (orientation:portrait) and (pointer:coarse) and (max-width:700px){#rotate{display:flex}}
+@media (max-height:410px){#hud{padding:5px 7px;gap:5px}.hud-pill{padding:5px 7px}.panel{padding:11px 18px}.panel p{margin:6px auto}.control{width:54px;height:54px}.control.action{width:60px;height:60px}.control.duck{width:52px;height:52px}#pad{padding-bottom:5px}.blob{margin:2px auto}}
+</style>
+</head>
+<body>
+<div id="stage">
+ <canvas id="game" width="960" height="540" aria-label="Игра Глазастик"></canvas>
+ <div id="hud">
+  <div class="hud-pill">💎 <span id="gems">0</span>/8</div>
+  <div class="hud-pill">💚 <span id="hearts">♥♥♥</span></div>
+  <div class="hud-pill" id="secretHUD" style="display:none">✨ <span>Секрет!</span></div>
+  <div id="progressWrap"><div id="progress"></div></div>
+  <div class="hud-right"><button id="audio" class="iconBtn" title="Звук" aria-label="Звук">♫</button><button id="pause" class="iconBtn" title="Пауза" aria-label="Пауза">Ⅱ</button><button id="fullscreen" class="iconBtn" title="Во весь экран" aria-label="Во весь экран">⛶</button></div>
+ </div>
+ <div id="toast" aria-live="polite"></div>
+ <div id="pad">
+  <div class="control-group"><button class="control" data-act="left" aria-label="Влево">◀</button><button class="control" data-act="right" aria-label="Вправо">▶</button></div>
+  <div class="control-group"><button class="control duck" data-act="duck" aria-label="Сжаться">↧</button><button class="control action" data-act="jump" aria-label="Прыжок">⬆</button></div>
+ </div>
+ <div id="overlay"><div class="panel">
+   <div class="eyebrow">Оригинальное приключение</div><div class="blob">🫧🟢</div>
+   <h1 id="panel-title">ГЛАЗАСТИК<em>ПРОБУЖДЕНИЕ</em></h1>
+   <p id="panel-desc">Маленький слизняк проснулся в затопленной лаборатории. Помоги ему собрать 8 кристаллов и добраться до портала!</p>
+   <div class="instructions" id="panel-help">◀ ▶ двигаться · ⬆ прыгать · ↧ сжиматься<br>На компьютере: A/D или стрелки, пробел, S</div>
+   <button id="start" class="primary">Играть! ✨</button>
+   <div class="small">Версия 0.2 · 1 уровень · работает без интернета</div>
+ </div></div>
+ <div id="rotate">📱↔️<br><br>Поверни телефон горизонтально,<br>чтобы Глазастику было просторнее!</div>
+</div>
+<script>
+(()=>{'use strict';
+const cvs=document.getElementById('game'), ctx=cvs.getContext('2d',{alpha:false});
+const el=id=>document.getElementById(id);
+let W=960;const H=540,GROUND=430,WORLD=3300,GRAV=1480,MAX_CRYSTALS=8;
+function fitScreen(){const s=el("stage"),ratio=Math.max(1,s.clientWidth)/Math.max(1,s.clientHeight);W=Math.max(960,Math.min(1350,Math.round(H*ratio)));cvs.width=W;cvs.height=H;}
+fitScreen(); window.addEventListener("resize",fitScreen,{passive:true}); window.addEventListener("orientationchange",()=>setTimeout(fitScreen,180),{passive:true});
+let time=0,last=0,cam=0,shake=0,flash=0,ambientT=0,muted=false,toastTimeout=0;
+let mode='menu',checkpoint=90,secretFound=false,crystals=0,hearts=3,deathCount=0;
+const pressed={left:false,right:false,jump:false,duck:false};let jumpQueue=0,wasGrounded=true;
+const rng=(n)=>{const x=Math.sin(n*78.233+0.25)*43758.545;return x-Math.floor(x)};
+const islands=[[0,710],[775,1350],[1415,1980],[2060,2630],[2700,3300]];
+const platforms=[{x:380,y:353,w:145},{x:825,y:350,w:145},{x:1255,y:335,w:134},{x:1550,y:330,w:146},{x:1945,y:345,w:140},{x:2250,y:343,w:125},{x:2500,y:323,w:140},{x:2910,y:350,w:115}];
+const roof={x:1000,y:379,w:154,h:26}; // only a crouched blob fits under it
+const spikes=[{x:580,w:45},{x:1230,w:48},{x:1830,w:46},{x:2800,w:50}];
+const stars=[
+ [225,378],[410,319],[525,391],[660,382],[815,390],[889,315],
+ [1072,418-28],[1190,386],[1320,297],[1495,388],[1610,296],[1742,390],
+ [1895,384],[2035,386],[2180,386],[2312,307],[2515,287],[2603,387],
+ [2730,389],[2945,314],[3090,381]
+].map(([x,y],id)=>({x,y,id,taken:false}));
+const secret={x:1625,y:255,r:14};
+const exit={x:3150,y:337,w:58,h:95};
+const p={x:92,y:430,vx:0,vy:0,w:39,h:43,grounded:true,duck:false,face:1,phase:0,inv:0,land:0};
+let particles=[];let bubbles=Array.from({length:76},(_,i)=>({x:rng(i+12)*WORLD,y:50+rng(i+123)*470,r:1+rng(i+800)*5,s:.3+rng(i+111)*1.7}));
+let audioCtx=null;
+function sfx(note=600,dur=.12,type='sine',vol=.065){if(muted)return;try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)(); if(audioCtx.state==='suspended')audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=type;o.frequency.setValueAtTime(note,audioCtx.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(50,note*.65),audioCtx.currentTime+dur);g.gain.setValueAtTime(vol,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+dur);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+dur)}catch(e){}}
+function notice(t){const z=el('toast');z.textContent=t;z.classList.add('show');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>z.classList.remove('show'),1800)}
+function setOverlay(title,desc,button,help=''){el('panel-title').innerHTML=title;el('panel-desc').textContent=desc;el('start').textContent=button;el('panel-help').innerHTML=help;el('overlay').classList.remove('hidden')}
+function hideOverlay(){el('overlay').classList.add('hidden')}
+function hud(){el('gems').textContent=crystals;el('hearts').textContent='♥'.repeat(Math.max(0,hearts));el('secretHUD').style.display=secretFound?'flex':'none';el('progress').style.width=Math.max(0,Math.min(100,(p.x-80)/(exit.x-80)*100))+'%'}
+function reset(all=true){p.x=all?92:checkpoint;p.y=430;p.vx=0;p.vy=0;p.h=43;p.grounded=false;p.inv=1.2;p.land=0;p.phase=0;if(all){crystals=0;hearts=3;checkpoint=92;secretFound=false;deathCount=0;stars.forEach(c=>c.taken=false);particles=[];}Object.keys(pressed).forEach(k=>pressed[k]=false);jumpQueue=0;hud();}
+function begin(){reset(true);mode='play';hideOverlay();sfx(680,.12);notice('Собери 8 кристаллов 💎')}
+function pulse(x,y,col,count=12,force=115){for(let i=0;i<count;i++){let a=rng(i*17+time*10)*Math.PI*2,s=rng(i*87+time*5)*force;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-30,life:.65+rng(i*31+time)*.4,max:1.05,c:col,r:2+rng(i+time)*4})}}
+function hurt(){if(mode!=='play'||p.inv>0)return;hearts--;deathCount++;shake=11;flash=.45;sfx(145,.3,'sawtooth',.04);pulse(p.x,p.y-24,'#ff9ba2',24,180);hud();if(hearts<=0){mode='over';setOverlay('ЕЩЁ ПОПРОБУЕМ?<em>ТЫ СПРАВИШЬСЯ!</em>','Глазастик устал, но приключение ещё не закончено. Давай начнём снова!','Начать заново 💚','Каждая попытка делает тебя сильнее.');return;}reset(false);notice('Ничего! Попробуй ещё 💚')}
+function win(){mode='win';sfx(740,.2,'triangle');setTimeout(()=>sfx(920,.22,'triangle'),140);try{let k=Number(localStorage.getItem('glazastik_best')||0);localStorage.setItem('glazastik_best',String(Math.max(k,crystals)))}catch(e){}setOverlay('УРА! ПОБЕДА!<em>ГЛАЗАСТИК СПАСЁН</em>',`Ты собрал ${crystals} кристаллов из ${stars.length}, прошёл лабораторию${secretFound?' и нашёл секретный светлячок':''}! Впереди ждёт целый подводный мир.`,`Сыграть ещё 🎮`,`💚 Осталось жизней: ${hearts} · ✨ Секрет: ${secretFound?'найден':'не найден'}`);pulse(p.x,p.y-30,'#87ffe3',50,250)}
+function overlap(a,b){return a.x-a.w/2 < b.x+b.w && a.x+a.w/2 > b.x && a.y-a.h < b.y+b.h && a.y > b.y}
+function interact(dt){if(mode!=='play')return;time+=dt;p.phase+=dt;p.inv=Math.max(0,p.inv-dt);p.land=Math.max(0,p.land-dt);shake*=Math.pow(.02,dt);flash=Math.max(0,flash-dt);
+ const oldX=p.x,oldY=p.y;const duck=pressed.duck && p.grounded;p.duck=duck;p.h=duck?23:43;p.w=duck?52:39;
+ const dir=(pressed.right?1:0)-(pressed.left?1:0);const speed=duck?126:258;
+ const accel=p.grounded?2900:1700;const target=dir*speed;p.vx+=Math.max(-accel*dt,Math.min(accel*dt,target-p.vx));if(dir)p.face=dir;
+ if(jumpQueue>0)jumpQueue-=dt;if(jumpQueue>0 && (p.grounded || (time-p.lastGround||99)<.12) && !duck){p.vy=-587;p.grounded=false;jumpQueue=0;sfx(440,.14,'triangle');pulse(p.x,p.y,'#b8ffec',5,60);}
+ if(!pressed.jump && p.vy< -220)p.vy+=1700*dt; // short hop if jump released early
+ p.vy=Math.min(1000,p.vy+GRAV*dt);
+ p.x+=p.vx*dt;p.y+=p.vy*dt;p.x=Math.max(22,Math.min(WORLD-22,p.x));
+ // roof is a full collision body; crouch fits below its underside
+ if(overlap(p,roof)){
+   if(oldY<=roof.y && p.vy>=0){p.y=roof.y;p.vy=0;p.grounded=true;}
+   else if(oldY-p.h >= roof.y+roof.h && p.vy<0){p.y=roof.y+roof.h+p.h;p.vy=0;}
+   else if(oldX<roof.x){p.x=roof.x-p.w/2;p.vx=0;}
+   else if(oldX>roof.x+roof.w){p.x=roof.x+roof.w+p.w/2;p.vx=0;}
+ }
+ // land on platforms when approaching from above
+ let newGround=false;
+ if(p.vy>=0){for(const b of platforms){if(p.x+p.w/2>b.x+6 && p.x-p.w/2<b.x+b.w-6 && oldY<=b.y+6 && p.y>=b.y){p.y=b.y;p.vy=0;newGround=true;break;}}
+  if(!newGround){for(const [a,b] of islands){if(p.x+p.w/2>a && p.x-p.w/2<b && oldY<=GROUND+8 && p.y>=GROUND){p.y=GROUND;p.vy=0;newGround=true;break;}}}
+  if(!newGround && p.y===roof.y){newGround=true;}}
+ if(newGround&&!p.grounded){p.land=.22;p.lastGround=time;sfx(145,.06,'sine',.025);pulse(p.x,p.y,'#a0ecff',4,35)}
+ if(!newGround && p.grounded)p.lastGround=time;p.grounded=newGround;
+ if(p.y>625){hurt();return;}
+ for(const c of stars){if(!c.taken && Math.abs(p.x-c.x)<30 && Math.abs((p.y-p.h/2)-c.y)<42){c.taken=true;crystals++;sfx(780+Math.min(8,crystals)*50,.16,'sine');pulse(c.x,c.y,'#9ffbff',14,126);hud();if(crystals===MAX_CRYSTALS)notice('Портал открыт! Найди выход ✨');}}
+ if(!secretFound && Math.hypot(p.x-secret.x,p.y-p.h/2-secret.y)<33){secretFound=true;pulse(secret.x,secret.y,'#ffb4f9',25,170);sfx(1000,.24,'triangle');notice('✨ Найден тайный светлячок!');hud()}
+ if(checkpoint<1600 && p.x>1735){checkpoint=1714;notice('🔷 Точка сохранения!');pulse(1714,395,'#6be6ff',20);sfx(550,.22)}
+ for(const s of spikes){if(p.x+p.w*.28>s.x && p.x-p.w*.28<s.x+s.w && p.y>=GROUND-14 && p.y<=GROUND+17){hurt();return;}}
+ const droneX=1510+Math.sin(time*1.4)*68,droneY=391+Math.sin(time*2.1)*9;
+ if(Math.hypot(p.x-droneX,p.y-p.h/2-droneY)<p.w*.35+16){hurt();return;}
+ const laserOn=(time%4.2)<2.25;
+ if(laserOn && p.x+p.w/2>2369 && p.x-p.w/2<2384 && p.y>=GROUND-94){hurt();return;}
+ if(p.x>exit.x-20 && p.y>exit.y-30){if(crystals>=MAX_CRYSTALS){win()}else if(time-(p.lastExitToast||0)>2.4){notice(`Ещё ${MAX_CRYSTALS-crystals} кристаллов до открытия!`);p.lastExitToast=time;p.x=exit.x-65;}}
+ hud();
+}
+function rrect(x,y,w,h,r,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+function glowCircle(x,y,r,col,blur=20){ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore()}
+function line(x1,y1,x2,y2,col,w=1){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+function blob(x,y,w=50,h=50,phase=time){ctx.save();ctx.translate(x,y);let bob=Math.sin(phase*4)*1.5;const g=ctx.createRadialGradient(-10,-22,3,5,-16,46);g.addColorStop(0,'#ddfff2');g.addColorStop(.25,'#67ffd2');g.addColorStop(.7,'#09cbb3');g.addColorStop(1,'#078b9d');ctx.fillStyle=g;ctx.shadowColor='#25efbb';ctx.shadowBlur=18;ctx.beginPath();ctx.ellipse(0,-h/2+bob,w/2,h/2,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#b3ffea75';ctx.beginPath();ctx.ellipse(-11,-h*.7,7,4,-.5,0,Math.PI*2);ctx.fill();if(h>31){ctx.fillStyle='#ecffff';ctx.beginPath();ctx.ellipse(-9,-h*.59,10,12,0,0,7);ctx.ellipse(10,-h*.59,10,12,0,0,7);ctx.fill();ctx.fillStyle='#174e68';ctx.beginPath();ctx.arc(-7,-h*.57,5.1,0,7);ctx.arc(12,-h*.57,5.1,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-8,-h*.61,1.8,0,7);ctx.arc(11,-h*.61,1.8,0,7);ctx.fill();ctx.strokeStyle='#097d83';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-h*.30,5,0.15,Math.PI-.15);ctx.stroke();}else{ctx.fillStyle='#f4ffff';ctx.beginPath();ctx.ellipse(-9,-h*.56,6,5,0,0,7);ctx.ellipse(9,-h*.56,6,5,0,0,7);ctx.fill();ctx.fillStyle='#164555';ctx.beginPath();ctx.arc(-7,-h*.55,2.8,0,7);ctx.arc(11,-h*.55,2.8,0,7);ctx.fill();}ctx.restore()}
+function bg(){let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#03192e');sky.addColorStop(.55,'#085376');sky.addColorStop(1,'#1a91a0');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ // shafts of watery light
+ for(let i=0;i<9;i++){let xx=(i*177-cam*.06)%1300-210;const a=.05+.02*Math.sin(time*.4+i);ctx.fillStyle=`rgba(146,245,255,${a})`;ctx.beginPath();ctx.moveTo(xx,-40);ctx.lineTo(xx+20,-40);ctx.lineTo(xx+255,540);ctx.lineTo(xx+145,540);ctx.fill();}
+ // distant domes and ruins
+ for(let i=0;i<23;i++){const x=i*210-(cam*.21)%210-140;let h=70+rng(i+4)*150;ctx.fillStyle='#022a46b8';rrect(x,350-h,115,h+280,[55,55,8,8],'#042b46');rrect(x+16,365-h,83,14,6,'#0a5370');for(let j=0;j<4;j++){rrect(x+26,382-h+j*36,17,8,3,'#59cadb35');rrect(x+65,382-h+j*36,17,8,3,'#59cadb30')}}
+ // seaweed layers in back
+ for(let i=0;i<37;i++){const wx=i*106+30;const x=wx-cam*.42,h=45+(i*7%75);ctx.strokeStyle=i%2?'#12586d88':'#227c8880';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,520);ctx.quadraticCurveTo(x-25,490-h/2,x+Math.sin(time*.6+i)*13,520-h);ctx.stroke()}
+ for(const b of bubbles){let bx=(b.x-cam*.64)%WORLD,by=(b.y-time*15*b.s)%520;if(by<0)by+=520;if(bx>-12&&bx<W+12){ctx.strokeStyle='#b8ffff36';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(bx,by,b.r,0,7);ctx.stroke();}}
+ // blue atmospheric veil near ground
+ const fog=ctx.createLinearGradient(0,290,0,540);fog.addColorStop(0,'#27b2bd00');fog.addColorStop(1,'#0d828a34');ctx.fillStyle=fog;ctx.fillRect(0,285,W,255);
+}
+function world(){ctx.save();ctx.translate(-cam,0);
+ // exterior terrain and metal platforms
+ for(const [a,b] of islands){let w=b-a;rrect(a,GROUND,w,140,0,'#10394d');rrect(a,GROUND,w,12,3,'#297f91');rrect(a,GROUND+7,w,6,2,'#8df1dc65');for(let x=a+23;x<b;x+=62){rrect(x,GROUND+29,44,13,3,'#082b3e');ctx.strokeStyle='#7ed6d433';ctx.lineWidth=1;ctx.strokeRect(x,GROUND+29,44,13);glowCircle(x+20,GROUND+35,2,'#20dcce',8)}for(let x=a+14;x<b;x+=70)rrect(x,GROUND+88,6,22,2,'#479bad28')}
+ // seam lamps and vines along edges
+ for(const [a,b] of islands){glowCircle(a+16,GROUND+6,4,'#62f6cf',15);glowCircle(b-16,GROUND+6,4,'#62f6cf',15)}
+ // decorative lab columns
+ for(let i=0;i<10;i++){const x=170+i*330;const y=60+rng(i+99)*90;rrect(x,0,16,y,3,'#0d3b59aa');rrect(x-13,y-3,42,9,4,'#12516b');glowCircle(x+8,y+10,5,'#69edfa88',12)}
+ for(const b of platforms){ctx.shadowColor='#37fce3aa';ctx.shadowBlur=12;rrect(b.x,b.y,b.w,12,5,'#4aadc0');ctx.shadowBlur=0;rrect(b.x+5,b.y+4,b.w-10,5,3,'#a5ffdf');rrect(b.x+18,b.y+12,11,8,2,'#15627a');rrect(b.x+b.w-29,b.y+12,11,8,2,'#15627a')}
+ // crouching tunnel
+ rrect(roof.x-17,roof.y-11,roof.w+34,10,2,'#19647b');rrect(roof.x,roof.y,roof.w,roof.h,4,'#12607a');rrect(roof.x+5,roof.y+4,roof.w-10,4,2,'#4ce5e2');for(let i=0;i<3;i++)glowCircle(roof.x+23+i*54,roof.y+18,2,'#92ffdc',6);
+ // electric fence
+ let on=(time%4.2)<2.25;const lx=2376;ctx.fillStyle='#103e57';rrect(lx-22,GROUND-112,42,13,3,'#195a73');rrect(lx-20,GROUND-11,40,13,3,'#195a73');glowCircle(lx,GROUND-110,5,on?'#ff767c':'#4bf3b0',12);if(on){ctx.save();ctx.shadowColor='#ff6b80';ctx.shadowBlur=25;ctx.strokeStyle='#ff8ca0';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(lx,GROUND-99);for(let y=GROUND-99;y<GROUND-9;y+=8){ctx.lineTo(lx+Math.sin(time*100+y)*8,y)}ctx.stroke();ctx.restore();}
+ // red spikes
+ for(const s of spikes){for(let x=s.x;x<s.x+s.w-1;x+=13){ctx.fillStyle='#0c2639';ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+6.5,GROUND-20);ctx.lineTo(x+13,GROUND);ctx.fill();ctx.strokeStyle='#ff837e';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+2,GROUND-4);ctx.lineTo(x+6.5,GROUND-19);ctx.lineTo(x+11,GROUND-4);ctx.stroke();}}
+ // checkpoint
+ const cx=1714;const cactive=checkpoint>1600;line(cx,GROUND,cx,GROUND-76,cactive?'#a9fbff':'#60a8b9',4);glowCircle(cx,GROUND-78,10,cactive?'#9dfff0':'#58a9c0',18);ctx.fillStyle=cactive?'#c5fff5':'#6acbdd';ctx.font='bold 13px system-ui';ctx.fillText('✦',cx-5,GROUND-74);
+ // goal portal
+ ctx.save();ctx.shadowColor=crystals>=MAX_CRYSTALS?'#76ffe5':'#58aab6';ctx.shadowBlur=crystals>=MAX_CRYSTALS?37:12;ctx.strokeStyle=crystals>=MAX_CRYSTALS?'#8bffe6':'#397e92';ctx.lineWidth=9;ctx.beginPath();ctx.ellipse(exit.x+29,exit.y+46,25,49,0,0,7);ctx.stroke();ctx.restore();let gg=ctx.createRadialGradient(exit.x+29,exit.y+48,2,exit.x+29,exit.y+46,38);gg.addColorStop(0,crystals>=MAX_CRYSTALS?'#b5fff5':'#113e54');gg.addColorStop(1,crystals>=MAX_CRYSTALS?'#14b4b466':'#092f4588');ctx.fillStyle=gg;ctx.beginPath();ctx.ellipse(exit.x+29,exit.y+45,20,42,0,0,7);ctx.fill();
+ // color crystals
+ for(const s of stars){if(s.taken)continue;let wob=Math.sin(time*3+s.id*1.7)*3;const x=s.x,y=s.y+wob;ctx.save();ctx.shadowBlur=15;ctx.shadowColor='#55ffe6';ctx.fillStyle='#adfff7';ctx.beginPath();ctx.moveTo(x,y-12);ctx.lineTo(x+9,y-3);ctx.lineTo(x+5,y+9);ctx.lineTo(x,y+14);ctx.lineTo(x-9,y+1);ctx.lineTo(x-6,y-7);ctx.closePath();ctx.fill();ctx.fillStyle='#21c0cf';ctx.beginPath();ctx.moveTo(x,y-12);ctx.lineTo(x+9,y-3);ctx.lineTo(x,y+3);ctx.fill();ctx.restore()}
+ if(!secretFound){let r=13+Math.sin(time*4)*2;glowCircle(secret.x,secret.y,r,'#eeb9ff',34);ctx.fillStyle='#ffffff';ctx.font='18px system-ui';ctx.fillText('✶',secret.x-8,secret.y+6)}
+ // enemy drone
+ const dx=1510+Math.sin(time*1.4)*68,dy=391+Math.sin(time*2.1)*9;ctx.save();ctx.translate(dx,dy);ctx.rotate(Math.sin(time*1.2)*.2);glowCircle(0,0,16,'#ff6c98',16);ctx.fillStyle='#572f65';ctx.beginPath();ctx.arc(0,0,13,0,7);ctx.fill();rrect(-8,-6,16,13,6,'#ffc7dc');glowCircle(0,0,3,'#b12c52',6);line(-23,-8,-11,-1,'#a7b6d6',4);line(11,-1,23,-8,'#a7b6d6',4);ctx.restore();
+ // entrance information signs
+ for(const s of [{x:975,t:'↧',c:'#91f8d8'},{x:2290,t:'⚡',c:'#fd9ca2'},{x:3075,t:'★',c:'#99fff2'}]){rrect(s.x-22,270,42,40,9,'#082a40bb');ctx.fillStyle=s.c;ctx.font='bold 24px system-ui';ctx.fillText(s.t,s.x-11,297)}
+ // protagonist soft shadow and body
+ if(mode!=='over'||hearts>0){ctx.save();ctx.globalAlpha=.27;ctx.fillStyle='#021727';ctx.beginPath();ctx.ellipse(p.x,GROUND+3,28,5,0,0,7);ctx.fill();ctx.restore();if(p.inv<=0 || Math.sin(p.inv*24)>0){let squish=p.land>0?Math.sin(p.land/.22*Math.PI)*8:0;ctx.save();ctx.translate(p.x,p.y);const h=p.h-squish,w=p.w+squish*1.5;blob(0,0,w,h,p.phase);ctx.restore()}}
+ for(const q of particles){ctx.globalAlpha=Math.max(0,q.life/q.max);glowCircle(q.x,q.y,q.r,q.c,7)}ctx.globalAlpha=1;
+ ctx.restore();}
+function draw(){ctx.save();ctx.clearRect(0,0,W,H);ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);bg();world();ctx.restore();
+ // gentle gradient vignette
+ const v=ctx.createRadialGradient(W*.5,H*.48,150,W*.5,H*.48,690);v.addColorStop(0,'#00152000');v.addColorStop(1,'#0010229b');ctx.fillStyle=v;ctx.fillRect(0,0,W,H);
+ if(flash>0){ctx.fillStyle=`rgba(255,84,124,${flash*.38})`;ctx.fillRect(0,0,W,H)}
+}
+function frame(t){if(!last)last=t;let dt=Math.min(.035,(t-last)/1000);last=t;ambientT+=dt;if(mode==='menu'){time+=dt*.6;p.x=92;p.y=430;}
+ if(mode==='play'){let steps=Math.ceil(dt/(1/100));for(let i=0;i<steps;i++)interact(dt/steps)}
+ if(mode==='win')time+=dt;
+ for(const q of particles){q.life-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vy+=190*dt}particles=particles.filter(a=>a.life>0).slice(-300);
+ cam=Math.max(0,Math.min(WORLD-W,cam+(Math.max(0,Math.min(WORLD-W,p.x-320))-cam)*Math.min(1,dt*5)));
+ draw();requestAnimationFrame(frame)}
+function action(name,on){if(on&&!pressed[name]&&name==='jump')jumpQueue=.16;pressed[name]=on;}
+const keymap={ArrowLeft:'left',KeyA:'left',ArrowRight:'right',KeyD:'right',ArrowUp:'jump',Space:'jump',KeyW:'jump',ArrowDown:'duck',KeyS:'duck'};
+document.addEventListener('keydown',e=>{const a=keymap[e.code];if(a){e.preventDefault();action(a,true);}if(e.code==='KeyP'||e.code==='Escape'){e.preventDefault();togglePause()}if(e.code==='Enter' && mode!=='play' && mode!=='pause'){begin();}});
+document.addEventListener('keyup',e=>{const a=keymap[e.code];if(a){e.preventDefault();action(a,false);}});
+window.addEventListener('blur',()=>{for(const a of Object.keys(pressed))pressed[a]=false;if(mode==='play')togglePause()});
+for(const btn of document.querySelectorAll('[data-act]')){
+ const a=btn.dataset.act;btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);btn.classList.add('down');action(a,true)});
+ for(const evt of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(evt,e=>{e.preventDefault();btn.classList.remove('down');action(a,false)});
+ btn.addEventListener('contextmenu',e=>e.preventDefault());
+}
+function togglePause(){if(mode==='play'){mode='pause';setOverlay('ПАУЗА<em>ГЛАЗАСТИК ОТДЫХАЕТ</em>','Кристаллы никуда не убегут. Можно продолжить в любой момент.','Продолжить ▶','Подсказка: под низким шлюзом нужно сжаться ↧')}else if(mode==='pause'){mode='play';hideOverlay();last=performance.now()}}
+el('pause').addEventListener('click',togglePause);
+el('start').addEventListener('click',()=>{if(mode==='pause'){togglePause()}else{begin()}});
+el('audio').addEventListener('click',()=>{muted=!muted;el('audio').textContent=muted?'♪̸':'♫';notice(muted?'Звук выключен':'Звук включён')});
+el('fullscreen').addEventListener('click',()=>{const s=el('stage');if(document.fullscreenElement){document.exitFullscreen?.()}else{s.requestFullscreen?.().catch(()=>notice('На этом устройстве полный экран недоступен'))}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden&&mode==='play')togglePause()});
+hud();requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>

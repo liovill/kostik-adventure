@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#061c30">
-<title>Глазастик: Пробуждение | v0.2 для iPhone</title>
+<title>Глазастик: Четыре главы | v0.3</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
@@ -40,6 +40,7 @@ h1 em{display:block;font-style:normal;color:#86ffe0;font-size:.56em;letter-spaci
 .primary{border:0;border-radius:15px;padding:12px 28px;font-size:clamp(15px,2vw,19px);font-weight:950;color:#063843;background:linear-gradient(120deg,#91ffe6,#48dff9);box-shadow:0 6px 0 #176a78,0 12px 27px #0008;cursor:pointer;touch-action:manipulation}
 .primary:active{transform:translateY(4px);box-shadow:0 2px 0 #176a78}
 .small{margin-top:14px;font-size:11px;color:#88b9cc}
+.levelPicker{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin:9px auto 2px}.levelPicker button{border:1px solid #9cffe870;background:#0d5270d0;color:#ebfffb;border-radius:11px;padding:7px 12px;font-weight:800;font-size:clamp(11px,1.5vw,14px);cursor:pointer}.levelPicker button:disabled{opacity:.35;cursor:not-allowed}.levelPicker button.chosen{background:#58eecb;color:#003b45}
 #rotate{display:none;position:absolute;inset:0;z-index:10;background:#05253cec;align-items:center;justify-content:center;text-align:center;padding:16px;font-size:15px;font-weight:750;line-height:1.4}
 @media (pointer:fine){#pad{opacity:.35}#pad:hover{opacity:.95}.control{width:55px;height:55px}.control.action{width:64px;height:64px}}
 @media (orientation:portrait) and (pointer:coarse) and (max-width:700px){#rotate{display:flex}}
@@ -50,7 +51,7 @@ h1 em{display:block;font-style:normal;color:#86ffe0;font-size:.56em;letter-spaci
 <div id="stage">
  <canvas id="game" width="960" height="540" aria-label="Игра Глазастик"></canvas>
  <div id="hud">
-  <div class="hud-pill">💎 <span id="gems">0</span>/8</div>
+  <div class="hud-pill"><span id="levelHUD">1/4</span></div><div class="hud-pill">💎 <span id="gems">0</span>/<span id="needGems">6</span></div>
   <div class="hud-pill">💚 <span id="hearts">♥♥♥</span></div>
   <div class="hud-pill" id="secretHUD" style="display:none">✨ <span>Секрет!</span></div>
   <div id="progressWrap"><div id="progress"></div></div>
@@ -64,10 +65,11 @@ h1 em{display:block;font-style:normal;color:#86ffe0;font-size:.56em;letter-spaci
  <div id="overlay"><div class="panel">
    <div class="eyebrow">Оригинальное приключение</div><div class="blob">🫧🟢</div>
    <h1 id="panel-title">ГЛАЗАСТИК<em>ПРОБУЖДЕНИЕ</em></h1>
-   <p id="panel-desc">Маленький слизняк проснулся в затопленной лаборатории. Помоги ему собрать 8 кристаллов и добраться до портала!</p>
+   <p id="panel-desc">Маленький слизняк проснулся в затопленной лаборатории. Открой четыре части подводной лаборатории, разгадай механизмы и найди дорогу к свободе!</p>
    <div class="instructions" id="panel-help">◀ ▶ двигаться · ⬆ прыгать · ↧ сжиматься<br>На компьютере: A/D или стрелки, пробел, S</div>
    <button id="start" class="primary">Играть! ✨</button>
-   <div class="small">Версия 0.2 · 1 уровень · работает без интернета</div>
+   <div id="levelPicker" class="levelPicker"></div>
+   <div class="small">Версия 0.3 · 4 уникальных уровня · сохранение прогресса</div>
  </div></div>
  <div id="rotate">📱↔️<br><br>Поверни телефон горизонтально,<br>чтобы Глазастику было просторнее!</div>
 </div>
@@ -75,25 +77,61 @@ h1 em{display:block;font-style:normal;color:#86ffe0;font-size:.56em;letter-spaci
 (()=>{'use strict';
 const cvs=document.getElementById('game'), ctx=cvs.getContext('2d',{alpha:false});
 const el=id=>document.getElementById(id);
-let W=960;const H=540,GROUND=430,WORLD=3300,GRAV=1480,MAX_CRYSTALS=8;
+let W=960,WORLD=3300,MAX_CRYSTALS=6;const H=540,GROUND=430,GRAV=1480;
 function fitScreen(){const s=el("stage"),ratio=Math.max(1,s.clientWidth)/Math.max(1,s.clientHeight);W=Math.max(960,Math.min(1350,Math.round(H*ratio)));cvs.width=W;cvs.height=H;}
 fitScreen(); window.addEventListener("resize",fitScreen,{passive:true}); window.addEventListener("orientationchange",()=>setTimeout(fitScreen,180),{passive:true});
 let time=0,last=0,cam=0,shake=0,flash=0,ambientT=0,muted=false,toastTimeout=0;
 let mode='menu',checkpoint=90,secretFound=false,crystals=0,hearts=3,deathCount=0;
 const pressed={left:false,right:false,jump:false,duck:false};let jumpQueue=0,wasGrounded=true;
 const rng=(n)=>{const x=Math.sin(n*78.233+0.25)*43758.545;return x-Math.floor(x)};
-const islands=[[0,710],[775,1350],[1415,1980],[2060,2630],[2700,3300]];
-const platforms=[{x:380,y:353,w:145},{x:825,y:350,w:145},{x:1255,y:335,w:134},{x:1550,y:330,w:146},{x:1945,y:345,w:140},{x:2250,y:343,w:125},{x:2500,y:323,w:140},{x:2910,y:350,w:115}];
-const roof={x:1000,y:379,w:154,h:26}; // only a crouched blob fits under it
-const spikes=[{x:580,w:45},{x:1230,w:48},{x:1830,w:46},{x:2800,w:50}];
-const stars=[
- [225,378],[410,319],[525,391],[660,382],[815,390],[889,315],
- [1072,418-28],[1190,386],[1320,297],[1495,388],[1610,296],[1742,390],
- [1895,384],[2035,386],[2180,386],[2312,307],[2515,287],[2603,387],
- [2730,389],[2945,314],[3090,381]
-].map(([x,y],id)=>({x,y,id,taken:false}));
-const secret={x:1625,y:255,r:14};
-const exit={x:3150,y:337,w:58,h:95};
+const LEVELS=[
+ {name:'Пробуждение',zone:'Заброшенный отсек',theme:0,world:3300,need:6,
+ islands:[[0,710],[775,1350],[1415,1980],[2060,2630],[2700,3300]],
+ platforms:[[380,353,145],[825,350,145],[1255,335,134],[1550,330,146],[1945,345,140],[2250,343,125],[2500,323,140],[2910,350,115]],
+ roofs:[[1000,379,154,26]],spikes:[[580,45],[1230,48],[1830,46],[2800,50]],lasers:[[2376,4.2,2.25,0]],
+ drone:[[1510,391,68]],stars:[[225,378],[410,319],[525,391],[660,382],[815,390],[889,315],[1072,390],[1190,386],[1320,297],[1495,388],[1610,296],[1742,390],[1895,384],[2035,386],[2180,386],[2312,307],[2515,287],[2603,387],[2730,389],[2945,314],[3090,381]],secret:[1625,255],checkpoint:1714,exit:3150,
+ intro:'Глазастик просыпается среди старых лабораторных машин. Научись прыгать и сжиматься под низкими шлюзами.',hint:'Под низкой балкой держи ↧, иначе не пролезть.'},
+ {name:'Насосная станция',zone:'Затопленные шлюзы',theme:1,world:3600,need:7,
+ islands:[[0,690],[755,1350],[1430,2110],[2190,2860],[2940,3600]],
+ platforms:[[345,338,125],[820,350,125],[1100,350,120],[1520,337,145],[1775,320,126],[2055,332,132],[2420,340,135],[2755,325,125],[3120,346,142]],
+ roofs:[[1050,379,160,26]],spikes:[[590,40],[1500,37],[2610,39]],lasers:[[2775,4.1,2.35,.7]],
+ drone:[[1935,388,75]],stars:[[235,379],[395,306],[615,388],[855,317],[1130,315],[1315,390],[1510,301],[1610,299],[1790,284],[1960,391],[2140,388],[2340,384],[2495,304],[2680,387],[2780,288],[3040,387],[3200,310],[3440,390]],
+ switches:[[1610,293]],gates:[[2290,281,149]],secret:[3180,270],checkpoint:1840,exit:3460,
+ intro:'Насосы остановились. Найди голубой выключатель над платформой, чтобы поднять массивный шлюз.',hint:'Переключатель горит голубым. Подпрыгни и коснись его.'},
+ {name:'Энергоблок',zone:'Реакторная',theme:2,world:3600,need:8,
+ islands:[[0,750],[823,1410],[1495,2150],[2235,2900],[2980,3600]],
+ platforms:[[295,345,155],[880,327,150],[1200,338,125],[1570,340,155],[1840,312,132],[2165,326,145],[2440,342,135],[2770,324,144],[3100,333,120]],
+ roofs:[[1130,378,149,27]],spikes:[[570,46],[1305,48],[2070,40],[3185,46]],
+ lasers:[[1040,3.1,1.5,0],[2605,3.9,2.1,1.4],[3060,4,2,0]],
+ drone:[[1720,390,75],[2890,394,49]],stars:[[210,384],[352,310],[618,387],[901,291],[1085,385],[1215,303],[1480,389],[1625,306],[1840,276],[2040,383],[2240,387],[2460,302],[2720,384],[2805,291],[3050,385],[3270,390],[3460,386]],
+ switches:[[1880,280]],gates:[[2370,282,148]],secret:[1970,244],checkpoint:1900,exit:3440,
+ intro:'Реактор ещё работает. Лазерные лучи то включаются, то гаснут. Открой аварийный шлюз.',hint:'Дождись, пока красный луч погаснет, затем беги.'},
+ {name:'Биолюминесцентные пещеры',zone:'Сад под океаном',theme:3,world:3800,need:9,
+ islands:[[0,780],[865,1490],[1570,2215],[2300,3050],[3130,3800]],
+ platforms:[[320,351,125],[930,350,135],[1220,340,140],[1610,337,142],[1900,325,135],[2225,345,120],[2460,315,140],[2910,334,140],[3320,337,140]],
+ roofs:[[1130,379,160,26]],spikes:[[660,45],[1430,42],[2380,44],[3340,45]],lasers:[[2820,4.8,2.1,1.8]],
+ drone:[[2025,393,62]],springs:[[734,430],[2170,430],[3055,430]],
+ stars:[[225,383],[350,316],[680,389],[940,314],[1265,305],[1480,389],[1680,302],[1920,289],[2090,385],[2250,308],[2450,277],[2690,388],[2890,301],[3130,389],[3340,298],[3460,380],[3680,382]],
+ switches:[[2470,277]],gates:[[3220,281,149]],secret:[2740,260],checkpoint:2105,exit:3630,
+ intro:'Светящиеся грибы спрятали последний путь. Используй упругие грибы-пружины и найди выход из глубин.',hint:'Светящиеся зелёные грибы подбрасывают Глазастика выше обычного.'}
+];
+let currentLevel=0,unlocked=1;
+try{unlocked=Math.max(1,Math.min(LEVELS.length,Number(localStorage.getItem('glaz_unlocked')||1)))}catch(e){}
+let islands=[],platforms=[],roofs=[],spikes=[],lasers=[],drones=[],springs=[],switches=[],gates=[],stars=[],secret=null,exit=null,checkpointPoint=0;
+let theme=0;
+function loadLevel(index){
+ currentLevel=Math.max(0,Math.min(LEVELS.length-1,index));const L=LEVELS[currentLevel];WORLD=L.world;MAX_CRYSTALS=L.need;theme=L.theme;
+ islands=L.islands;platforms=L.platforms.map(q=>({x:q[0],y:q[1],w:q[2]}));roofs=(L.roofs||[]).map(q=>({x:q[0],y:q[1],w:q[2],h:q[3]}));
+ spikes=(L.spikes||[]).map(q=>({x:q[0],w:q[1]}));lasers=(L.lasers||[]).map(q=>({x:q[0],period:q[1],duration:q[2],offset:q[3]}));
+ drones=(L.drone||[]).map(q=>({x:q[0],y:q[1],sway:q[2]}));springs=(L.springs||[]).map(q=>({x:q[0],y:q[1]}));
+ switches=(L.switches||[]).map(q=>({x:q[0],y:q[1],on:false}));gates=(L.gates||[]).map(q=>({x:q[0],y:q[1],h:q[2]}));
+ stars=L.stars.map(([x,y],id)=>({x,y,id,taken:false}));secret={x:L.secret[0],y:L.secret[1],r:14};exit={x:L.exit,y:337,w:58,h:95};checkpointPoint=L.checkpoint;
+ el('levelHUD').textContent=`${currentLevel+1}/4 · ${L.name}`;el('needGems').textContent=MAX_CRYSTALS;cam=0;time=0;
+ bubbles=Array.from({length:76},(_,i)=>({x:rng(i+12+currentLevel*11)*WORLD,y:50+rng(i+123)*470,r:1+rng(i+800)*5,s:.3+rng(i+111)*1.7}));
+}
+function pickLevel(){const target=el('levelPicker');target.innerHTML='';LEVELS.forEach((L,i)=>{const b=document.createElement('button');b.type='button';b.textContent=`${i+1} · ${L.name}${i>=unlocked?' 🔒':''}`;b.disabled=i>=unlocked;b.className=i===currentLevel?'chosen':'';b.addEventListener('click',()=>{loadLevel(i);showIntro();});target.appendChild(b)});}
+function showIntro(){const L=LEVELS[currentLevel];el('panel-title').innerHTML=`ГЛАЗАСТИК<em>${L.name.toUpperCase()}</em>`;el('panel-desc').textContent=L.intro;el('panel-help').textContent=L.hint;el('start').textContent=`Играть · Уровень ${currentLevel+1} ▶`;pickLevel();el('overlay').classList.remove('hidden');mode='menu';}
+function laserOn(l){return ((time+l.offset)%l.period)<l.duration;}
 const p={x:92,y:430,vx:0,vy:0,w:39,h:43,grounded:true,duck:false,face:1,phase:0,inv:0,land:0};
 let particles=[];let bubbles=Array.from({length:76},(_,i)=>({x:rng(i+12)*WORLD,y:50+rng(i+123)*470,r:1+rng(i+800)*5,s:.3+rng(i+111)*1.7}));
 let audioCtx=null;
@@ -102,11 +140,18 @@ function notice(t){const z=el('toast');z.textContent=t;z.classList.add('show');c
 function setOverlay(title,desc,button,help=''){el('panel-title').innerHTML=title;el('panel-desc').textContent=desc;el('start').textContent=button;el('panel-help').innerHTML=help;el('overlay').classList.remove('hidden')}
 function hideOverlay(){el('overlay').classList.add('hidden')}
 function hud(){el('gems').textContent=crystals;el('hearts').textContent='♥'.repeat(Math.max(0,hearts));el('secretHUD').style.display=secretFound?'flex':'none';el('progress').style.width=Math.max(0,Math.min(100,(p.x-80)/(exit.x-80)*100))+'%'}
-function reset(all=true){p.x=all?92:checkpoint;p.y=430;p.vx=0;p.vy=0;p.h=43;p.grounded=false;p.inv=1.2;p.land=0;p.phase=0;if(all){crystals=0;hearts=3;checkpoint=92;secretFound=false;deathCount=0;stars.forEach(c=>c.taken=false);particles=[];}Object.keys(pressed).forEach(k=>pressed[k]=false);jumpQueue=0;hud();}
-function begin(){reset(true);mode='play';hideOverlay();sfx(680,.12);notice('Собери 8 кристаллов 💎')}
+function reset(all=true){p.x=all?92:checkpoint;p.y=430;p.vx=0;p.vy=0;p.h=43;p.grounded=false;p.inv=1.2;p.land=0;p.phase=0;if(all){crystals=0;hearts=3;checkpoint=92;secretFound=false;deathCount=0;stars.forEach(c=>c.taken=false);switches.forEach(q=>q.on=false);particles=[];}Object.keys(pressed).forEach(k=>pressed[k]=false);jumpQueue=0;hud();}
+function begin(){loadLevel(currentLevel);reset(true);mode='play';hideOverlay();sfx(680,.12);notice(`Уровень ${currentLevel+1}: собери ${MAX_CRYSTALS} кристаллов 💎`)}
 function pulse(x,y,col,count=12,force=115){for(let i=0;i<count;i++){let a=rng(i*17+time*10)*Math.PI*2,s=rng(i*87+time*5)*force;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-30,life:.65+rng(i*31+time)*.4,max:1.05,c:col,r:2+rng(i+time)*4})}}
-function hurt(){if(mode!=='play'||p.inv>0)return;hearts--;deathCount++;shake=11;flash=.45;sfx(145,.3,'sawtooth',.04);pulse(p.x,p.y-24,'#ff9ba2',24,180);hud();if(hearts<=0){mode='over';setOverlay('ЕЩЁ ПОПРОБУЕМ?<em>ТЫ СПРАВИШЬСЯ!</em>','Глазастик устал, но приключение ещё не закончено. Давай начнём снова!','Начать заново 💚','Каждая попытка делает тебя сильнее.');return;}reset(false);notice('Ничего! Попробуй ещё 💚')}
-function win(){mode='win';sfx(740,.2,'triangle');setTimeout(()=>sfx(920,.22,'triangle'),140);try{let k=Number(localStorage.getItem('glazastik_best')||0);localStorage.setItem('glazastik_best',String(Math.max(k,crystals)))}catch(e){}setOverlay('УРА! ПОБЕДА!<em>ГЛАЗАСТИК СПАСЁН</em>',`Ты собрал ${crystals} кристаллов из ${stars.length}, прошёл лабораторию${secretFound?' и нашёл секретный светлячок':''}! Впереди ждёт целый подводный мир.`,`Сыграть ещё 🎮`,`💚 Осталось жизней: ${hearts} · ✨ Секрет: ${secretFound?'найден':'не найден'}`);pulse(p.x,p.y-30,'#87ffe3',50,250)}
+function hurt(){if(mode!=='play'||p.inv>0)return;hearts--;deathCount++;shake=11;flash=.45;sfx(145,.3,'sawtooth',.04);pulse(p.x,p.y-24,'#ff9ba2',24,180);hud();if(hearts<=0){mode='over';el('levelPicker').innerHTML='';setOverlay('ЕЩЁ ПОПРОБУЕМ?<em>ТЫ СПРАВИШЬСЯ!</em>','Глазастик устал, но приключение ещё не закончено. Давай начнём снова!','Начать заново 💚','Каждая попытка делает тебя сильнее.');return;}reset(false);notice('Ничего! Попробуй ещё 💚')}
+function win(){
+ mode='win';sfx(740,.2,'triangle');setTimeout(()=>sfx(920,.22,'triangle'),140);
+ unlocked=Math.max(unlocked,Math.min(LEVELS.length,currentLevel+2));try{localStorage.setItem('glaz_unlocked',String(unlocked));let k=Number(localStorage.getItem('glazastik_best')||0);localStorage.setItem('glazastik_best',String(Math.max(k,crystals)))}catch(e){}
+ el('levelPicker').innerHTML='';
+ const isLast=currentLevel===LEVELS.length-1;
+ setOverlay(isLast?'ПРИКЛЮЧЕНИЕ ПРОЙДЕНО!<em>ГЛАЗАСТИК СВОБОДЕН!</em>':'УРОВЕНЬ ПРОЙДЕН!<em>ОТКРЫТА НОВАЯ ГЛАВА</em>',`Уровень «${LEVELS[currentLevel].name}» пройден! Кристаллов: ${crystals}/${stars.length}. ${secretFound?'Найден тайный светлячок!':'Секретный светлячок ещё ждёт тебя.'}`,isLast?'Играть с начала 🟢':'Следующий уровень ▶',`💚 Жизней: ${hearts} · ${isLast?'Все четыре главы завершены!':'Путь продолжается!'}`);
+ pulse(p.x,p.y-30,'#87ffe3',50,250)
+}
 function overlap(a,b){return a.x-a.w/2 < b.x+b.w && a.x+a.w/2 > b.x && a.y-a.h < b.y+b.h && a.y > b.y}
 function interact(dt){if(mode!=='play')return;time+=dt;p.phase+=dt;p.inv=Math.max(0,p.inv-dt);p.land=Math.max(0,p.land-dt);shake*=Math.pow(.02,dt);flash=Math.max(0,flash-dt);
  const oldX=p.x,oldY=p.y;const duck=pressed.duck && p.grounded;p.duck=duck;p.h=duck?23:43;p.w=duck?52:39;
@@ -116,29 +161,33 @@ function interact(dt){if(mode!=='play')return;time+=dt;p.phase+=dt;p.inv=Math.ma
  if(!pressed.jump && p.vy< -220)p.vy+=1700*dt; // short hop if jump released early
  p.vy=Math.min(1000,p.vy+GRAV*dt);
  p.x+=p.vx*dt;p.y+=p.vy*dt;p.x=Math.max(22,Math.min(WORLD-22,p.x));
- // roof is a full collision body; crouch fits below its underside
- if(overlap(p,roof)){
-   if(oldY<=roof.y && p.vy>=0){p.y=roof.y;p.vy=0;p.grounded=true;}
-   else if(oldY-p.h >= roof.y+roof.h && p.vy<0){p.y=roof.y+roof.h+p.h;p.vy=0;}
-   else if(oldX<roof.x){p.x=roof.x-p.w/2;p.vx=0;}
-   else if(oldX>roof.x+roof.w){p.x=roof.x+roof.w+p.w/2;p.vx=0;}
- }
+ // overhead ducts: crouching lets the blob slide under them
+ for(const roof of roofs){if(overlap(p,roof)){
+   if(oldY<=roof.y+4 && p.vy>=0){p.y=roof.y;p.vy=0;p.grounded=true;}
+   else if(oldY-p.h >= roof.y+roof.h-3 && p.vy<0){p.y=roof.y+roof.h+p.h;p.vy=0;}
+   else if(oldX<=roof.x){p.x=roof.x-p.w/2;p.vx=0;}
+   else if(oldX>=roof.x+roof.w){p.x=roof.x+roof.w+p.w/2;p.vx=0;}
+ }}
+ // closed mechanical doors stop passage until the blue pressure plate is touched
+ if(!switches.every(q=>q.on)){for(const door of gates){if(p.x+p.w/2>door.x && p.x-p.w/2<door.x+21 && p.y>door.y && p.y-p.h<door.y+door.h){
+ if(oldX<door.x){p.x=door.x-p.w/2;p.vx=0}else if(oldX>door.x+21){p.x=door.x+21+p.w/2;p.vx=0}
+ }}}
  // land on platforms when approaching from above
  let newGround=false;
  if(p.vy>=0){for(const b of platforms){if(p.x+p.w/2>b.x+6 && p.x-p.w/2<b.x+b.w-6 && oldY<=b.y+6 && p.y>=b.y){p.y=b.y;p.vy=0;newGround=true;break;}}
   if(!newGround){for(const [a,b] of islands){if(p.x+p.w/2>a && p.x-p.w/2<b && oldY<=GROUND+8 && p.y>=GROUND){p.y=GROUND;p.vy=0;newGround=true;break;}}}
-  if(!newGround && p.y===roof.y){newGround=true;}}
+  if(!newGround && roofs.some(roof=>p.y===roof.y)){newGround=true;}}
  if(newGround&&!p.grounded){p.land=.22;p.lastGround=time;sfx(145,.06,'sine',.025);pulse(p.x,p.y,'#a0ecff',4,35)}
  if(!newGround && p.grounded)p.lastGround=time;p.grounded=newGround;
  if(p.y>625){hurt();return;}
  for(const c of stars){if(!c.taken && Math.abs(p.x-c.x)<30 && Math.abs((p.y-p.h/2)-c.y)<42){c.taken=true;crystals++;sfx(780+Math.min(8,crystals)*50,.16,'sine');pulse(c.x,c.y,'#9ffbff',14,126);hud();if(crystals===MAX_CRYSTALS)notice('Портал открыт! Найди выход ✨');}}
  if(!secretFound && Math.hypot(p.x-secret.x,p.y-p.h/2-secret.y)<33){secretFound=true;pulse(secret.x,secret.y,'#ffb4f9',25,170);sfx(1000,.24,'triangle');notice('✨ Найден тайный светлячок!');hud()}
- if(checkpoint<1600 && p.x>1735){checkpoint=1714;notice('🔷 Точка сохранения!');pulse(1714,395,'#6be6ff',20);sfx(550,.22)}
+ if(checkpoint<checkpointPoint && p.x>checkpointPoint+15){checkpoint=checkpointPoint;notice('🔷 Точка сохранения!');pulse(checkpointPoint,395,'#6be6ff',20);sfx(550,.22)}
  for(const s of spikes){if(p.x+p.w*.28>s.x && p.x-p.w*.28<s.x+s.w && p.y>=GROUND-14 && p.y<=GROUND+17){hurt();return;}}
- const droneX=1510+Math.sin(time*1.4)*68,droneY=391+Math.sin(time*2.1)*9;
- if(Math.hypot(p.x-droneX,p.y-p.h/2-droneY)<p.w*.35+16){hurt();return;}
- const laserOn=(time%4.2)<2.25;
- if(laserOn && p.x+p.w/2>2369 && p.x-p.w/2<2384 && p.y>=GROUND-94){hurt();return;}
+ for(const d of drones){const dx=d.x+Math.sin(time*1.4)*d.sway,dy=d.y+Math.sin(time*2.1)*9;if(Math.hypot(p.x-dx,p.y-p.h/2-dy)<p.w*.35+16){hurt();return;}}
+ for(const l of lasers){if(laserOn(l) && p.x+p.w/2>l.x-7 && p.x-p.w/2<l.x+8 && p.y>=GROUND-94){hurt();return;}}
+ for(const sw of switches){if(!sw.on && Math.hypot(p.x-sw.x,p.y-p.h/2-sw.y)<42){sw.on=true;notice('🔓 Шлюз открыт!');sfx(880,.2,'triangle');pulse(sw.x,sw.y,'#97ffe0',30,135);}}
+ for(const sp of springs){if(p.vy>=0 && Math.abs(p.x-sp.x)<36 && p.y>GROUND-11 && oldY<=GROUND+3){p.vy=-770;p.grounded=false;sfx(650,.18,'triangle');pulse(sp.x,GROUND-16,'#d7ffa0',12,90);}}
  if(p.x>exit.x-20 && p.y>exit.y-30){if(crystals>=MAX_CRYSTALS){win()}else if(time-(p.lastExitToast||0)>2.4){notice(`Ещё ${MAX_CRYSTALS-crystals} кристаллов до открытия!`);p.lastExitToast=time;p.x=exit.x-65;}}
  hud();
 }
@@ -146,11 +195,15 @@ function rrect(x,y,w,h,r,fill){ctx.fillStyle=fill;ctx.beginPath();ctx.roundRect(
 function glowCircle(x,y,r,col,blur=20){ctx.save();ctx.shadowColor=col;ctx.shadowBlur=blur;ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fill();ctx.restore()}
 function line(x1,y1,x2,y2,col,w=1){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
 function blob(x,y,w=50,h=50,phase=time){ctx.save();ctx.translate(x,y);let bob=Math.sin(phase*4)*1.5;const g=ctx.createRadialGradient(-10,-22,3,5,-16,46);g.addColorStop(0,'#ddfff2');g.addColorStop(.25,'#67ffd2');g.addColorStop(.7,'#09cbb3');g.addColorStop(1,'#078b9d');ctx.fillStyle=g;ctx.shadowColor='#25efbb';ctx.shadowBlur=18;ctx.beginPath();ctx.ellipse(0,-h/2+bob,w/2,h/2,0,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#b3ffea75';ctx.beginPath();ctx.ellipse(-11,-h*.7,7,4,-.5,0,Math.PI*2);ctx.fill();if(h>31){ctx.fillStyle='#ecffff';ctx.beginPath();ctx.ellipse(-9,-h*.59,10,12,0,0,7);ctx.ellipse(10,-h*.59,10,12,0,0,7);ctx.fill();ctx.fillStyle='#174e68';ctx.beginPath();ctx.arc(-7,-h*.57,5.1,0,7);ctx.arc(12,-h*.57,5.1,0,7);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(-8,-h*.61,1.8,0,7);ctx.arc(11,-h*.61,1.8,0,7);ctx.fill();ctx.strokeStyle='#097d83';ctx.lineWidth=1.3;ctx.beginPath();ctx.arc(0,-h*.30,5,0.15,Math.PI-.15);ctx.stroke();}else{ctx.fillStyle='#f4ffff';ctx.beginPath();ctx.ellipse(-9,-h*.56,6,5,0,0,7);ctx.ellipse(9,-h*.56,6,5,0,0,7);ctx.fill();ctx.fillStyle='#164555';ctx.beginPath();ctx.arc(-7,-h*.55,2.8,0,7);ctx.arc(11,-h*.55,2.8,0,7);ctx.fill();}ctx.restore()}
-function bg(){let sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#03192e');sky.addColorStop(.55,'#085376');sky.addColorStop(1,'#1a91a0');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+function bg(){let sky=ctx.createLinearGradient(0,0,0,H);const pal=[['#03192e','#085376','#1a91a0'],['#071c35','#125e79','#098b91'],['#240e29','#653143','#c46c53'],['#0c2831','#136d67','#43a481']][theme];sky.addColorStop(0,pal[0]);sky.addColorStop(.55,pal[1]);sky.addColorStop(1,pal[2]);ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
  // shafts of watery light
  for(let i=0;i<9;i++){let xx=(i*177-cam*.06)%1300-210;const a=.05+.02*Math.sin(time*.4+i);ctx.fillStyle=`rgba(146,245,255,${a})`;ctx.beginPath();ctx.moveTo(xx,-40);ctx.lineTo(xx+20,-40);ctx.lineTo(xx+255,540);ctx.lineTo(xx+145,540);ctx.fill();}
  // distant domes and ruins
  for(let i=0;i<23;i++){const x=i*210-(cam*.21)%210-140;let h=70+rng(i+4)*150;ctx.fillStyle='#022a46b8';rrect(x,350-h,115,h+280,[55,55,8,8],'#042b46');rrect(x+16,365-h,83,14,6,'#0a5370');for(let j=0;j<4;j++){rrect(x+26,382-h+j*36,17,8,3,'#59cadb35');rrect(x+65,382-h+j*36,17,8,3,'#59cadb30')}}
+ // distinct background silhouettes for each chapter
+ if(theme===1){for(let i=0;i<12;i++){const xx=i*335-cam*.13;rrect(xx+30,120,42,240,8,'#02445d88');rrect(xx,110,100,16,5,'#17778c90');glowCircle(xx+52,138,13,'#4cf6de44',15);}}
+ if(theme===2){for(let i=0;i<15;i++){let xx=i*260-cam*.17;glowCircle(xx+30,220+Math.sin(i)*70,36,'#ff854321',40);rrect(xx,115,23,290,4,'#461f3577')}}
+ if(theme===3){for(let i=0;i<29;i++){const xx=i*150-cam*.21,h=34+rng(i+44)*80;ctx.fillStyle='#47eea526';ctx.beginPath();ctx.ellipse(xx,GROUND+18-h,20+h*.22,10+h*.2,0,Math.PI,7);ctx.fill();line(xx,GROUND+10-h,xx,GROUND+90,'#5cceab48',9);}}
  // seaweed layers in back
  for(let i=0;i<37;i++){const wx=i*106+30;const x=wx-cam*.42,h=45+(i*7%75);ctx.strokeStyle=i%2?'#12586d88':'#227c8880';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(x,520);ctx.quadraticCurveTo(x-25,490-h/2,x+Math.sin(time*.6+i)*13,520-h);ctx.stroke()}
  for(const b of bubbles){let bx=(b.x-cam*.64)%WORLD,by=(b.y-time*15*b.s)%520;if(by<0)by+=520;if(bx>-12&&bx<W+12){ctx.strokeStyle='#b8ffff36';ctx.lineWidth=1.4;ctx.beginPath();ctx.arc(bx,by,b.r,0,7);ctx.stroke();}}
@@ -165,23 +218,27 @@ function world(){ctx.save();ctx.translate(-cam,0);
  // decorative lab columns
  for(let i=0;i<10;i++){const x=170+i*330;const y=60+rng(i+99)*90;rrect(x,0,16,y,3,'#0d3b59aa');rrect(x-13,y-3,42,9,4,'#12516b');glowCircle(x+8,y+10,5,'#69edfa88',12)}
  for(const b of platforms){ctx.shadowColor='#37fce3aa';ctx.shadowBlur=12;rrect(b.x,b.y,b.w,12,5,'#4aadc0');ctx.shadowBlur=0;rrect(b.x+5,b.y+4,b.w-10,5,3,'#a5ffdf');rrect(b.x+18,b.y+12,11,8,2,'#15627a');rrect(b.x+b.w-29,b.y+12,11,8,2,'#15627a')}
- // crouching tunnel
- rrect(roof.x-17,roof.y-11,roof.w+34,10,2,'#19647b');rrect(roof.x,roof.y,roof.w,roof.h,4,'#12607a');rrect(roof.x+5,roof.y+4,roof.w-10,4,2,'#4ce5e2');for(let i=0;i<3;i++)glowCircle(roof.x+23+i*54,roof.y+18,2,'#92ffdc',6);
- // electric fence
- let on=(time%4.2)<2.25;const lx=2376;ctx.fillStyle='#103e57';rrect(lx-22,GROUND-112,42,13,3,'#195a73');rrect(lx-20,GROUND-11,40,13,3,'#195a73');glowCircle(lx,GROUND-110,5,on?'#ff767c':'#4bf3b0',12);if(on){ctx.save();ctx.shadowColor='#ff6b80';ctx.shadowBlur=25;ctx.strokeStyle='#ff8ca0';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(lx,GROUND-99);for(let y=GROUND-99;y<GROUND-9;y+=8){ctx.lineTo(lx+Math.sin(time*100+y)*8,y)}ctx.stroke();ctx.restore();}
+ // crouching tunnels, multiple per level
+ for(const roof of roofs){rrect(roof.x-17,roof.y-11,roof.w+34,10,2,'#19647b');rrect(roof.x,roof.y,roof.w,roof.h,4,'#12607a');rrect(roof.x+5,roof.y+4,roof.w-10,4,2,'#4ce5e2');for(let i=0;i<3;i++)glowCircle(roof.x+23+i*54,roof.y+18,2,'#92ffdc',6);}
+ // electrical hazard bars
+ for(const l of lasers){const active=laserOn(l),lx=l.x;rrect(lx-22,GROUND-112,42,13,3,'#195a73');rrect(lx-20,GROUND-11,40,13,3,'#195a73');glowCircle(lx,GROUND-110,5,active?'#ff767c':'#4bf3b0',12);if(active){ctx.save();ctx.shadowColor='#ff6b80';ctx.shadowBlur=25;ctx.strokeStyle='#ff8ca0';ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(lx,GROUND-99);for(let y=GROUND-99;y<GROUND-9;y+=8)ctx.lineTo(lx+Math.sin(time*100+y)*8,y);ctx.stroke();ctx.restore();}}
+ // doors, pressure switches, and mushroom trampolines
+ for(const gate of gates){let active=switches.every(q=>q.on);rrect(gate.x-9,gate.y-8,39,gate.h+20,6,'#09263899');if(!active){rrect(gate.x,gate.y,21,gate.h,5,'#186477');for(let j=12;j<gate.h;j+=22)rrect(gate.x+3,gate.y+j,15,9,2,'#75ecf688');glowCircle(gate.x+10,gate.y+16,5,'#f56b71',13)}else{rrect(gate.x-4,gate.y-15,30,12,4,'#54d6b9');glowCircle(gate.x+10,gate.y-9,6,'#73ffe3',17)}}
+ for(const sw of switches){glowCircle(sw.x,sw.y,16,sw.on?'#5affca':'#26c4ee',23);rrect(sw.x-16,sw.y-6,32,20,7,'#08455f');rrect(sw.x-10,sw.y-3,20,13,3,sw.on?'#75ffbe':'#96cfff');ctx.fillStyle='#002c3e';ctx.font='bold 15px system-ui';ctx.fillText(sw.on?'✓':'●',sw.x-6,sw.y+9)}
+ for(const sp of springs){const yy=GROUND-9;glowCircle(sp.x,yy,24,'#95ff9460',24);ctx.fillStyle='#1c815e';ctx.beginPath();ctx.ellipse(sp.x,yy,31,17,0,Math.PI,7);ctx.fill();rrect(sp.x-6,yy,12,20,5,'#78e8a3');glowCircle(sp.x-9,yy-3,4,'#ebfff4',5);glowCircle(sp.x+10,yy-4,4,'#e4fffb',5)}
  // red spikes
  for(const s of spikes){for(let x=s.x;x<s.x+s.w-1;x+=13){ctx.fillStyle='#0c2639';ctx.beginPath();ctx.moveTo(x,GROUND);ctx.lineTo(x+6.5,GROUND-20);ctx.lineTo(x+13,GROUND);ctx.fill();ctx.strokeStyle='#ff837e';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+2,GROUND-4);ctx.lineTo(x+6.5,GROUND-19);ctx.lineTo(x+11,GROUND-4);ctx.stroke();}}
  // checkpoint
- const cx=1714;const cactive=checkpoint>1600;line(cx,GROUND,cx,GROUND-76,cactive?'#a9fbff':'#60a8b9',4);glowCircle(cx,GROUND-78,10,cactive?'#9dfff0':'#58a9c0',18);ctx.fillStyle=cactive?'#c5fff5':'#6acbdd';ctx.font='bold 13px system-ui';ctx.fillText('✦',cx-5,GROUND-74);
+ const cx=checkpointPoint;const cactive=checkpoint>=checkpointPoint;line(cx,GROUND,cx,GROUND-76,cactive?'#a9fbff':'#60a8b9',4);glowCircle(cx,GROUND-78,10,cactive?'#9dfff0':'#58a9c0',18);ctx.fillStyle=cactive?'#c5fff5':'#6acbdd';ctx.font='bold 13px system-ui';ctx.fillText('✦',cx-5,GROUND-74);
  // goal portal
  ctx.save();ctx.shadowColor=crystals>=MAX_CRYSTALS?'#76ffe5':'#58aab6';ctx.shadowBlur=crystals>=MAX_CRYSTALS?37:12;ctx.strokeStyle=crystals>=MAX_CRYSTALS?'#8bffe6':'#397e92';ctx.lineWidth=9;ctx.beginPath();ctx.ellipse(exit.x+29,exit.y+46,25,49,0,0,7);ctx.stroke();ctx.restore();let gg=ctx.createRadialGradient(exit.x+29,exit.y+48,2,exit.x+29,exit.y+46,38);gg.addColorStop(0,crystals>=MAX_CRYSTALS?'#b5fff5':'#113e54');gg.addColorStop(1,crystals>=MAX_CRYSTALS?'#14b4b466':'#092f4588');ctx.fillStyle=gg;ctx.beginPath();ctx.ellipse(exit.x+29,exit.y+45,20,42,0,0,7);ctx.fill();
  // color crystals
  for(const s of stars){if(s.taken)continue;let wob=Math.sin(time*3+s.id*1.7)*3;const x=s.x,y=s.y+wob;ctx.save();ctx.shadowBlur=15;ctx.shadowColor='#55ffe6';ctx.fillStyle='#adfff7';ctx.beginPath();ctx.moveTo(x,y-12);ctx.lineTo(x+9,y-3);ctx.lineTo(x+5,y+9);ctx.lineTo(x,y+14);ctx.lineTo(x-9,y+1);ctx.lineTo(x-6,y-7);ctx.closePath();ctx.fill();ctx.fillStyle='#21c0cf';ctx.beginPath();ctx.moveTo(x,y-12);ctx.lineTo(x+9,y-3);ctx.lineTo(x,y+3);ctx.fill();ctx.restore()}
  if(!secretFound){let r=13+Math.sin(time*4)*2;glowCircle(secret.x,secret.y,r,'#eeb9ff',34);ctx.fillStyle='#ffffff';ctx.font='18px system-ui';ctx.fillText('✶',secret.x-8,secret.y+6)}
- // enemy drone
- const dx=1510+Math.sin(time*1.4)*68,dy=391+Math.sin(time*2.1)*9;ctx.save();ctx.translate(dx,dy);ctx.rotate(Math.sin(time*1.2)*.2);glowCircle(0,0,16,'#ff6c98',16);ctx.fillStyle='#572f65';ctx.beginPath();ctx.arc(0,0,13,0,7);ctx.fill();rrect(-8,-6,16,13,6,'#ffc7dc');glowCircle(0,0,3,'#b12c52',6);line(-23,-8,-11,-1,'#a7b6d6',4);line(11,-1,23,-8,'#a7b6d6',4);ctx.restore();
+ // enemy patrols
+ for(const d of drones){const dx=d.x+Math.sin(time*1.4)*d.sway,dy=d.y+Math.sin(time*2.1)*9;ctx.save();ctx.translate(dx,dy);ctx.rotate(Math.sin(time*1.2)*.2);glowCircle(0,0,16,'#ff6c98',16);ctx.fillStyle='#572f65';ctx.beginPath();ctx.arc(0,0,13,0,7);ctx.fill();rrect(-8,-6,16,13,6,'#ffc7dc');glowCircle(0,0,3,'#b12c52',6);line(-23,-8,-11,-1,'#a7b6d6',4);line(11,-1,23,-8,'#a7b6d6',4);ctx.restore();}
  // entrance information signs
- for(const s of [{x:975,t:'↧',c:'#91f8d8'},{x:2290,t:'⚡',c:'#fd9ca2'},{x:3075,t:'★',c:'#99fff2'}]){rrect(s.x-22,270,42,40,9,'#082a40bb');ctx.fillStyle=s.c;ctx.font='bold 24px system-ui';ctx.fillText(s.t,s.x-11,297)}
+ for(const s of [{x:roofs[0]?.x-25||700,t:'↧',c:'#91f8d8'},{x:lasers[0]?.x-90||2100,t:'⚡',c:'#fd9ca2'},{x:exit.x-75,t:'★',c:'#99fff2'}]){rrect(s.x-22,270,42,40,9,'#082a40bb');ctx.fillStyle=s.c;ctx.font='bold 24px system-ui';ctx.fillText(s.t,s.x-11,297)}
  // protagonist soft shadow and body
  if(mode!=='over'||hearts>0){ctx.save();ctx.globalAlpha=.27;ctx.fillStyle='#021727';ctx.beginPath();ctx.ellipse(p.x,GROUND+3,28,5,0,0,7);ctx.fill();ctx.restore();if(p.inv<=0 || Math.sin(p.inv*24)>0){let squish=p.land>0?Math.sin(p.land/.22*Math.PI)*8:0;ctx.save();ctx.translate(p.x,p.y);const h=p.h-squish,w=p.w+squish*1.5;blob(0,0,w,h,p.phase);ctx.restore()}}
  for(const q of particles){ctx.globalAlpha=Math.max(0,q.life/q.max);glowCircle(q.x,q.y,q.r,q.c,7)}ctx.globalAlpha=1;
@@ -207,13 +264,14 @@ for(const btn of document.querySelectorAll('[data-act]')){
  for(const evt of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(evt,e=>{e.preventDefault();btn.classList.remove('down');action(a,false)});
  btn.addEventListener('contextmenu',e=>e.preventDefault());
 }
-function togglePause(){if(mode==='play'){mode='pause';setOverlay('ПАУЗА<em>ГЛАЗАСТИК ОТДЫХАЕТ</em>','Кристаллы никуда не убегут. Можно продолжить в любой момент.','Продолжить ▶','Подсказка: под низким шлюзом нужно сжаться ↧')}else if(mode==='pause'){mode='play';hideOverlay();last=performance.now()}}
+function togglePause(){if(mode==='play'){mode='pause';el('levelPicker').innerHTML='';setOverlay('ПАУЗА<em>ГЛАЗАСТИК ОТДЫХАЕТ</em>','Кристаллы никуда не убегут. Можно продолжить в любой момент.','Продолжить ▶','Подсказка: под низким шлюзом нужно сжаться ↧')}else if(mode==='pause'){mode='play';hideOverlay();last=performance.now()}}
 el('pause').addEventListener('click',togglePause);
-el('start').addEventListener('click',()=>{if(mode==='pause'){togglePause()}else{begin()}});
+el('start').addEventListener('click',()=>{if(mode==='pause'){togglePause()}else{if(mode==='win'){currentLevel=(currentLevel+1)%LEVELS.length;}begin()}});
 el('audio').addEventListener('click',()=>{muted=!muted;el('audio').textContent=muted?'♪̸':'♫';notice(muted?'Звук выключен':'Звук включён')});
 el('fullscreen').addEventListener('click',()=>{const s=el('stage');if(document.fullscreenElement){document.exitFullscreen?.()}else{s.requestFullscreen?.().catch(()=>notice('На этом устройстве полный экран недоступен'))}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&mode==='play')togglePause()});
-hud();requestAnimationFrame(frame);
+loadLevel(0);showIntro();hud();requestAnimationFrame(frame);
+if(new URLSearchParams(location.search).has('debug')) window.__glazTest={get state(){return {mode,currentLevel,unlocked,crystals,hearts,x:p.x,y:p.y,checkpoint,gatesOpen:switches.every(q=>q.on)}},setPos(x,y=GROUND){p.x=x;p.y=y;p.vy=0;p.grounded=true},finish(){crystals=MAX_CRYSTALS;win()},load(i){loadLevel(i);begin()}};
 })();
 </script>
 </body>
